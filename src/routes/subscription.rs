@@ -28,7 +28,7 @@ async fn create_subscription(
   Extension(context): Extension<Context>,
   Json(payload): Json<CreateSubscription>,
 ) -> Result<Json<PublicSubscription>, Error> {
-  let subscription = Subscription::new(user.id, payload.name);
+  let subscription = Subscription::new(user.id, payload.url);
   let subscription = context.models.subscription.create(subscription).await?;
   let res = PublicSubscription::from(subscription);
 
@@ -99,5 +99,5 @@ async fn remove_subscription_by_id(
 
 #[derive(Deserialize)]
 struct CreateSubscription {
-  name: String,
+  url: String,
 }

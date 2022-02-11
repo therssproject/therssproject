@@ -1,5 +1,6 @@
 use axum::AddExtensionLayer;
 use axum::Router;
+use bson::doc;
 use http::header;
 use std::net::SocketAddr;
 use tower_http::{
@@ -20,6 +21,8 @@ mod settings;
 use context::Context;
 use database::Database;
 use logger::Logger;
+use models::subscription::Subscription;
+use models::ModelExt;
 use settings::Settings;
 
 #[tokio::main]
@@ -59,13 +62,36 @@ async fn main() {
     .layer(PropagateHeaderLayer::new(header::HeaderName::from_static(
       "x-request-id",
     )))
-    .layer(AddExtensionLayer::new(context));
+    .layer(AddExtensionLayer::new(context.clone()));
 
   let port = settings.server.port;
   let address = SocketAddr::from(([127, 0, 0, 1], port));
 
-  info!("listening on {}", &address);
+  let context = context.clone();
+  tokio::spawn(async move {
+    use tokio::time::{sleep, Duration};
 
+    loop {
+      info!("Running scheduler");
+
+      let subscriptions = context
+        .models
+        .subscription
+        .find(doc! {}, None)
+        .await
+        .unwrap()
+        .into_iter()
+        .map(Into::into)
+        .collect::<Vec<Subscription>>();
+
+      dbg!("subscriptions {:?}", subscriptions);
+
+      // TODO: Push to a queue that will handle these jobs
+      sleep(Duration::from_millis(5_000)).await;
+    }
+  });
+
+  info!("listening on {}", &address);
   axum::Server::bind(&address)
     .serve(app.into_make_service())
     .await
