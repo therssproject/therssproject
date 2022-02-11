@@ -84,7 +84,11 @@ async fn main() {
         .map(Into::into)
         .collect::<Vec<Subscription>>();
 
-      dbg!("subscriptions {:?}", subscriptions);
+      for subscription in subscriptions {
+        dbg!("About to parse {:?}", &subscription.url);
+        let url = subscription.url.clone();
+        lib::parse_rss::parse_rss(url).await;
+      }
 
       // TODO: Push to a queue that will handle these jobs
       sleep(Duration::from_millis(5_000)).await;
