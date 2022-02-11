@@ -1,6 +1,6 @@
 use crate::database::Database;
 
-use crate::models::cat::Model as CatModel;
+use crate::models::subscription::Model as SubscriptionModel;
 use crate::models::user::Model as UserModel;
 use crate::settings::Settings;
 
@@ -13,9 +13,9 @@ pub struct Context {
 impl Context {
   pub fn new(db: Database, settings: Settings) -> Self {
     let user = UserModel::new(db.clone());
-    let cat = CatModel::new(db);
+    let subscription = SubscriptionModel::new(db);
 
-    let models = Models { user, cat };
+    let models = Models { user, subscription };
 
     Self { models, settings }
   }
@@ -24,5 +24,5 @@ impl Context {
 #[derive(Clone)]
 pub struct Models {
   pub user: UserModel,
-  pub cat: CatModel,
+  pub subscription: SubscriptionModel,
 }

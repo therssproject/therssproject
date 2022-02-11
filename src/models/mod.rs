@@ -1,4 +1,4 @@
-pub mod cat;
+pub mod subscription;
 pub mod user;
 
 use async_trait::async_trait;

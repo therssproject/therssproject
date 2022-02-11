@@ -22,7 +22,7 @@ impl Model {
 }
 
 impl ModelExt for Model {
-  type T = Cat;
+  type T = Subscription;
   fn get_database(&self) -> &Database {
     &self.db
   }
@@ -30,22 +30,22 @@ impl ModelExt for Model {
 
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(keys = r#"doc!{ "user": 1 }"#))]
-pub struct Cat {
+pub struct Subscription {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
   pub user: ObjectId,
-  pub name: String,
+  pub url: String,
   pub updated_at: Date,
   pub created_at: Date,
 }
 
-impl Cat {
-  pub fn new(user: ObjectId, name: String) -> Self {
+impl Subscription {
+  pub fn new(user: ObjectId, url: String) -> Self {
     let now = date::now();
     Self {
       id: None,
       user,
-      name,
+      url,
       updated_at: now,
       created_at: now,
     }
@@ -53,26 +53,26 @@ impl Cat {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct PublicCat {
+pub struct PublicSubscription {
   #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub id: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub user: ObjectId,
-  pub name: String,
+  pub url: String,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub updated_at: Date,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub created_at: Date,
 }
 
-impl From<Cat> for PublicCat {
-  fn from(cat: Cat) -> Self {
+impl From<Subscription> for PublicSubscription {
+  fn from(subscription: Subscription) -> Self {
     Self {
-      id: cat.id.unwrap(),
-      user: cat.user,
-      name: cat.name.clone(),
-      updated_at: cat.updated_at,
-      created_at: cat.created_at,
+      id: subscription.id.unwrap(),
+      user: subscription.user,
+      url: subscription.url.clone(),
+      updated_at: subscription.updated_at,
+      created_at: subscription.created_at,
     }
   }
 }

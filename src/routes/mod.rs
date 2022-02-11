@@ -1,2 +1,2 @@
-pub mod cat;
+pub mod subscription;
 pub mod user;

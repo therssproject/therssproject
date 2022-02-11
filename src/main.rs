@@ -40,7 +40,7 @@ async fn main() {
 
   let app = Router::new()
     .merge(routes::user::create_route())
-    .merge(routes::cat::create_route())
+    .merge(routes::subscription::create_route())
     // High level logging of requests and responses
     .layer(
       trace::TraceLayer::new_for_http()
