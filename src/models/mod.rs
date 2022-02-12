@@ -1,3 +1,5 @@
+pub mod entry;
+pub mod feed;
 pub mod subscription;
 pub mod user;
 
