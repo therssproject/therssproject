@@ -44,6 +44,7 @@ async fn main() {
   let app = Router::new()
     .merge(routes::user::create_route())
     .merge(routes::subscription::create_route())
+    .merge(routes::feed::create_route())
     // High level logging of requests and responses
     .layer(
       trace::TraceLayer::new_for_http()
@@ -87,11 +88,12 @@ async fn main() {
       for subscription in subscriptions {
         dbg!("About to parse {:?}", &subscription.url);
         let url = subscription.url.clone();
-        lib::parse_rss::parse_rss(url).await;
+        let feed = lib::parse_rss::parse_rss(url).await;
+        println!("Feed {:#?}", feed);
       }
 
       // TODO: Push to a queue that will handle these jobs
-      sleep(Duration::from_millis(5_000)).await;
+      sleep(Duration::from_millis(5_000_000)).await;
     }
   });
 

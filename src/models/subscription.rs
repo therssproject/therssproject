@@ -35,17 +35,20 @@ pub struct Subscription {
   pub id: Option<ObjectId>,
   pub user: ObjectId,
   pub url: String,
+  #[serde(serialize_with = "serialize_object_id_as_hex_string")]
+  pub feed: ObjectId,
   pub updated_at: Date,
   pub created_at: Date,
 }
 
 impl Subscription {
-  pub fn new(user: ObjectId, url: String) -> Self {
+  pub fn new(user: ObjectId, feed: ObjectId, url: String) -> Self {
     let now = date::now();
     Self {
       id: None,
       user,
       url,
+      feed,
       updated_at: now,
       created_at: now,
     }
@@ -59,6 +62,8 @@ pub struct PublicSubscription {
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub user: ObjectId,
   pub url: String,
+  #[serde(serialize_with = "serialize_object_id_as_hex_string")]
+  pub feed: ObjectId,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub updated_at: Date,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
@@ -71,6 +76,7 @@ impl From<Subscription> for PublicSubscription {
       id: subscription.id.unwrap(),
       user: subscription.user,
       url: subscription.url.clone(),
+      feed: subscription.feed,
       updated_at: subscription.updated_at,
       created_at: subscription.created_at,
     }
