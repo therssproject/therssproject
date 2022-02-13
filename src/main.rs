@@ -41,6 +41,32 @@ async fn main() {
 
   let context = Context::new(db, settings.clone());
 
+  // TODO: This is not pretty nice. Find a better way to do this.
+  context
+    .models
+    .user
+    .sync_indexes()
+    .await
+    .expect("Failed to sync indexes");
+  context
+    .models
+    .subscription
+    .sync_indexes()
+    .await
+    .expect("Failed to sync indexes");
+  context
+    .models
+    .feed
+    .sync_indexes()
+    .await
+    .expect("Failed to sync indexes");
+  context
+    .models
+    .entry
+    .sync_indexes()
+    .await
+    .expect("Failed to sync indexes");
+
   let app = Router::new()
     .merge(routes::user::create_route())
     .merge(routes::subscription::create_route())

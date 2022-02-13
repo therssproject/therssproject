@@ -1,6 +1,6 @@
 use axum::{
   extract::{Extension, Path},
-  routing::{delete},
+  routing::delete,
   Router,
 };
 use bson::doc;
@@ -14,8 +14,7 @@ use crate::lib::token::TokenUser;
 use crate::models::ModelExt;
 
 pub fn create_route() -> Router {
-  Router::new()
-    .route("/feeds/:id", delete(remove_feed_by_id))
+  Router::new().route("/feeds/:id", delete(remove_feed_by_id))
 }
 
 async fn remove_feed_by_id(

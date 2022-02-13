@@ -29,13 +29,15 @@ impl ModelExt for Model {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
-#[model(index(keys = r#"doc!{ "user": 1 }"#))]
+#[model(index(
+  keys = r#"doc!{ "user": 1, "url": 1 }"#,
+  options = r#"doc!{ "unique": true }"#
+))]
 pub struct Subscription {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
   pub user: ObjectId,
   pub url: String,
-  #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub feed: ObjectId,
   pub updated_at: Date,
   pub created_at: Date,

@@ -10,12 +10,12 @@ use tracing::debug;
 use crate::context::Context;
 use crate::errors::Error;
 use crate::errors::NotFound;
+use crate::lib::parse_rss::parse_rss;
 use crate::lib::to_object_id::to_object_id;
 use crate::lib::token::TokenUser;
-use crate::lib::parse_rss::{parse_rss};
+use crate::models::feed::{Feed, FeedType};
 use crate::models::subscription::{PublicSubscription, Subscription};
 use crate::models::ModelExt;
-use crate::models::feed::{Feed, FeedType};
 
 pub fn create_route() -> Router {
   Router::new()
@@ -30,28 +30,32 @@ async fn create_subscription(
   Extension(context): Extension<Context>,
   Json(payload): Json<CreateSubscription>,
 ) -> Result<Json<PublicSubscription>, Error> {
-  let existing = context.models.subscription.find_one(doc! { "url": payload.url.clone() }, None).await?;
+  let subscription = context
+    .models
+    .subscription
+    .find_one(doc! { "user": &user.id, "url": &payload.url }, None)
+    .await?;
 
-  if let Some(existing) = existing {
-      return Ok(Json(PublicSubscription::from(existing)))
+  if let Some(subscription) = subscription {
+    return Ok(Json(PublicSubscription::from(subscription)));
   }
 
   let feed = context
     .models
     .feed
-    .find_one(doc! { "url": payload.url.clone() }, None)
+    .find_one(doc! { "url": &payload.url }, None)
     .await?;
 
   let feed = match feed {
-      Some(f) => f,
-      None => {
-          let public_id = "public_id".to_string();
-          let raw_feed = parse_rss(payload.url.clone()).await;
-          let feed_type = FeedType::from(raw_feed.feed_type);
+    Some(feed) => feed,
+    None => {
+      let raw_feed = parse_rss(payload.url.clone()).await;
+      let feed_type = FeedType::from(raw_feed.feed_type);
+      let public_id = raw_feed.id;
 
-          let feed_fields = Feed::new(public_id, feed_type, payload.url.clone(), None);
-          context.models.feed.create(feed_fields).await?
-      }
+      let feed = Feed::new(public_id, feed_type, payload.url.clone(), None);
+      context.models.feed.create(feed).await?
+    }
   };
 
   let subscription = Subscription::new(user.id, feed.id.unwrap(), payload.url);
