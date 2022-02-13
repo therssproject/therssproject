@@ -10,10 +10,9 @@ use tracing::debug;
 use crate::context::Context;
 use crate::errors::Error;
 use crate::errors::NotFound;
-use crate::lib::parse_rss::parse_rss;
 use crate::lib::to_object_id::to_object_id;
 use crate::lib::token::TokenUser;
-use crate::models::feed::{Feed, FeedType};
+use crate::models::feed::Feed;
 use crate::models::subscription::{PublicSubscription, Subscription};
 use crate::models::ModelExt;
 
@@ -49,11 +48,7 @@ async fn create_subscription(
   let feed = match feed {
     Some(feed) => feed,
     None => {
-      let raw_feed = parse_rss(payload.url.clone()).await;
-      let feed_type = FeedType::from(raw_feed.feed_type);
-      let public_id = raw_feed.id;
-
-      let feed = Feed::new(public_id, feed_type, payload.url.clone(), None);
+      let feed = Feed::from_url(payload.url.clone()).await;
       context.models.feed.create(feed).await?
     }
   };

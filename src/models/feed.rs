@@ -8,6 +8,7 @@ use wither::Model as WitherModel;
 
 use crate::database::Database;
 use crate::lib::date::Date;
+use crate::lib::parse_rss::parse_rss;
 use crate::models::ModelExt;
 
 #[derive(Clone)]
@@ -55,6 +56,12 @@ impl Feed {
       updated_at: now,
       created_at: now,
     }
+  }
+
+  pub async fn from_url(url: String) -> Self {
+    let raw_feed = parse_rss(url.clone()).await;
+
+    Self::new(raw_feed.id, FeedType::from(raw_feed.feed_type), url, None)
   }
 }
 
