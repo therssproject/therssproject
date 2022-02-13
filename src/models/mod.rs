@@ -2,6 +2,7 @@ pub mod entry;
 pub mod feed;
 pub mod subscription;
 pub mod user;
+pub mod webhook;
 
 use async_trait::async_trait;
 use futures::stream::TryStreamExt;

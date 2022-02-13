@@ -14,6 +14,7 @@ use crate::lib::to_object_id::to_object_id;
 use crate::lib::token::TokenUser;
 use crate::models::feed::Feed;
 use crate::models::subscription::{PublicSubscription, Subscription};
+use crate::models::webhook::Webhook;
 use crate::models::ModelExt;
 
 pub fn create_route() -> Router {
@@ -42,6 +43,7 @@ async fn create_subscription(
   let feed = context
     .models
     .feed
+    // Feeds are global, not attached to any user
     .find_one(doc! { "url": &payload.url }, None)
     .await?;
 
@@ -53,8 +55,32 @@ async fn create_subscription(
     }
   };
 
-  let feed_id = feed.id.expect("feed shoudl have an id");
-  let subscription = Subscription::new(user.id, feed_id, payload.url);
+  let webhook = match payload.webhook {
+    SubscriptionWebhook::Url { url, title } => {
+      let webhook = Webhook::new(user.id, url, title);
+      context.models.webhook.create(webhook).await?
+    }
+
+    SubscriptionWebhook::Webhook { id } => {
+      let webhook_id = to_object_id(id)?;
+      let webhook = context
+        .models
+        .webhook
+        .find_one(doc! { "user": &user.id, "_id": webhook_id }, None)
+        .await?;
+
+      match webhook {
+        Some(webhook) => webhook,
+        None => {
+          return Err(Error::NotFound(NotFound::new(String::from("webhook"))));
+        }
+      }
+    }
+  };
+
+  let feed_id = feed.id.expect("existing feed should have an id");
+  let webhook_id = webhook.id.expect("existing webhook should have an id");
+  let subscription = Subscription::new(user.id, feed_id, webhook_id, payload.url);
   let subscription = context.models.subscription.create(subscription).await?;
   let res = PublicSubscription::from(subscription);
 
@@ -124,6 +150,14 @@ async fn remove_subscription_by_id(
 }
 
 #[derive(Deserialize)]
+#[serde(untagged)]
+enum SubscriptionWebhook {
+  Url { url: String, title: Option<String> },
+  Webhook { id: String },
+}
+
+#[derive(Deserialize)]
 struct CreateSubscription {
   url: String,
+  webhook: SubscriptionWebhook,
 }

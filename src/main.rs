@@ -66,11 +66,18 @@ async fn main() {
     .sync_indexes()
     .await
     .expect("Failed to sync indexes");
+  context
+    .models
+    .webhook
+    .sync_indexes()
+    .await
+    .expect("Failed to sync indexes");
 
   let app = Router::new()
     .merge(routes::user::create_route())
     .merge(routes::subscription::create_route())
     .merge(routes::feed::create_route())
+    .merge(routes::webhook::create_route())
     // High level logging of requests and responses
     .layer(
       trace::TraceLayer::new_for_http()
