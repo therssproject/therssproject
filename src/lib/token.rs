@@ -20,7 +20,7 @@ pub struct TokenUser {
 impl From<User> for TokenUser {
   fn from(user: User) -> Self {
     Self {
-      id: user.id.unwrap(),
+      id: user.id.expect("TokenUser From<User> expects an id"),
       name: user.name.clone(),
       email: user.email,
     }

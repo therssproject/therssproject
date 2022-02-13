@@ -1,3 +1,5 @@
+use bson::serde_helpers::bson_datetime_as_rfc3339_string;
+use bson::serde_helpers::serialize_object_id_as_hex_string;
 use feed_rs;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -6,6 +8,7 @@ use wither::Model as WitherModel;
 
 use crate::database::Database;
 use crate::lib::date::Date;
+use crate::lib::parse_rss::parse_rss;
 use crate::models::ModelExt;
 
 #[derive(Clone)]
@@ -29,7 +32,6 @@ impl ModelExt for Model {
 // TODO: Get struct values from:
 // https://docs.rs/feed-rs/latest/feed_rs/model/struct.Feed.html
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
-#[model(index(keys = r#"doc!{ "user": 1 }"#))]
 #[model(index(keys = r#"doc!{ "url": 1 }"#, options = r#"doc!{ "unique": true }"#))]
 pub struct Feed {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
@@ -55,6 +57,12 @@ impl Feed {
       created_at: now,
     }
   }
+
+  pub async fn from_url(url: String) -> Self {
+    let raw_feed = parse_rss(url.clone()).await;
+
+    Self::new(raw_feed.id, FeedType::from(raw_feed.feed_type), url, None)
+  }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -75,6 +83,34 @@ impl From<feed_rs::model::FeedType> for FeedType {
       feed_rs::model::FeedType::RSS0 => FeedType::RSS0,
       feed_rs::model::FeedType::RSS1 => FeedType::RSS1,
       feed_rs::model::FeedType::RSS2 => FeedType::RSS2,
+    }
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PublicFeed {
+  #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
+  pub id: ObjectId,
+  pub public_id: String,
+  pub feed_type: FeedType,
+  pub url: String,
+  pub title: Option<String>,
+  #[serde(with = "bson_datetime_as_rfc3339_string")]
+  pub updated_at: Date,
+  #[serde(with = "bson_datetime_as_rfc3339_string")]
+  pub created_at: Date,
+}
+
+impl From<Feed> for PublicFeed {
+  fn from(feed: Feed) -> Self {
+    Self {
+      id: feed.id.expect("PublicFeed From<Feed> expects an id"),
+      public_id: feed.public_id,
+      feed_type: feed.feed_type,
+      url: feed.url,
+      title: feed.title,
+      updated_at: feed.updated_at,
+      created_at: feed.created_at,
     }
   }
 }

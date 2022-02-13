@@ -106,7 +106,7 @@ async fn main() {
         .subscription
         .find(doc! {}, None)
         .await
-        .unwrap()
+        .expect("failed to find subscriptions")
         .into_iter()
         .map(Into::into)
         .collect::<Vec<Subscription>>();
