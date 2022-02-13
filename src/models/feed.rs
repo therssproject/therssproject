@@ -1,8 +1,8 @@
+use feed_rs;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
-use feed_rs;
 
 use crate::database::Database;
 use crate::lib::date::Date;
@@ -30,6 +30,7 @@ impl ModelExt for Model {
 // https://docs.rs/feed-rs/latest/feed_rs/model/struct.Feed.html
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(keys = r#"doc!{ "user": 1 }"#))]
+#[model(index(keys = r#"doc!{ "url": 1 }"#, options = r#"doc!{ "unique": true }"#))]
 pub struct Feed {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
@@ -42,21 +43,22 @@ pub struct Feed {
 }
 
 impl Feed {
-    pub fn new(public_id: String, feed_type: FeedType, url: String, title: Option<String>) -> Self {
-        let now = Date::now();
-        Self {
-            id: None,
-            public_id,
-            feed_type,
-            url,
-            title,
-            updated_at: now,
-            created_at: now,
-        }
+  pub fn new(public_id: String, feed_type: FeedType, url: String, title: Option<String>) -> Self {
+    let now = Date::now();
+    Self {
+      id: None,
+      public_id,
+      feed_type,
+      url,
+      title,
+      updated_at: now,
+      created_at: now,
     }
+  }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum FeedType {
   Atom,
   Json,
@@ -65,14 +67,14 @@ pub enum FeedType {
   RSS2,
 }
 
-impl From<feed_rs::model::FeedType> for  FeedType {
-    fn from(feed_type: feed_rs::model::FeedType) -> Self {
-        match feed_type {
-            feed_rs::model::FeedType::Atom => FeedType::Atom,
-            feed_rs::model::FeedType::JSON => FeedType::Json,
-            feed_rs::model::FeedType::RSS0 => FeedType::RSS0,
-            feed_rs::model::FeedType::RSS1 => FeedType::RSS1,
-            feed_rs::model::FeedType::RSS2 => FeedType::RSS2
-        }
+impl From<feed_rs::model::FeedType> for FeedType {
+  fn from(feed_type: feed_rs::model::FeedType) -> Self {
+    match feed_type {
+      feed_rs::model::FeedType::Atom => FeedType::Atom,
+      feed_rs::model::FeedType::JSON => FeedType::Json,
+      feed_rs::model::FeedType::RSS0 => FeedType::RSS0,
+      feed_rs::model::FeedType::RSS1 => FeedType::RSS1,
+      feed_rs::model::FeedType::RSS2 => FeedType::RSS2,
     }
+  }
 }
