@@ -79,7 +79,7 @@ pub struct PublicUser {
 impl From<User> for PublicUser {
   fn from(user: User) -> Self {
     Self {
-      id: user.id.unwrap(),
+      id: user.id.expect("PublicUser From<User> expects an id"),
       name: user.name.clone(),
       email: user.email.clone(),
       updated_at: user.updated_at,

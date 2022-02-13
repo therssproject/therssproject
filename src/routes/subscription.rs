@@ -58,7 +58,8 @@ async fn create_subscription(
     }
   };
 
-  let subscription = Subscription::new(user.id, feed.id.unwrap(), payload.url);
+  let feed_id = feed.id.expect("feed shoudl have an id");
+  let subscription = Subscription::new(user.id, feed_id, payload.url);
   let subscription = context.models.subscription.create(subscription).await?;
   let res = PublicSubscription::from(subscription);
 

@@ -75,7 +75,9 @@ pub struct PublicSubscription {
 impl From<Subscription> for PublicSubscription {
   fn from(subscription: Subscription) -> Self {
     Self {
-      id: subscription.id.unwrap(),
+      id: subscription
+        .id
+        .expect("PublicSubscription From<Subscription> expects an id"),
       user: subscription.user,
       url: subscription.url.clone(),
       feed: subscription.feed,

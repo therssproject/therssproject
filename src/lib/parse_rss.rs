@@ -5,7 +5,12 @@ use reqwest;
 // TODO: handle errors
 // TODO: rename => fetch_rss ???
 pub async fn parse_rss(url: String) -> Feed {
-  let content = reqwest::get(url).await.unwrap().bytes().await.unwrap();
+  let content = reqwest::get(url)
+    .await
+    .expect("failed to fetch rss feed")
+    .bytes()
+    .await
+    .expect("failed to decode body");
 
-  parser::parse(content.as_ref()).unwrap()
+  parser::parse(content.as_ref()).expect("failed to parse rss feed")
 }
