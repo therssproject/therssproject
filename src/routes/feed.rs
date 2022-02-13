@@ -20,8 +20,28 @@ use crate::models::ModelExt;
 
 pub fn create_route() -> Router {
   Router::new()
+    // TODO: make these routes only accesibble by admins
+    .route("/feeds", get(query_feed))
     .route("/feeds/:id", get(get_feed_by_id))
+    // TODO: enable this rounte only in debug mode
     .route("/feeds/:id", delete(remove_feed_by_id))
+}
+
+async fn query_feed(
+  _user: TokenUser,
+  Extension(context): Extension<Context>,
+) -> Result<Json<Vec<PublicFeed>>, Error> {
+  let feeds = context
+    .models
+    .feed
+    .find(doc! {}, None)
+    .await?
+    .into_iter()
+    .map(Into::into)
+    .collect::<Vec<PublicFeed>>();
+
+  debug!("Returning feeds");
+  Ok(Json(feeds))
 }
 
 #[derive(Serialize, Deserialize)]

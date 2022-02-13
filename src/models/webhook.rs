@@ -6,7 +6,6 @@ use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
 use crate::database::Database;
-use crate::lib::date;
 use crate::lib::date::Date;
 use crate::models::ModelExt;
 
@@ -22,7 +21,7 @@ impl Model {
 }
 
 impl ModelExt for Model {
-  type T = Subscription;
+  type T = Webhook;
   fn get_database(&self) -> &Database {
     &self.db
   }
@@ -33,26 +32,24 @@ impl ModelExt for Model {
   keys = r#"doc!{ "user": 1, "url": 1 }"#,
   options = r#"doc!{ "unique": true }"#
 ))]
-pub struct Subscription {
+pub struct Webhook {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
   pub user: ObjectId,
   pub url: String,
-  pub feed: ObjectId,
-  pub webhook: ObjectId,
+  pub title: Option<String>,
   pub updated_at: Date,
   pub created_at: Date,
 }
 
-impl Subscription {
-  pub fn new(user: ObjectId, feed: ObjectId, webhook: ObjectId, url: String) -> Self {
-    let now = date::now();
+impl Webhook {
+  pub fn new(user: ObjectId, url: String, title: Option<String>) -> Self {
+    let now = Date::now();
     Self {
       id: None,
       user,
       url,
-      feed,
-      webhook,
+      title,
       updated_at: now,
       created_at: now,
     }
@@ -60,34 +57,30 @@ impl Subscription {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct PublicSubscription {
+pub struct PublicWebhook {
   #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub id: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub user: ObjectId,
   pub url: String,
-  #[serde(serialize_with = "serialize_object_id_as_hex_string")]
-  pub feed: ObjectId,
-  #[serde(serialize_with = "serialize_object_id_as_hex_string")]
-  pub webhook: ObjectId,
+  pub title: Option<String>,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub updated_at: Date,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub created_at: Date,
 }
 
-impl From<Subscription> for PublicSubscription {
-  fn from(subscription: Subscription) -> Self {
+impl From<Webhook> for PublicWebhook {
+  fn from(webhook: Webhook) -> Self {
     Self {
-      id: subscription
+      id: webhook
         .id
-        .expect("PublicSubscription From<Subscription> expects an id"),
-      user: subscription.user,
-      url: subscription.url.clone(),
-      feed: subscription.feed,
-      webhook: subscription.webhook,
-      updated_at: subscription.updated_at,
-      created_at: subscription.created_at,
+        .expect("PublicWebhook From<Webhook> expects an id"),
+      user: webhook.user,
+      url: webhook.url,
+      title: webhook.title,
+      updated_at: webhook.updated_at,
+      created_at: webhook.created_at,
     }
   }
 }

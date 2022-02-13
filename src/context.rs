@@ -4,6 +4,7 @@ use crate::models::entry::Model as EntryModel;
 use crate::models::feed::Model as FeedModel;
 use crate::models::subscription::Model as SubscriptionModel;
 use crate::models::user::Model as UserModel;
+use crate::models::webhook::Model as WebhookModel;
 use crate::settings::Settings;
 
 #[derive(Clone)]
@@ -17,13 +18,15 @@ impl Context {
     let user = UserModel::new(db.clone());
     let subscription = SubscriptionModel::new(db.clone());
     let feed = FeedModel::new(db.clone());
-    let entry = EntryModel::new(db);
+    let entry = EntryModel::new(db.clone());
+    let webhook = WebhookModel::new(db);
 
     let models = Models {
       user,
       subscription,
       feed,
       entry,
+      webhook,
     };
 
     Self { models, settings }
@@ -36,4 +39,5 @@ pub struct Models {
   pub subscription: SubscriptionModel,
   pub feed: FeedModel,
   pub entry: EntryModel,
+  pub webhook: WebhookModel,
 }
