@@ -67,6 +67,7 @@ impl Subscription {
   }
 
   pub async fn check(&self) {
+    // TODO: get the URL from the feed instead
     let url = self.url.clone();
     let feed = parse_rss::parse_rss(url).await;
     println!("Feed {:#?}", feed);
