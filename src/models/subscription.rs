@@ -8,6 +8,7 @@ use wither::Model as WitherModel;
 use crate::database::Database;
 use crate::lib::date;
 use crate::lib::date::Date;
+use crate::lib::parse_rss;
 use crate::models::ModelExt;
 
 #[derive(Clone)]
@@ -33,6 +34,11 @@ impl ModelExt for Model {
   keys = r#"doc!{ "user": 1, "url": 1 }"#,
   options = r#"doc!{ "unique": true }"#
 ))]
+#[model(index(
+  keys = r#"doc!{ "user": 1, "feed": 1 }"#,
+  options = r#"doc!{ "unique": true }"#
+))]
+#[model(index(keys = r#"doc!{ "feed": 1 }"#))]
 pub struct Subscription {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
@@ -40,6 +46,7 @@ pub struct Subscription {
   pub url: String,
   pub feed: ObjectId,
   pub webhook: ObjectId,
+  pub checked_at: Date,
   pub updated_at: Date,
   pub created_at: Date,
 }
@@ -53,9 +60,18 @@ impl Subscription {
       url,
       feed,
       webhook,
+      checked_at: now,
       updated_at: now,
       created_at: now,
     }
+  }
+
+  pub async fn check(&self) {
+    let url = self.url.clone();
+    let feed = parse_rss::parse_rss(url).await;
+    println!("Feed {:#?}", feed);
+
+    // Magic will happen here
   }
 }
 
@@ -70,6 +86,8 @@ pub struct PublicSubscription {
   pub feed: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub webhook: ObjectId,
+  #[serde(with = "bson_datetime_as_rfc3339_string")]
+  pub checked_at: Date,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub updated_at: Date,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
@@ -86,6 +104,7 @@ impl From<Subscription> for PublicSubscription {
       url: subscription.url.clone(),
       feed: subscription.feed,
       webhook: subscription.webhook,
+      checked_at: subscription.checked_at,
       updated_at: subscription.updated_at,
       created_at: subscription.created_at,
     }
