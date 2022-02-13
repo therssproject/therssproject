@@ -120,9 +120,7 @@ async fn main() {
 
       for subscription in subscriptions {
         dbg!("About to parse {:?}", &subscription.url);
-        let url = subscription.url.clone();
-        let feed = lib::parse_rss::parse_rss(url).await;
-        println!("Feed {:#?}", feed);
+        subscription.check().await;
       }
 
       // TODO: Push to a queue that will handle these jobs
