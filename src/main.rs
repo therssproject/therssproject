@@ -127,7 +127,7 @@ async fn main() {
         .await;
 
       // TODO: Push to a queue that will handle these jobs
-      sleep(Duration::from_millis(5_000)).await;
+      sleep(Duration::from_millis(5_000_000)).await;
     }
   });
 
