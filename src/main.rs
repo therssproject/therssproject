@@ -108,7 +108,6 @@ async fn main() {
 
     loop {
       info!("Running scheduler");
-      // let context = context.clone();
 
       let concurrency = 50;
       context
