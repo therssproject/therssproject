@@ -1,13 +1,15 @@
 use axum::AddExtensionLayer;
 use axum::Router;
 use bson::doc;
+use futures::stream::{self, StreamExt};
+use futures::FutureExt;
 use http::header;
 use std::net::SocketAddr;
 use tower_http::{
   compression::CompressionLayer, propagate_header::PropagateHeaderLayer,
   sensitive_headers::SetSensitiveHeadersLayer, trace,
 };
-use tracing::info;
+use tracing::{debug, error, info};
 
 mod context;
 mod database;
@@ -21,7 +23,6 @@ mod settings;
 use context::Context;
 use database::Database;
 use logger::Logger;
-use models::subscription::Subscription;
 use models::ModelExt;
 use settings::Settings;
 
@@ -107,24 +108,27 @@ async fn main() {
 
     loop {
       info!("Running scheduler");
+      // let context = context.clone();
 
-      let subscriptions = context
+      let concurrency = 50;
+      context
         .models
-        .subscription
+        .feed
         .find(doc! {}, None)
-        .await
-        .expect("failed to find subscriptions")
-        .into_iter()
-        .map(Into::into)
-        .collect::<Vec<Subscription>>();
-
-      for subscription in subscriptions {
-        dbg!("About to parse {:?}", &subscription.url);
-        subscription.check().await;
-      }
+        .into_stream()
+        .flat_map_unordered(concurrency, |feeds| stream::iter(feeds.unwrap()))
+        .for_each_concurrent(concurrency, |feed| async move {
+          let id = feed.id.unwrap();
+          let url = feed.url.clone();
+          match feed.sync().await {
+            Ok(_) => debug!("Synced feed {:?} with URL: {:?}", id, url),
+            Err(err) => error!("Failed to sync feed {:?}: {:?}", id, err),
+          }
+        })
+        .await;
 
       // TODO: Push to a queue that will handle these jobs
-      sleep(Duration::from_millis(5_000_000)).await;
+      sleep(Duration::from_millis(5_000)).await;
     }
   });
 
