@@ -1,9 +1,11 @@
+use feed_rs::model::Entry as RawEntry;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
 use crate::database::Database;
+use crate::lib::date::now;
 use crate::lib::date::Date;
 use crate::models::ModelExt;
 
@@ -36,4 +38,16 @@ pub struct Entry {
   pub public_id: String,
   pub title: Option<String>,
   pub created_at: Date,
+}
+
+impl Entry {
+  pub fn from_raw_entry(feed: ObjectId, raw_entry: RawEntry) -> Self {
+    Self {
+      id: None,
+      feed,
+      public_id: raw_entry.id,
+      title: None,
+      created_at: now(),
+    }
+  }
 }

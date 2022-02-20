@@ -2,24 +2,60 @@ use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use feed_rs;
 use serde::{Deserialize, Serialize};
+use tracing::error;
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
 use crate::database::Database;
 use crate::errors::Error;
+use crate::lib::date::now;
 use crate::lib::date::Date;
-use crate::lib::parse_rss::parse_rss;
+use crate::lib::fetch_rss::fetch_rss;
+use crate::models::entry::Entry;
+use crate::models::entry::Model as EntryModel;
 use crate::models::ModelExt;
 
 #[derive(Clone)]
 pub struct Model {
   pub db: Database,
+  pub entry: EntryModel,
 }
 
 impl Model {
   pub fn new(db: Database) -> Self {
-    Self { db }
+    let entry = EntryModel::new(db.clone());
+    Self { db, entry }
+  }
+
+  pub async fn sync(&self, id: ObjectId) -> Result<(), Error> {
+    let feed = self.find_by_id(&id).await?;
+    let feed = match feed {
+      Some(feed) => feed,
+      None => {
+        error!("Failed to sync, Feed with ID {} not found", &id);
+        return Ok(());
+      }
+    };
+
+    let url = feed.url;
+    let raw_feed = fetch_rss(url.clone()).await;
+    let entries = raw_feed
+      .entries
+      .into_iter()
+      .map(|raw_entry| Entry::from_raw_entry(id, raw_entry))
+      .collect::<Vec<Entry>>();
+
+    self.entry.insert_many(entries).await.unwrap();
+    self
+      .update_one(
+        doc! { "_id": id },
+        doc! { "$set": { "synced_at": now() } },
+        None,
+      )
+      .await?;
+
+    Ok(())
   }
 }
 
@@ -43,6 +79,7 @@ pub struct Feed {
   pub title: Option<String>,
   pub updated_at: Date,
   pub created_at: Date,
+  pub synced_at: Date,
 }
 
 impl Feed {
@@ -56,18 +93,13 @@ impl Feed {
       title,
       updated_at: now,
       created_at: now,
+      synced_at: now,
     }
   }
 
   pub async fn from_url(url: String) -> Self {
-    let raw_feed = parse_rss(url.clone()).await;
+    let raw_feed = fetch_rss(url.clone()).await;
     Self::new(raw_feed.id, FeedType::from(raw_feed.feed_type), url, None)
-  }
-
-  pub async fn sync(&self) -> Result<(), Error> {
-    // Do something
-    dbg!("Syncing feeds");
-    Ok(())
   }
 }
 
