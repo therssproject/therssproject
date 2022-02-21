@@ -8,7 +8,7 @@ use wither::Model as WitherModel;
 use crate::database::Database;
 use crate::lib::date;
 use crate::lib::date::Date;
-use crate::lib::parse_rss;
+use crate::lib::fetch_rss;
 use crate::models::ModelExt;
 
 #[derive(Clone)]
@@ -69,7 +69,7 @@ impl Subscription {
   pub async fn _sync(&self) {
     // TODO: get the URL from the feed instead
     let url = self.url.clone();
-    let feed = parse_rss::parse_rss(url).await;
+    let feed = fetch_rss::fetch_rss(url).await;
     println!("Feed {:#?}", feed);
 
     // Magic will happen here

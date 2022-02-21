@@ -1,15 +1,14 @@
 use axum::AddExtensionLayer;
 use axum::Router;
 use bson::doc;
-use futures::stream::{self, StreamExt};
-use futures::FutureExt;
+use futures::stream::StreamExt;
 use http::header;
 use std::net::SocketAddr;
 use tower_http::{
   compression::CompressionLayer, propagate_header::PropagateHeaderLayer,
   sensitive_headers::SetSensitiveHeadersLayer, trace,
 };
-use tracing::{debug, error, info};
+use tracing::info;
 
 mod context;
 mod database;
@@ -113,21 +112,24 @@ async fn main() {
       context
         .models
         .feed
-        .find(doc! {}, None)
-        .into_stream()
-        .flat_map_unordered(concurrency, |feeds| stream::iter(feeds.unwrap()))
-        .for_each_concurrent(concurrency, |feed| async move {
+        .cursor(doc! {}, None)
+        .await
+        .unwrap()
+        .for_each_concurrent(concurrency, |feed| {
+          let models = context.models.clone();
+          let feed = feed.unwrap();
           let id = feed.id.unwrap();
-          let url = feed.url.clone();
-          match feed.sync().await {
-            Ok(_) => debug!("Synced feed {:?} with URL: {:?}", id, url),
-            Err(err) => error!("Failed to sync feed {:?}: {:?}", id, err),
+          let url = feed.url;
+
+          async move {
+            info!("Syncing feed with ID {} and URL {}", &id, url);
+            models.feed.sync(id).await.unwrap();
           }
         })
         .await;
 
       // TODO: Push to a queue that will handle these jobs
-      sleep(Duration::from_millis(5_000_000)).await;
+      sleep(Duration::from_millis(5_000)).await;
     }
   });
 

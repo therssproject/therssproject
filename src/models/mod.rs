@@ -19,7 +19,9 @@ use wither::mongodb::options::FindOptions;
 use wither::mongodb::options::ReturnDocument;
 use wither::mongodb::options::UpdateOptions;
 use wither::mongodb::results::DeleteResult;
+use wither::mongodb::results::InsertManyResult;
 use wither::mongodb::results::UpdateResult;
+use wither::mongodb::Collection;
 use wither::Model as WitherModel;
 use wither::ModelCursor;
 
@@ -44,6 +46,11 @@ pub trait ModelExt {
     model.save(&db.conn, None).await.map_err(Error::Wither)?;
 
     Ok(model)
+  }
+
+  async fn collection(&self) -> Collection<Self::T> {
+    let db = self.get_database();
+    Self::T::collection(&db.conn)
   }
 
   async fn find_by_id(&self, id: &ObjectId) -> Result<Option<Self::T>, Error> {
@@ -162,6 +169,14 @@ pub trait ModelExt {
       .map_err(Error::Mongo)?;
 
     Ok(count > 0)
+  }
+
+  async fn insert_many(&self, documents: Vec<Self::T>) -> Result<InsertManyResult, Error> {
+    let db = self.get_database();
+    Self::T::collection(&db.conn)
+      .insert_many(documents, None)
+      .await
+      .map_err(Error::Mongo)
   }
 
   async fn aggregate<A>(&self, pipeline: Vec<Document>) -> Result<Vec<A>, Error>
