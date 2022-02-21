@@ -16,6 +16,7 @@ use wither::bson::{self, oid::ObjectId};
 use wither::mongodb::options::FindOneAndUpdateOptions;
 use wither::mongodb::options::FindOneOptions;
 use wither::mongodb::options::FindOptions;
+use wither::mongodb::options::InsertManyOptions;
 use wither::mongodb::options::ReturnDocument;
 use wither::mongodb::options::UpdateOptions;
 use wither::mongodb::results::DeleteResult;
@@ -171,10 +172,14 @@ pub trait ModelExt {
     Ok(count > 0)
   }
 
-  async fn insert_many(&self, documents: Vec<Self::T>) -> Result<InsertManyResult, Error> {
+  async fn insert_many(
+    &self,
+    documents: Vec<Self::T>,
+    options: InsertManyOptions,
+  ) -> Result<InsertManyResult, Error> {
     let db = self.get_database();
     Self::T::collection(&db.conn)
-      .insert_many(documents, None)
+      .insert_many(documents, options)
       .await
       .map_err(Error::Mongo)
   }
