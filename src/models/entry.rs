@@ -31,6 +31,10 @@ impl ModelExt for Model {
 // https://docs.rs/feed-rs/latest/feed_rs/model/struct.Entry.html
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(keys = r#"doc!{ "feed": 1 }"#))]
+#[model(index(
+  keys = r#"doc!{ "feed": 1, "public_id": 1 }"#,
+  options = r#"doc!{ "unique": true }"#
+))]
 pub struct Entry {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,

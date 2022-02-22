@@ -5,10 +5,12 @@ use serde::{Deserialize, Serialize};
 use tracing::error;
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
+use wither::mongodb::options::InsertManyOptions;
 use wither::Model as WitherModel;
 
 use crate::database::Database;
 use crate::errors::Error;
+use crate::errors::NotFound;
 use crate::lib::date::now;
 use crate::lib::date::Date;
 use crate::lib::fetch_rss::fetch_rss;
@@ -34,7 +36,7 @@ impl Model {
       Some(feed) => feed,
       None => {
         error!("Failed to sync, Feed with ID {} not found", &id);
-        return Ok(());
+        return Err(Error::NotFound(NotFound::new("feed".to_owned())));
       }
     };
 
@@ -46,7 +48,12 @@ impl Model {
       .map(|raw_entry| Entry::from_raw_entry(id, raw_entry))
       .collect::<Vec<Entry>>();
 
-    self.entry.insert_many(entries).await.unwrap();
+    // When a write fails, continue with the remaining writes, if any.
+    // TODO: Check if there is a non duplicate failure and report. Duplicate
+    // failures are expected when the feed is updated.
+    let insert_options = InsertManyOptions::builder().ordered(false).build();
+    let _result = self.entry.insert_many(entries, insert_options).await;
+
     self
       .update_one(
         doc! { "_id": id },
