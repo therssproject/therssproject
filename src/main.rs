@@ -1,7 +1,7 @@
 use axum::AddExtensionLayer;
 use axum::Router;
 use bson::doc;
-use futures::stream::StreamExt;
+use futures::stream::{self, StreamExt};
 use http::header;
 use std::net::SocketAddr;
 use tower_http::{
@@ -108,7 +108,7 @@ async fn main() {
     loop {
       info!("Running scheduler");
 
-      let concurrency = 50;
+      let concurrency = 100;
       context
         .models
         .feed
@@ -116,7 +116,7 @@ async fn main() {
         .cursor(doc! {}, None)
         .await
         .unwrap()
-        .for_each_concurrent(concurrency, |feed| {
+        .map(|feed| {
           let models = context.models.clone();
           let feed = feed.unwrap();
           let id = feed.id.unwrap();
@@ -125,6 +125,32 @@ async fn main() {
           async move {
             info!("Syncing feed with ID {} and URL {}", &id, url);
             models.feed.sync(id).await.unwrap();
+            id
+          }
+        })
+        .buffer_unordered(concurrency)
+        .map(|feed_id| {
+          let models = context.models.clone();
+
+          async move {
+            let subscriptions = models
+              .subscription
+              .find(doc! { "feed": feed_id }, None)
+              .await
+              .unwrap();
+
+            stream::iter(subscriptions)
+          }
+        })
+        .buffer_unordered(concurrency)
+        .flatten()
+        .for_each_concurrent(concurrency, |subscription| {
+          let models = context.models.clone();
+          let id = subscription.id.unwrap();
+
+          async move {
+            info!("Syncing subscription with ID {}", &id);
+            models.subscription.sync(id).await;
           }
         })
         .await;

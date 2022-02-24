@@ -63,7 +63,7 @@ async fn authenticate_user(
     Some(user) => user,
     None => {
       debug!("User not found, returning 401");
-      return Err(Error::NotFound(NotFound::new(String::from("user"))));
+      return Err(Error::NotFound(NotFound::new("user")));
     }
   };
 

@@ -72,7 +72,7 @@ async fn get_feed_by_id(
     Some(feed) => feed,
     None => {
       debug!("feed not found, returning 404 status code");
-      return Err(Error::NotFound(NotFound::new(String::from("feed"))));
+      return Err(Error::NotFound(NotFound::new("feed")));
     }
   };
 
@@ -105,7 +105,7 @@ async fn remove_feed_by_id(
 
   if delete_result.deleted_count == 0 {
     debug!("feed not found, returning 404 status code");
-    return Err(Error::NotFound(NotFound::new(String::from("feed"))));
+    return Err(Error::NotFound(NotFound::new("feed")));
   }
 
   Ok(())

@@ -20,6 +20,10 @@ impl Model {
   pub fn new(db: Database) -> Self {
     Self { db }
   }
+
+  pub async fn sync(&self, _feed_id: ObjectId) {
+    dbg!("Syncing subscription!");
+  }
 }
 
 impl ModelExt for Model {

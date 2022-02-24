@@ -36,7 +36,7 @@ impl Model {
       Some(feed) => feed,
       None => {
         error!("Failed to sync, Feed with ID {} not found", &id);
-        return Err(Error::NotFound(NotFound::new("feed".to_owned())));
+        return Err(Error::NotFound(NotFound::new("feed")));
       }
     };
 
@@ -56,7 +56,7 @@ impl Model {
 
     self
       .update_one(
-        doc! { "_id": id },
+        doc! { "_id": &id },
         doc! { "$set": { "synced_at": now() } },
         None,
       )
