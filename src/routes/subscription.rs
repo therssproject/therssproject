@@ -72,7 +72,7 @@ async fn create_subscription(
       match webhook {
         Some(webhook) => webhook,
         None => {
-          return Err(Error::NotFound(NotFound::new(String::from("webhook"))));
+          return Err(Error::NotFound(NotFound::new("webhook")));
         }
       }
     }
@@ -121,7 +121,7 @@ async fn get_subscription_by_id(
     Some(subscription) => subscription,
     None => {
       debug!("subscription not found, returning 404 status code");
-      return Err(Error::NotFound(NotFound::new(String::from("subscription"))));
+      return Err(Error::NotFound(NotFound::new("subscription")));
     }
   };
 
@@ -143,7 +143,7 @@ async fn remove_subscription_by_id(
 
   if delete_result.deleted_count == 0 {
     debug!("subscription not found, returning 404 status code");
-    return Err(Error::NotFound(NotFound::new(String::from("subscription"))));
+    return Err(Error::NotFound(NotFound::new("subscription")));
   }
 
   Ok(())

@@ -130,10 +130,13 @@ pub struct NotFound {
 }
 
 impl NotFound {
-  pub fn new(resource: String) -> Self {
+  pub fn new<S>(resource: S) -> Self
+  where
+    S: Into<String> + Clone,
+  {
     NotFound {
-      resource: resource.clone(),
-      message: format!("{} not found", resource),
+      resource: resource.clone().into(),
+      message: format!("{} not found", resource.into()),
     }
   }
 }

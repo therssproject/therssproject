@@ -82,7 +82,7 @@ async fn get_webhook_by_id(
     Some(webhook) => webhook,
     None => {
       debug!("webhook not found, returning 404 status code");
-      return Err(Error::NotFound(NotFound::new(String::from("webhook"))));
+      return Err(Error::NotFound(NotFound::new("webhook")));
     }
   };
 
@@ -103,7 +103,7 @@ async fn remove_webhook_by_id(
 
   if delete_result.deleted_count == 0 {
     debug!("webhook not found, returning 404 status code");
-    return Err(Error::NotFound(NotFound::new(String::from("webhook"))));
+    return Err(Error::NotFound(NotFound::new("webhook")));
   }
 
   Ok(())
