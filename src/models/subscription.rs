@@ -1,28 +1,93 @@
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
+use tracing::{debug, error};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
+use wither::mongodb::options::FindOptions;
 use wither::Model as WitherModel;
 
 use crate::database::Database;
+use crate::errors::Error;
+use crate::errors::NotFound;
 use crate::lib::date;
+use crate::lib::date::now;
 use crate::lib::date::Date;
 use crate::lib::fetch_rss;
+use crate::models::entry::Model as EntryModel;
+use crate::models::webhook::Model as WebhookModel;
 use crate::models::ModelExt;
 
 #[derive(Clone)]
 pub struct Model {
   pub db: Database,
+  pub entry: EntryModel,
+  pub webhook: WebhookModel,
 }
 
 impl Model {
   pub fn new(db: Database) -> Self {
-    Self { db }
+    let entry = EntryModel::new(db.clone());
+    let webhook = WebhookModel::new(db.clone());
+
+    Self { db, entry, webhook }
   }
 
-  pub async fn sync(&self, _feed_id: ObjectId) {
-    dbg!("Syncing subscription!");
+  pub async fn notify(&self, id: ObjectId) -> Result<(), Error> {
+    debug!("Notifying subscription!");
+
+    let subscription = self.find_by_id(&id).await?;
+    let subscription = match subscription {
+      Some(subscription) => subscription,
+      None => {
+        error!("Failed to notify, Subscription with ID {} not found", &id);
+        return Err(Error::NotFound(NotFound::new("subscription")));
+      }
+    };
+
+    let entries = self
+      .entry
+      .find(
+        doc! {
+          "user": subscription.user,
+          "feed": subscription.feed,
+          "_id": {
+            "$gt": subscription.last_notified_feed
+          }
+        },
+        sort_by_id(),
+      )
+      .await?;
+
+    let has_entries = !entries.is_empty();
+    if !has_entries {
+      return Ok(());
+    }
+
+    self.webhook.notify(id, &entries).await.unwrap();
+
+    let last_entry = entries.last().unwrap();
+
+    self
+      .update_one(
+        doc! {
+          "_id": &id,
+          // We might have concurrent jobs processing the same subscription.
+          // Store the last sent notification feed.
+          "last_notified_feed": { "$lt": last_entry.id }
+        },
+        doc! {
+          "$set": {
+            "last_notified_feed": last_entry.id,
+            // TODO: Use the webhook notification date.
+            "notified_at": now()
+          }
+        },
+        None,
+      )
+      .await?;
+
+    Ok(())
   }
 }
 
@@ -50,7 +115,11 @@ pub struct Subscription {
   pub url: String,
   pub feed: ObjectId,
   pub webhook: ObjectId,
-  pub checked_at: Date,
+
+  pub last_notified_feed: Option<ObjectId>,
+  pub checked_at: Option<Date>,
+  pub notified_at: Option<Date>,
+
   pub updated_at: Date,
   pub created_at: Date,
 }
@@ -64,7 +133,9 @@ impl Subscription {
       url,
       feed,
       webhook,
-      checked_at: now,
+      last_notified_feed: None,
+      notified_at: None,
+      checked_at: None,
       updated_at: now,
       created_at: now,
     }
@@ -92,8 +163,6 @@ pub struct PublicSubscription {
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub webhook: ObjectId,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
-  pub checked_at: Date,
-  #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub updated_at: Date,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub created_at: Date,
@@ -109,9 +178,12 @@ impl From<Subscription> for PublicSubscription {
       url: subscription.url.clone(),
       feed: subscription.feed,
       webhook: subscription.webhook,
-      checked_at: subscription.checked_at,
       updated_at: subscription.updated_at,
       created_at: subscription.created_at,
     }
   }
+}
+
+fn sort_by_id() -> FindOptions {
+  FindOptions::builder().sort(doc! { "_id": 1 }).build()
 }

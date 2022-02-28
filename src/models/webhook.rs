@@ -1,12 +1,17 @@
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use tracing::{debug, error};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
 use crate::database::Database;
+use crate::errors::Error;
+use crate::errors::NotFound;
 use crate::lib::date::Date;
+use crate::models::entry::Entry;
 use crate::models::ModelExt;
 
 #[derive(Clone)]
@@ -17,6 +22,34 @@ pub struct Model {
 impl Model {
   pub fn new(db: Database) -> Self {
     Self { db }
+  }
+
+  // TODO:
+  // * Create webhook payload struct
+  // * Store a database record with the failed or successful webhook
+  // * Return the webhook notification date so we can store it in the
+  //   subscription.
+  pub async fn notify(&self, id: ObjectId, _entries: &[Entry]) -> Result<(), Error> {
+    debug!("notifying webhook");
+
+    let webhook = self.find_by_id(&id).await?;
+    let webhook = match webhook {
+      Some(webhook) => webhook,
+      None => {
+        error!("Failed to notify, Webhook with ID {} not found", &id);
+        return Err(Error::NotFound(NotFound::new("webhook")));
+      }
+    };
+
+    let mut map = HashMap::new();
+    map.insert("foo", "baz");
+    map.insert("entries", "baz");
+
+    let client = reqwest::Client::new();
+    let url = webhook.url;
+    let _res = client.post(url).json(&map).send().await.unwrap();
+
+    Ok(())
   }
 }
 

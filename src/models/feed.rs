@@ -2,6 +2,7 @@ use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use feed_rs;
 use serde::{Deserialize, Serialize};
+use tracing::debug;
 use tracing::error;
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
@@ -31,6 +32,8 @@ impl Model {
   }
 
   pub async fn sync(&self, id: ObjectId) -> Result<(), Error> {
+    debug!("Syncing feed");
+
     let feed = self.find_by_id(&id).await?;
     let feed = match feed {
       Some(feed) => feed,

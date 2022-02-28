@@ -150,7 +150,7 @@ async fn main() {
 
           async move {
             info!("Syncing subscription with ID {}", &id);
-            models.subscription.sync(id).await;
+            models.subscription.notify(id).await.unwrap();
           }
         })
         .await;
