@@ -72,13 +72,15 @@ pub trait ModelExt {
       .map_err(Error::Wither)
   }
 
-  async fn find(
+  async fn find<O>(
     &self,
     query: Document,
-    options: Option<FindOptions>,
-  ) -> Result<Vec<Self::T>, Error> {
+    options: O,
+  ) -> Result<Vec<Self::T>, Error>
+  where O: Into<Option<FindOptions>> + Send
+  {
     let db = self.get_database();
-    Self::T::find(&db.conn, query, options)
+    Self::T::find(&db.conn, query, options.into())
       .await
       .map_err(Error::Wither)?
       .try_collect::<Vec<Self::T>>()

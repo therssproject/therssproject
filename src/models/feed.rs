@@ -7,6 +7,7 @@ use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::mongodb::options::InsertManyOptions;
 use wither::Model as WitherModel;
+use tracing::debug;
 
 use crate::database::Database;
 use crate::errors::Error;
@@ -31,6 +32,8 @@ impl Model {
   }
 
   pub async fn sync(&self, id: ObjectId) -> Result<(), Error> {
+    debug!("Syncing feed");
+
     let feed = self.find_by_id(&id).await?;
     let feed = match feed {
       Some(feed) => feed,
