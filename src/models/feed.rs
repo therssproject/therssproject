@@ -2,12 +2,12 @@ use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use feed_rs;
 use serde::{Deserialize, Serialize};
+use tracing::debug;
 use tracing::error;
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::mongodb::options::InsertManyOptions;
 use wither::Model as WitherModel;
-use tracing::debug;
 
 use crate::database::Database;
 use crate::errors::Error;

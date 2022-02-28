@@ -1,23 +1,22 @@
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
+use tracing::{debug, error};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
-use wither::Model as WitherModel;
-use tracing::{error, debug};
 use wither::mongodb::options::FindOptions;
+use wither::Model as WitherModel;
 
 use crate::database::Database;
 use crate::errors::Error;
+use crate::errors::NotFound;
 use crate::lib::date;
 use crate::lib::date::now;
 use crate::lib::date::Date;
 use crate::lib::fetch_rss;
-use crate::models::ModelExt;
-use crate::errors::NotFound;
 use crate::models::entry::Model as EntryModel;
 use crate::models::webhook::Model as WebhookModel;
-
+use crate::models::ModelExt;
 
 #[derive(Clone)]
 pub struct Model {
@@ -31,11 +30,7 @@ impl Model {
     let entry = EntryModel::new(db.clone());
     let webhook = WebhookModel::new(db.clone());
 
-    Self {
-      db,
-      entry,
-      webhook
-    }
+    Self { db, entry, webhook }
   }
 
   pub async fn notify(&self, id: ObjectId) -> Result<(), Error> {
@@ -52,13 +47,16 @@ impl Model {
 
     let entries = self
       .entry
-      .find(doc! {
-        "user": subscription.user,
-        "feed": subscription.feed,
-        "_id": {
-          "$gt": subscription.last_notified_feed
-        }
-      }, sort_by_id())
+      .find(
+        doc! {
+          "user": subscription.user,
+          "feed": subscription.feed,
+          "_id": {
+            "$gt": subscription.last_notified_feed
+          }
+        },
+        sort_by_id(),
+      )
       .await?;
 
     let has_entries = !entries.is_empty();
@@ -66,11 +64,7 @@ impl Model {
       return Ok(());
     }
 
-    self
-      .webhook
-      .notify(id, &entries)
-      .await
-      .unwrap();
+    self.webhook.notify(id, &entries).await.unwrap();
 
     let last_entry = entries.last().unwrap();
 
@@ -190,6 +184,6 @@ impl From<Subscription> for PublicSubscription {
   }
 }
 
-fn sort_by_id () -> FindOptions {
+fn sort_by_id() -> FindOptions {
   FindOptions::builder().sort(doc! { "_id": 1 }).build()
 }
