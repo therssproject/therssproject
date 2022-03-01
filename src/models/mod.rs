@@ -1,4 +1,5 @@
 pub mod entry;
+pub mod event;
 pub mod feed;
 pub mod subscription;
 pub mod user;

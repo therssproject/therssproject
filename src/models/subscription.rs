@@ -3,17 +3,13 @@ use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
 use tracing::{debug, error};
 use validator::Validate;
-use wither::bson::{doc, oid::ObjectId};
+use wither::bson::{doc, oid::ObjectId, Bson};
 use wither::mongodb::options::FindOptions;
 use wither::Model as WitherModel;
 
 use crate::database::Database;
-use crate::errors::Error;
-use crate::errors::NotFound;
-use crate::lib::date;
-use crate::lib::date::now;
-use crate::lib::date::Date;
-use crate::lib::fetch_rss;
+use crate::errors::{Error, NotFound};
+use crate::lib::date::{now, Date};
 use crate::models::entry::Model as EntryModel;
 use crate::models::webhook::Model as WebhookModel;
 use crate::models::ModelExt;
@@ -45,26 +41,25 @@ impl Model {
       }
     };
 
-    let entries = self
-      .entry
-      .find(
-        doc! {
-          "user": subscription.user,
-          "feed": subscription.feed,
-          "_id": {
-            "$gt": subscription.last_notified_feed
-          }
-        },
-        sort_by_id(),
-      )
-      .await?;
+    let mut query = doc! { "feed": subscription.feed };
+    // Query entries that are newer than the last notified feed entry. If this
+    // is the first time we're notifying, we'll query all entries.
+    if let Some(last_notified_feed) = subscription.last_notified_feed {
+      query.insert("_id", doc! { "$gt": last_notified_feed });
+    }
 
+    let entries = self.entry.find(query, sort_by_id()).await?;
     let has_entries = !entries.is_empty();
     if !has_entries {
+      debug!("No new entries found for subscription {}", &id);
       return Ok(());
     }
 
-    self.webhook.notify(id, &entries).await.unwrap();
+    self
+      .webhook
+      .notify(subscription.webhook, id, &entries)
+      .await
+      .unwrap();
 
     let last_entry = entries.last().unwrap();
 
@@ -74,12 +69,15 @@ impl Model {
           "_id": &id,
           // We might have concurrent jobs processing the same subscription.
           // Store the last sent notification feed.
-          "last_notified_feed": { "$lt": last_entry.id }
+          "$or": [
+              { "last_notified_feed": Bson::Null },
+              { "last_notified_feed": { "$lt": last_entry.id } }
+          ]
         },
         doc! {
           "$set": {
             "last_notified_feed": last_entry.id,
-            // TODO: Use the webhook notification date.
+            // TODO: Use the webhook notification date?
             "notified_at": now()
           }
         },
@@ -126,7 +124,7 @@ pub struct Subscription {
 
 impl Subscription {
   pub fn new(user: ObjectId, feed: ObjectId, webhook: ObjectId, url: String) -> Self {
-    let now = date::now();
+    let now = now();
     Self {
       id: None,
       user,
@@ -139,15 +137,6 @@ impl Subscription {
       updated_at: now,
       created_at: now,
     }
-  }
-
-  pub async fn _sync(&self) {
-    // TODO: get the URL from the feed instead
-    let url = self.url.clone();
-    let feed = fetch_rss::fetch_rss(url).await;
-    println!("Feed {:#?}", feed);
-
-    // Magic will happen here
   }
 }
 
