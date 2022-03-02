@@ -12,8 +12,7 @@ use wither::Model as WitherModel;
 use crate::database::Database;
 use crate::errors::Error;
 use crate::errors::NotFound;
-use crate::lib::date::now;
-use crate::lib::date::Date;
+use crate::lib::date::{now, Date};
 use crate::lib::fetch_rss::fetch_rss;
 use crate::models::entry::Entry;
 use crate::models::entry::Model as EntryModel;
@@ -94,7 +93,7 @@ pub struct Feed {
 
 impl Feed {
   pub fn new(public_id: String, feed_type: FeedType, url: String, title: Option<String>) -> Self {
-    let now = Date::now();
+    let now = now();
     Self {
       id: None,
       public_id,

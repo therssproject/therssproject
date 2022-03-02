@@ -10,18 +10,22 @@ use wither::Model as WitherModel;
 use crate::database::Database;
 use crate::errors::Error;
 use crate::errors::NotFound;
-use crate::lib::date::Date;
+use crate::lib::date::{now, Date};
 use crate::models::entry::Entry;
+use crate::models::event::Event;
+use crate::models::event::Model as EventModel;
 use crate::models::ModelExt;
 
 #[derive(Clone)]
 pub struct Model {
   pub db: Database,
+  pub event: EventModel,
 }
 
 impl Model {
   pub fn new(db: Database) -> Self {
-    Self { db }
+    let event = EventModel::new(db.clone());
+    Self { db, event }
   }
 
   // TODO:
@@ -29,8 +33,13 @@ impl Model {
   // * Store a database record with the failed or successful webhook
   // * Return the webhook notification date so we can store it in the
   //   subscription.
-  pub async fn notify(&self, id: ObjectId, _entries: &[Entry]) -> Result<(), Error> {
-    debug!("notifying webhook");
+  pub async fn notify(
+    &self,
+    id: ObjectId,
+    subscription: ObjectId,
+    _entries: &[Entry],
+  ) -> Result<(), Error> {
+    debug!("Notifying webhook");
 
     let webhook = self.find_by_id(&id).await?;
     let webhook = match webhook {
@@ -41,6 +50,8 @@ impl Model {
       }
     };
 
+    let event = Event::new(webhook.user, subscription, id, webhook.url.clone());
+
     let mut map = HashMap::new();
     map.insert("foo", "baz");
     map.insert("entries", "baz");
@@ -48,6 +59,7 @@ impl Model {
     let client = reqwest::Client::new();
     let url = webhook.url;
     let _res = client.post(url).json(&map).send().await.unwrap();
+    self.event.create(event).await?;
 
     Ok(())
   }
@@ -77,7 +89,7 @@ pub struct Webhook {
 
 impl Webhook {
   pub fn new(user: ObjectId, url: String, title: Option<String>) -> Self {
-    let now = Date::now();
+    let now = now();
     Self {
       id: None,
       user,
