@@ -16,6 +16,7 @@ mod errors;
 mod lib;
 mod logger;
 mod models;
+mod rabbitmq;
 mod routes;
 mod settings;
 
@@ -23,6 +24,7 @@ use context::Context;
 use database::Database;
 use logger::Logger;
 use models::ModelExt;
+use rabbitmq::Rabbitmq;
 use settings::Settings;
 
 #[tokio::main]
@@ -38,6 +40,21 @@ async fn main() {
     Ok(value) => value,
     Err(_) => panic!("Failed to setup database connection"),
   };
+
+  let rabbitmq = match Rabbitmq::setup(&settings).await {
+    Ok(value) => value,
+    Err(_) => panic!("Failed to setup RabbitMQ connection"),
+  };
+
+  let _queue = rabbitmq
+    .get_channel()
+    .queue_declare(
+      "send_webhook",
+      lapin::options::QueueDeclareOptions::default(),
+      lapin::types::FieldTable::default(),
+    )
+    .await
+    .unwrap();
 
   let context = Context::new(db, settings.clone());
 
@@ -101,7 +118,6 @@ async fn main() {
   let port = settings.server.port;
   let address = SocketAddr::from(([127, 0, 0, 1], port));
 
-  let context = context.clone();
   tokio::spawn(async move {
     use tokio::time::{sleep, Duration};
 
@@ -146,11 +162,25 @@ async fn main() {
         .flatten()
         .for_each_concurrent(concurrency, |subscription| {
           let models = context.models.clone();
+          let channel = rabbitmq.get_channel();
           let id = subscription.id.unwrap();
 
           async move {
             info!("Syncing subscription with ID {}", &id);
             models.subscription.notify(id).await.unwrap();
+
+            let _confirm = channel
+              .basic_publish(
+                "",
+                "send_webhook",
+                lapin::options::BasicPublishOptions::default(),
+                b"Test",
+                lapin::BasicProperties::default(),
+              )
+              .await
+              .unwrap()
+              .await
+              .unwrap();
           }
         })
         .await;
