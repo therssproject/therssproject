@@ -15,16 +15,16 @@ mod database;
 mod errors;
 mod lib;
 mod logger;
+mod messenger;
 mod models;
-mod rabbitmq;
 mod routes;
 mod settings;
 
 use context::Context;
 use database::Database;
 use logger::Logger;
+use messenger::Messenger;
 use models::ModelExt;
-use rabbitmq::Rabbitmq;
 use settings::Settings;
 
 #[tokio::main]
@@ -41,22 +41,12 @@ async fn main() {
     Err(_) => panic!("Failed to setup database connection"),
   };
 
-  let rabbitmq = match Rabbitmq::setup(&settings).await {
+  let messenger = match Messenger::setup(&settings).await {
     Ok(value) => value,
-    Err(_) => panic!("Failed to setup RabbitMQ connection"),
+    Err(_) => panic!("Failed to setup message broker connection"),
   };
 
-  let _queue = rabbitmq
-    .get_channel()
-    .queue_declare(
-      "send_webhook",
-      lapin::options::QueueDeclareOptions::default(),
-      lapin::types::FieldTable::default(),
-    )
-    .await
-    .unwrap();
-
-  let context = Context::new(db, settings.clone());
+  let context = Context::setup(settings.clone(), db, messenger.clone()).await;
 
   // TODO: This is not pretty nice. Find a better way to do this.
   context
@@ -162,23 +152,15 @@ async fn main() {
         .flatten()
         .for_each_concurrent(concurrency, |subscription| {
           let models = context.models.clone();
-          let channel = rabbitmq.get_channel();
+          let messenger = messenger.clone();
           let id = subscription.id.unwrap();
 
           async move {
             info!("Syncing subscription with ID {}", &id);
             models.subscription.notify(id).await.unwrap();
 
-            let _confirm = channel
-              .basic_publish(
-                "",
-                "send_webhook",
-                lapin::options::BasicPublishOptions::default(),
-                b"Test",
-                lapin::BasicProperties::default(),
-              )
-              .await
-              .unwrap()
+            messenger
+              .publish("send_webhook_event", id.bytes().as_ref())
               .await
               .unwrap();
           }

@@ -1,3 +1,5 @@
+mod notify_job;
+
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
@@ -10,6 +12,7 @@ use wither::Model as WitherModel;
 use crate::database::Database;
 use crate::errors::{Error, NotFound};
 use crate::lib::date::{now, Date};
+use crate::messenger::Messenger;
 use crate::models::entry::Model as EntryModel;
 use crate::models::webhook::Model as WebhookModel;
 use crate::models::ModelExt;
@@ -22,9 +25,11 @@ pub struct Model {
 }
 
 impl Model {
-  pub fn new(db: Database) -> Self {
+  pub async fn setup(db: Database, messenger: Messenger) -> Self {
     let entry = EntryModel::new(db.clone());
     let webhook = WebhookModel::new(db.clone());
+
+    notify_job::setup(messenger).await.unwrap();
 
     Self { db, entry, webhook }
   }
