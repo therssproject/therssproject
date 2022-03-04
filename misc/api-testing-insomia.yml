@@ -1,7 +1,7 @@
 _type: export
 __export_format: 4
-__export_date: 2022-02-13T15:44:21.443Z
-__export_source: insomnia.desktop.app:v2021.7.2
+__export_date: 2022-03-04T23:28:16.712Z
+__export_source: insomnia.desktop.app:v2022.1.0
 resources:
   - _id: req_85289b31b294466fb92be91a826c0f67
     parentId: fld_0a21a5a354814d8584e54cde33c122ef
@@ -38,9 +38,9 @@ resources:
     _type: request_group
   - _id: wrk_167dc5aa07e64e449751fda0064c921c
     parentId: null
-    modified: 1644701821830
+    modified: 1646360802882
     created: 1644701821830
-    name: Subscriptions and feeds
+    name: RSS API
     description: ""
     scope: collection
     _type: workspace
@@ -67,255 +67,12 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: req_9231bf2de7d949c59e0d5f936adaf761
-    parentId: fld_b0c070e716b94dcf9dbdbedf283be1a3
-    modified: 1644766060891
-    created: 1644765425804
-    url: http://localhost:8080/users
-    name: Register
-    description: ""
-    method: POST
-    body:
-      mimeType: application/json
-      text: |-
-        {
-        	"name": "ndelvalle",
-        	"email": "n@mail.com",
-        	"password": "123456789"
-        }
-    parameters: []
-    headers:
-      - name: Content-Type
-        value: application/json
-        id: pair_2c1e58bca559474b841049bf0ada28f4
-    authentication: {}
-    metaSortKey: -1644701851107
-    isPrivate: false
-    settingStoreCookies: true
-    settingSendCookies: true
-    settingDisableRenderRequestBody: false
-    settingEncodeUrl: true
-    settingRebuildPath: true
-    settingFollowRedirects: global
-    _type: request
-  - _id: fld_b0c070e716b94dcf9dbdbedf283be1a3
-    parentId: wrk_167dc5aa07e64e449751fda0064c921c
-    modified: 1644765416949
-    created: 1644765416949
-    name: Other user
-    description: ""
-    environment: {}
-    environmentPropertyOrder: null
-    metaSortKey: -1644765416949
-    _type: request_group
-  - _id: req_72f4b425d8594555a127de6818c830e5
-    parentId: fld_b0c070e716b94dcf9dbdbedf283be1a3
-    modified: 1644766341516
-    created: 1644766038297
-    url: http://localhost:8080/users/authenticate
-    name: Login
-    description: ""
-    method: POST
-    body:
-      mimeType: application/json
-      text: |-
-        {
-        	"email": "n@mail.com",
-        	"password": "123456789"
-        }
-    parameters: []
-    headers:
-      - name: Content-Type
-        value: application/json
-        id: pair_2c1e58bca559474b841049bf0ada28f4
-    authentication: {}
-    metaSortKey: -1644701851057
-    isPrivate: false
-    settingStoreCookies: true
-    settingSendCookies: true
-    settingDisableRenderRequestBody: false
-    settingEncodeUrl: true
-    settingRebuildPath: true
-    settingFollowRedirects: global
-    _type: request
-  - _id: req_2c50844f58ba4b03ad236cd895988adc
-    parentId: fld_b0c070e716b94dcf9dbdbedf283be1a3
-    modified: 1644766551535
-    created: 1644766067061
-    url: http://localhost:8080/subscriptions
-    name: New Subscription
-    description: ""
-    method: POST
-    body:
-      mimeType: application/json
-      text: |-
-        {
-        	"url": "https://museapp.com/podcast.rss",
-        	"webhook": { "id": "620924793bff622d38907d93" }
-        }
-    parameters: []
-    headers:
-      - name: Content-Type
-        value: application/json
-        id: pair_0c0e07051b2b47af99141a5984fa4d22
-    authentication:
-      type: bearer
-      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTgwNDgsImlhdCI6MTY0NDc2NjA0OCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTIwZmU3ZTVjMjNlYzlkOTI1MDJjIn0sIm5hbWUiOiJuZGVsdmFsbGUiLCJlbWFpbCI6Im5AbWFpbC5jb20ifX0.zlY2wgw0qAmDAMl7gldIUbHtFdbSlUkKtG-dzqqiTnw
-    metaSortKey: -1644701851007
-    isPrivate: false
-    settingStoreCookies: true
-    settingSendCookies: true
-    settingDisableRenderRequestBody: false
-    settingEncodeUrl: true
-    settingRebuildPath: true
-    settingFollowRedirects: global
-    _type: request
-  - _id: req_7f9a5905ee51445cbfdf91d8fd12b141
-    parentId: fld_b0c070e716b94dcf9dbdbedf283be1a3
-    modified: 1644766152331
-    created: 1644766126200
-    url: http://localhost:8080/subscriptions
-    name: Subscriptions
-    description: ""
-    method: GET
-    body: {}
-    parameters: []
-    headers: []
-    authentication:
-      type: bearer
-      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTgwNDgsImlhdCI6MTY0NDc2NjA0OCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTIwZmU3ZTVjMjNlYzlkOTI1MDJjIn0sIm5hbWUiOiJuZGVsdmFsbGUiLCJlbWFpbCI6Im5AbWFpbC5jb20ifX0.zlY2wgw0qAmDAMl7gldIUbHtFdbSlUkKtG-dzqqiTnw
-    metaSortKey: -1644701850957
-    isPrivate: false
-    settingStoreCookies: true
-    settingSendCookies: true
-    settingDisableRenderRequestBody: false
-    settingEncodeUrl: true
-    settingRebuildPath: true
-    settingFollowRedirects: global
-    _type: request
-  - _id: req_13415f6767e448ba9ba10cb76fb96b57
-    parentId: fld_b0c070e716b94dcf9dbdbedf283be1a3
-    modified: 1644766347858
-    created: 1644766336666
-    url: http://localhost:8080/webhooks
-    name: Webhooks
-    description: ""
-    method: GET
-    body: {}
-    parameters: []
-    headers: []
-    authentication:
-      type: bearer
-      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTgwNDgsImlhdCI6MTY0NDc2NjA0OCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTIwZmU3ZTVjMjNlYzlkOTI1MDJjIn0sIm5hbWUiOiJuZGVsdmFsbGUiLCJlbWFpbCI6Im5AbWFpbC5jb20ifX0.zlY2wgw0qAmDAMl7gldIUbHtFdbSlUkKtG-dzqqiTnw
-    metaSortKey: -1644701850932
-    isPrivate: false
-    settingStoreCookies: true
-    settingSendCookies: true
-    settingDisableRenderRequestBody: false
-    settingEncodeUrl: true
-    settingRebuildPath: true
-    settingFollowRedirects: global
-    _type: request
-  - _id: req_f097993b42d941e6ae7297b1cdef44cb
-    parentId: fld_b0c070e716b94dcf9dbdbedf283be1a3
-    modified: 1644766247307
-    created: 1644766161153
-    url: http://localhost:8080/subscriptions/620924197e5c23ec9d92502e
-    name: Remove Subscription
-    description: ""
-    method: DELETE
-    body: {}
-    parameters: []
-    headers: []
-    authentication:
-      type: bearer
-      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTgwNDgsImlhdCI6MTY0NDc2NjA0OCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTIwZmU3ZTVjMjNlYzlkOTI1MDJjIn0sIm5hbWUiOiJuZGVsdmFsbGUiLCJlbWFpbCI6Im5AbWFpbC5jb20ifX0.zlY2wgw0qAmDAMl7gldIUbHtFdbSlUkKtG-dzqqiTnw
-    metaSortKey: -1644701850907
-    isPrivate: false
-    settingStoreCookies: true
-    settingSendCookies: true
-    settingDisableRenderRequestBody: false
-    settingEncodeUrl: true
-    settingRebuildPath: true
-    settingFollowRedirects: global
-    _type: request
-  - _id: req_0ef80d79223e49468c05a95603295299
-    parentId: fld_a0684e80ea9541428b902961b061471e
-    modified: 1644765397274
-    created: 1644764556293
-    url: http://localhost:8080/users
-    name: Register
-    description: ""
-    method: POST
-    body:
-      mimeType: application/json
-      text: |-
-        {
-        	"name": "gillchristian",
-        	"email": "g@mail.com",
-        	"password": "123456789"
-        }
-    parameters: []
-    headers:
-      - name: Content-Type
-        value: application/json
-        id: pair_2c1e58bca559474b841049bf0ada28f4
-    authentication: {}
-    metaSortKey: -1644701851132
-    isPrivate: false
-    settingStoreCookies: true
-    settingSendCookies: true
-    settingDisableRenderRequestBody: false
-    settingEncodeUrl: true
-    settingRebuildPath: true
-    settingFollowRedirects: global
-    _type: request
-  - _id: fld_a0684e80ea9541428b902961b061471e
-    parentId: wrk_167dc5aa07e64e449751fda0064c921c
-    modified: 1644765394981
-    created: 1644765394981
-    name: My user
-    description: ""
-    environment: {}
-    environmentPropertyOrder: null
-    metaSortKey: -1644765394981
-    _type: request_group
-  - _id: req_408d6268bdba4ce6be1d7569530018cd
-    parentId: fld_a0684e80ea9541428b902961b061471e
-    modified: 1644765398459
-    created: 1644701851082
-    url: http://localhost:8080/users/authenticate
-    name: Login
-    description: ""
-    method: POST
-    body:
-      mimeType: application/json
-      text: |-
-        {
-        	"email": "g@mail.com",
-        	"password": "123456789"
-        }
-    parameters: []
-    headers:
-      - name: Content-Type
-        value: application/json
-        id: pair_2c1e58bca559474b841049bf0ada28f4
-    authentication: {}
-    metaSortKey: -1644701851082
-    isPrivate: false
-    settingStoreCookies: true
-    settingSendCookies: true
-    settingDisableRenderRequestBody: false
-    settingEncodeUrl: true
-    settingRebuildPath: true
-    settingFollowRedirects: global
-    _type: request
   - _id: req_94f5371e41e64ffdb98aa582af731424
-    parentId: fld_a0684e80ea9541428b902961b061471e
-    modified: 1644765399756
+    parentId: fld_d273d430a7184e789268ba6c21e54fd6
+    modified: 1646361524648
     created: 1644701953659
     url: http://localhost:8080/subscriptions
-    name: New Subscription
+    name: Create Subscription
     description: ""
     method: POST
     body:
@@ -332,7 +89,8 @@ resources:
         id: pair_0c0e07051b2b47af99141a5984fa4d22
     authentication:
       type: bearer
-      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDg5NTMwNDcsImlhdCI6MTY0NjM2MTA0NywidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIyMTc5ZDQ5ZWI3MzAxY2U2MzAyNzA1In0sIm5hbWUiOiJtaWxhIiwiZW1haWwiOiJtaWxhQG1haWwuY29tIn19.9GSWGCOCI992VmEcIdjYPdRgbfojLBNIgcWI74OoxEw
+      prefix: Bearer
     metaSortKey: -1644701851032
     isPrivate: false
     settingStoreCookies: true
@@ -342,12 +100,32 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: req_36d86b6788dc4640b8a78d19c28e21af
+  - _id: fld_d273d430a7184e789268ba6c21e54fd6
     parentId: fld_a0684e80ea9541428b902961b061471e
-    modified: 1644765402715
+    modified: 1646361520975
+    created: 1646361520975
+    name: Subscription
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1646361520975
+    _type: request_group
+  - _id: fld_a0684e80ea9541428b902961b061471e
+    parentId: wrk_167dc5aa07e64e449751fda0064c921c
+    modified: 1646360912374
+    created: 1644765394981
+    name: User
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1644765394981
+    _type: request_group
+  - _id: req_36d86b6788dc4640b8a78d19c28e21af
+    parentId: fld_d273d430a7184e789268ba6c21e54fd6
+    modified: 1646361528197
     created: 1644702046228
     url: http://localhost:8080/subscriptions
-    name: Subscriptions
+    name: Query Subscriptions
     description: ""
     method: GET
     body: {}
@@ -365,12 +143,12 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
-  - _id: req_8e4cc99d4bf24d79ba379c1c072b989e
-    parentId: fld_a0684e80ea9541428b902961b061471e
-    modified: 1644765405060
-    created: 1644764464484
-    url: http://localhost:8080/webhooks
-    name: Webhooks
+  - _id: req_23243489c04544779429e0444d6b97cd
+    parentId: fld_d273d430a7184e789268ba6c21e54fd6
+    modified: 1646361607171
+    created: 1646361584762
+    url: http://localhost:8080/subscriptions/6208301a536bb150aaefe788
+    name: Get Subscription
     description: ""
     method: GET
     body: {}
@@ -379,7 +157,245 @@ resources:
     authentication:
       type: bearer
       token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
+      prefix: Bearer
+    metaSortKey: -1644701850958.5625
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_dd07b852244e42c19328a6e6b49dbaf3
+    parentId: fld_d273d430a7184e789268ba6c21e54fd6
+    modified: 1646361535137
+    created: 1644702279794
+    url: http://localhost:8080/subscriptions/6208301a536bb150aaefe788
+    name: Remove Subscription
+    description: ""
+    method: DELETE
+    body: {}
+    parameters: []
+    headers: []
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
     metaSortKey: -1644701850932
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_7826fc9297b043f7a658a5f3df0d6620
+    parentId: fld_1188ef77438e4a6caa5a3d7332aaea70
+    modified: 1646436461214
+    created: 1646361219875
+    url: http://localhost:8080/webhooks
+    name: Create Webhook
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"title": "Mila Production API",
+        	"url": "https://mila.com"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_1e41a4b673c74586a9a04c1bd6c5249c
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
+    metaSortKey: -1644701850935.125
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_1188ef77438e4a6caa5a3d7332aaea70
+    parentId: fld_a0684e80ea9541428b902961b061471e
+    modified: 1646361460823
+    created: 1646361460823
+    name: Webhook
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1646361460823
+    _type: request_group
+  - _id: req_8e4cc99d4bf24d79ba379c1c072b989e
+    parentId: fld_1188ef77438e4a6caa5a3d7332aaea70
+    modified: 1646361485240
+    created: 1644764464484
+    url: http://localhost:8080/webhooks
+    name: Query Webhooks
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
+    metaSortKey: -1644701850910.125
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_3362e084a76442a9b7d2238ffc1d1f6a
+    parentId: fld_1188ef77438e4a6caa5a3d7332aaea70
+    modified: 1646361500640
+    created: 1646361374710
+    url: http://localhost:8080/webhooks/62217ab49eb7301ce6302706
+    name: Get Webhook
+    description: ""
+    method: GET
+    body:
+      mimeType: application/json
+      text: ""
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_1e41a4b673c74586a9a04c1bd6c5249c
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
+    metaSortKey: -1644701850885.125
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_8d9daf2202cf48789f9a1a84eddb5b75
+    parentId: fld_1188ef77438e4a6caa5a3d7332aaea70
+    modified: 1646361479375
+    created: 1646361280413
+    url: http://localhost:8080/webhooks/62217ab49eb7301ce6302706
+    name: Update Webhook
+    description: ""
+    method: PUT
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"title": "Mila Production API 2",
+        	"url": "https://mila.com"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_1e41a4b673c74586a9a04c1bd6c5249c
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
+    metaSortKey: -1644701850860.125
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_b9dcf3e1035b479ebb875eb5df0d0fd6
+    parentId: fld_1188ef77438e4a6caa5a3d7332aaea70
+    modified: 1646361472356
+    created: 1646361427974
+    url: http://localhost:8080/webhooks/62217ab49eb7301ce6302706
+    name: Remove Webhook
+    description: ""
+    method: DELETE
+    body:
+      mimeType: application/json
+      text: ""
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_1e41a4b673c74586a9a04c1bd6c5249c
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
+    metaSortKey: -1644701850835.125
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_0ef80d79223e49468c05a95603295299
+    parentId: fld_a0684e80ea9541428b902961b061471e
+    modified: 1646361042491
+    created: 1644764556293
+    url: http://localhost:8080/users
+    name: Register
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"name": "mila",
+        	"email": "mila@mail.com",
+        	"password": "milanga"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_2c1e58bca559474b841049bf0ada28f4
+    authentication: {}
+    metaSortKey: -1644701851132
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_408d6268bdba4ce6be1d7569530018cd
+    parentId: fld_a0684e80ea9541428b902961b061471e
+    modified: 1646361046158
+    created: 1644701851082
+    url: http://localhost:8080/users/authenticate
+    name: Login
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"email": "mila@mail.com",
+        	"password": "milanga"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_2c1e58bca559474b841049bf0ada28f4
+    authentication: {}
+    metaSortKey: -1644701851082
     isPrivate: false
     settingStoreCookies: true
     settingSendCookies: true
@@ -403,29 +419,6 @@ resources:
       type: bearer
       token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
     metaSortKey: -1644701850832
-    isPrivate: false
-    settingStoreCookies: true
-    settingSendCookies: true
-    settingDisableRenderRequestBody: false
-    settingEncodeUrl: true
-    settingRebuildPath: true
-    settingFollowRedirects: global
-    _type: request
-  - _id: req_dd07b852244e42c19328a6e6b49dbaf3
-    parentId: fld_a0684e80ea9541428b902961b061471e
-    modified: 1644765409151
-    created: 1644702279794
-    url: http://localhost:8080/subscriptions/6208301a536bb150aaefe788
-    name: Remove Subscription
-    description: ""
-    method: DELETE
-    body: {}
-    parameters: []
-    headers: []
-    authentication:
-      type: bearer
-      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
-    metaSortKey: -1644701850782
     isPrivate: false
     settingStoreCookies: true
     settingSendCookies: true
