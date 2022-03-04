@@ -82,13 +82,13 @@ pub struct Webhook {
   pub id: Option<ObjectId>,
   pub user: ObjectId,
   pub url: String,
-  pub title: Option<String>,
+  pub title: String,
   pub updated_at: Date,
   pub created_at: Date,
 }
 
 impl Webhook {
-  pub fn new(user: ObjectId, url: String, title: Option<String>) -> Self {
+  pub fn new(user: ObjectId, url: String, title: String) -> Self {
     let now = now();
     Self {
       id: None,
@@ -108,7 +108,7 @@ pub struct PublicWebhook {
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub user: ObjectId,
   pub url: String,
-  pub title: Option<String>,
+  pub title: String,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub updated_at: Date,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
