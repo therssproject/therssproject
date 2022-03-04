@@ -15,6 +15,7 @@ mod database;
 mod errors;
 mod lib;
 mod logger;
+mod messenger;
 mod models;
 mod routes;
 mod settings;
@@ -22,6 +23,7 @@ mod settings;
 use context::Context;
 use database::Database;
 use logger::Logger;
+use messenger::Messenger;
 use models::ModelExt;
 use settings::Settings;
 
@@ -39,7 +41,12 @@ async fn main() {
     Err(_) => panic!("Failed to setup database connection"),
   };
 
-  let context = Context::new(db, settings.clone());
+  let messenger = match Messenger::setup(&settings).await {
+    Ok(value) => value,
+    Err(_) => panic!("Failed to setup message broker connection"),
+  };
+
+  let context = Context::setup(settings.clone(), db, messenger.clone()).await;
 
   // TODO: This is not pretty nice. Find a better way to do this.
   context
@@ -101,7 +108,6 @@ async fn main() {
   let port = settings.server.port;
   let address = SocketAddr::from(([127, 0, 0, 1], port));
 
-  let context = context.clone();
   tokio::spawn(async move {
     use tokio::time::{sleep, Duration};
 
@@ -146,11 +152,17 @@ async fn main() {
         .flatten()
         .for_each_concurrent(concurrency, |subscription| {
           let models = context.models.clone();
+          let messenger = messenger.clone();
           let id = subscription.id.unwrap();
 
           async move {
             info!("Syncing subscription with ID {}", &id);
             models.subscription.notify(id).await.unwrap();
+
+            messenger
+              .publish("send_webhook_event", id.bytes().as_ref())
+              .await
+              .unwrap();
           }
         })
         .await;

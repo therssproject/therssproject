@@ -2,6 +2,8 @@ use wither::mongodb;
 
 use crate::settings::Settings;
 
+// Database uses std::sync::Arc internally, so it can safely be shared across
+// threads or async tasks
 #[derive(Clone)]
 pub struct Database {
   pub conn: mongodb::Database,
