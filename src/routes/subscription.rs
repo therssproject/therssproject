@@ -152,7 +152,7 @@ async fn remove_subscription_by_id(
 #[derive(Deserialize)]
 #[serde(untagged)]
 enum SubscriptionWebhook {
-  Url { url: String, title: Option<String> },
+  Url { url: String, title: String },
   Webhook { id: String },
 }
 

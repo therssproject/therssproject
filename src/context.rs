@@ -33,6 +33,8 @@ impl Context {
   }
 }
 
+// TODO: This definition should be in a new file. In this file we should also
+// sync indexes.
 #[derive(Clone)]
 pub struct Models {
   pub user: UserModel,

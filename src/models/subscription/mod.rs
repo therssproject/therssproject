@@ -28,10 +28,10 @@ impl Model {
   pub async fn setup(db: Database, messenger: Messenger) -> Self {
     let entry = EntryModel::new(db.clone());
     let webhook = WebhookModel::new(db.clone());
+    let this = Self { db, entry, webhook };
 
-    notify_job::setup(messenger).await.unwrap();
-
-    Self { db, entry, webhook }
+    notify_job::setup(this.clone(), messenger).await.unwrap();
+    this
   }
 
   pub async fn notify(&self, id: ObjectId) -> Result<(), Error> {

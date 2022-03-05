@@ -31,19 +31,19 @@ use settings::Settings;
 async fn main() {
   let settings = match Settings::new() {
     Ok(value) => value,
-    Err(err) => panic!("Failed to setup configuration. Error: {}", err),
+    Err(err) => panic!("Failed to setup configuration {}", err),
   };
 
   Logger::setup(&settings);
 
   let db = match Database::setup(&settings).await {
     Ok(value) => value,
-    Err(_) => panic!("Failed to setup database connection"),
+    Err(err) => panic!("Failed to setup database connection {}", err),
   };
 
   let messenger = match Messenger::setup(&settings).await {
     Ok(value) => value,
-    Err(_) => panic!("Failed to setup message broker connection"),
+    Err(err) => panic!("Failed to setup message broker connection{}", err),
   };
 
   let context = Context::setup(settings.clone(), db, messenger.clone()).await;
@@ -151,14 +151,10 @@ async fn main() {
         .buffer_unordered(concurrency)
         .flatten()
         .for_each_concurrent(concurrency, |subscription| {
-          let models = context.models.clone();
           let messenger = messenger.clone();
           let id = subscription.id.unwrap();
 
           async move {
-            info!("Syncing subscription with ID {}", &id);
-            models.subscription.notify(id).await.unwrap();
-
             messenger
               .publish("send_webhook_event", id.bytes().as_ref())
               .await
@@ -167,7 +163,6 @@ async fn main() {
         })
         .await;
 
-      // TODO: Push to a queue that will handle these jobs
       sleep(Duration::from_millis(5_000)).await;
     }
   });
