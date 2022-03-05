@@ -12,11 +12,11 @@ use tracing::debug;
 use crate::context::Context;
 use crate::errors::Error;
 use crate::errors::NotFound;
+use crate::lib::database_model::ModelExt;
 use crate::lib::to_object_id::to_object_id;
 use crate::lib::token::TokenUser;
 use crate::models::feed::PublicFeed;
 use crate::models::subscription::PublicSubscription;
-use crate::models::ModelExt;
 
 pub fn create_route() -> Router {
   Router::new()

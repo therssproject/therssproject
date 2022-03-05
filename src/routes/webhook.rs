@@ -9,11 +9,11 @@ use tracing::debug;
 use crate::context::Context;
 use crate::errors::Error;
 use crate::errors::NotFound;
+use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::lib::to_object_id::to_object_id;
 use crate::lib::token::TokenUser;
 use crate::models::webhook::{PublicWebhook, Webhook};
-use crate::models::ModelExt;
 
 pub fn create_route() -> Router {
   Router::new()
