@@ -5,9 +5,9 @@ use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
 use crate::database::Database;
+use crate::lib::database_model::ModelExt;
 use crate::lib::date::now;
 use crate::lib::date::Date;
-use crate::models::ModelExt;
 
 #[derive(Clone)]
 pub struct Model {

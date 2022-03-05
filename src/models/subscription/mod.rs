@@ -11,11 +11,11 @@ use wither::Model as WitherModel;
 
 use crate::database::Database;
 use crate::errors::{Error, NotFound};
+use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::messenger::Messenger;
 use crate::models::entry::Model as EntryModel;
 use crate::models::webhook::Model as WebhookModel;
-use crate::models::ModelExt;
 
 #[derive(Clone)]
 pub struct Model {

@@ -1,7 +1,8 @@
 use axum::extract::Extension;
 use axum::Router;
 use bson::doc;
-use futures::stream::{self, StreamExt};
+use futures::stream;
+use futures::StreamExt;
 use http::header;
 use std::net::SocketAddr;
 use tower_http::{
@@ -22,9 +23,10 @@ mod settings;
 
 use context::Context;
 use database::Database;
+use lib::database_model::ModelExt;
 use logger::Logger;
 use messenger::Messenger;
-use models::ModelExt;
+use models::Models;
 use settings::Settings;
 
 #[tokio::main]
@@ -43,42 +45,15 @@ async fn main() {
 
   let messenger = match Messenger::setup(&settings).await {
     Ok(value) => value,
-    Err(err) => panic!("Failed to setup message broker connection{}", err),
+    Err(err) => panic!("Failed to setup message broker connection {}", err),
   };
 
-  let context = Context::setup(settings.clone(), db, messenger.clone()).await;
+  let models = match Models::setup(db.clone(), messenger.clone()).await {
+    Ok(value) => value,
+    Err(err) => panic!("Failed to setup models {}", err),
+  };
 
-  // TODO: This is not pretty nice. Find a better way to do this.
-  context
-    .models
-    .user
-    .sync_indexes()
-    .await
-    .expect("Failed to sync indexes");
-  context
-    .models
-    .subscription
-    .sync_indexes()
-    .await
-    .expect("Failed to sync indexes");
-  context
-    .models
-    .feed
-    .sync_indexes()
-    .await
-    .expect("Failed to sync indexes");
-  context
-    .models
-    .entry
-    .sync_indexes()
-    .await
-    .expect("Failed to sync indexes");
-  context
-    .models
-    .webhook
-    .sync_indexes()
-    .await
-    .expect("Failed to sync indexes");
+  let context = Context::new(settings.clone(), models.clone());
 
   let app = Router::new()
     .merge(routes::user::create_route())
