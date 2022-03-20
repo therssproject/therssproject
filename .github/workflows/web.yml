@@ -42,7 +42,7 @@ jobs:
         working-directory: web
 
       - name: Typecheck
-        run: yarn typecheck
+        run: yarn ts:check
         working-directory: web
 
       - name: Tests
