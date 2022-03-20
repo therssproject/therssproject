@@ -52,11 +52,11 @@ export default function ComponentsPage() {
               >
                 Set to {mode === 'dark' ? 'light' : 'dark'}
               </Button>
-              {/* <Button onClick={randomize}>Randomize CSS Variable</Button> */}
             </div>
 
             <ol className="mt-8 space-y-6">
               <li className="space-y-2">
+                {/* TODO: remove when colors are selected */}
                 <h2 className="text-lg md:text-xl">Customize Colors</h2>
                 <p className={clsx('!mt-1 text-sm', textColor)}>
                   You can change primary color to any Tailwind CSS colors. See
