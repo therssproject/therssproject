@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const { fontFamily } = require('tailwindcss/defaultTheme');
+const {fontFamily} = require('tailwindcss/defaultTheme');
 
 function withOpacityValue(variable) {
-  return ({ opacityValue }) => {
+  return ({opacityValue}) => {
     if (opacityValue === undefined) {
       return `rgb(var(${variable}))`;
     }

@@ -10,17 +10,17 @@ export default function HomePage() {
       <Seo />
 
       <main>
-        <section className='bg-white'>
-          <div className='layout flex min-h-screen flex-col items-center justify-center text-center'>
-            <h1 className='mt-4'>RSS</h1>
+        <section className="bg-white">
+          <div className="layout flex min-h-screen flex-col items-center justify-center text-center">
+            <h1 className="mt-4">RSS</h1>
 
-            <footer className='absolute bottom-2 text-gray-700'>
+            <footer className="absolute bottom-2 text-gray-700">
               © {new Date().getFullYear()} By{' '}
-              <UnderlineLink href='https://gillchristian.xyz'>
+              <UnderlineLink href="https://gillchristian.xyz">
                 gillchristian
               </UnderlineLink>
               {' & '}
-              <UnderlineLink href='https://github.com/ndelvalle'>
+              <UnderlineLink href="https://github.com/ndelvalle">
                 ndelvalle
               </UnderlineLink>
             </footer>
