@@ -7,6 +7,6 @@ module.exports = {
   siteUrl: 'https://rss.dev',
   generateRobotsTxt: true,
   robotsTxtOptions: {
-    policies: [{ userAgent: '*', allow: '/' }],
+    policies: [{userAgent: '*', allow: '/'}],
   },
 };

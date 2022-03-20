@@ -2,7 +2,8 @@
   <h1>Web Client</h1>
 </div>
 
-Generated with [ts-nextjs-tailwind-starter](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter)
+Generated with
+[ts-nextjs-tailwind-starter](https://github.com/theodorusclarence/ts-nextjs-tailwind-starter)
 
 ## Development
 
@@ -22,8 +23,11 @@ You can start the server using this command:
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the
+result.
 
 ### 3. Commit Message Convention
 
-This starter is using [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/), it is mandatory to use it to commit changes.
+This starter is using
+[conventional commits](https://www.conventionalcommits.org/en/v1.0.0/), it is
+mandatory to use it to commit changes.

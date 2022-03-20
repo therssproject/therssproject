@@ -1,11 +1,11 @@
-import Image, { ImageLoaderProps, ImageProps } from 'next/image';
+import Image, {ImageLoaderProps, ImageProps} from 'next/image';
 import * as React from 'react';
 
 import clsxm from '@/lib/clsxm';
 
 type NextImageProps = (
-  | { width: string | number; height: string | number }
-  | { layout: 'fill'; width?: string | number; height?: string | number }
+  | {width: string | number; height: string | number}
+  | {layout: 'fill'; width?: string | number; height?: string | number}
 ) &
   ImageProps;
 
@@ -21,16 +21,16 @@ export default function NextImage({
   return (
     <div className={clsxm(className)}>
       <Image
-        className='transition-all duration-200'
+        className="transition-all duration-200"
         src={src}
         width={width}
         height={height}
         layout={layout}
         alt={alt}
         loader={customLoader}
-        placeholder='blur'
+        placeholder="blur"
         blurDataURL={`data:image/svg+xml;base64,${toBase64(
-          shimmer(width ? +width : 700, height ? +height : 475)
+          shimmer(width ? +width : 700, height ? +height : 475),
         )}`}
         {...rest}
       />
@@ -38,7 +38,7 @@ export default function NextImage({
   );
 }
 
-const customLoader = ({ src, width, quality }: ImageLoaderProps): string => {
+const customLoader = ({src, width, quality}: ImageLoaderProps): string => {
   return `${src}?w=${width}&q=${quality || 75}`;
 };
 
