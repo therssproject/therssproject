@@ -1,0 +1,53 @@
+name: Web CI
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'web/**'
+      - '.github/workflows/web.yml'
+  push:
+    branches:
+      - '*'
+    paths:
+      - 'web/**'
+      - '.github/workflows/web.yml'
+
+jobs:
+  build:
+    name: Build and checks
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn
+        working-directory: web
+
+      - name: Linter check
+        run: yarn lint:strict
+        working-directory: web
+
+      - name: Format check
+        run: yarn format:check
+        working-directory: web
+
+      - name: Typecheck
+        run: yarn typecheck
+        working-directory: web
+
+      - name: Tests
+        run: yarn test
+        working-directory: web
+
+      - name: Build
+        run: yarn build
+        working-directory: web
