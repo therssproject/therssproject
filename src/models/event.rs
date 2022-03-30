@@ -38,8 +38,8 @@ pub struct Event {
   pub user: ObjectId,
   pub subscription: ObjectId,
   pub webhook: ObjectId,
-  // The webhook might change its URL and we want to keep a record of the
-  // original URL where this is event was sent.
+  // The webhook might change its URL, we want to keep a record of the original
+  // URL where this is event was sent.
   pub url: String,
   pub created_at: Date,
 }
