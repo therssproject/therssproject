@@ -40,8 +40,8 @@ pub struct User {
   #[validate(email)]
   pub email: String,
   pub password: String,
-  pub updated_at: Date,
   pub created_at: Date,
+  pub updated_at: Date,
   pub locked_at: Option<Date>,
 }
 
