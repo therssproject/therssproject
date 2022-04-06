@@ -1,7 +1,7 @@
 _type: export
 __export_format: 4
-__export_date: 2022-03-04T23:28:16.712Z
-__export_source: insomnia.desktop.app:v2022.1.0
+__export_date: 2022-04-06T23:17:07.007Z
+__export_source: insomnia.desktop.app:v2022.2.1
 resources:
   - _id: req_85289b31b294466fb92be91a826c0f67
     parentId: fld_0a21a5a354814d8584e54cde33c122ef
@@ -67,6 +67,136 @@ resources:
     settingRebuildPath: true
     settingFollowRedirects: global
     _type: request
+  - _id: req_0947f2840d06488f9e6682cb297b9ff5
+    parentId: fld_c7378de09cc346438f84ca439f0d370b
+    modified: 1649286876565
+    created: 1649286773613
+    url: http://localhost:8080/applications
+    name: Query Applications
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTE4Nzg4MjksImlhdCI6MTY0OTI4NjgyOSwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIyMTc5ZDQ5ZWI3MzAxY2U2MzAyNzA1In0sIm5hbWUiOiJtaWxhIiwiZW1haWwiOiJtaWxhQG1haWwuY29tIn19.DbqangmGK4wOj1cx0LmHZI4g3PE813xF_c6aD9F2FcA
+    metaSortKey: -1648555447948.75
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_c7378de09cc346438f84ca439f0d370b
+    parentId: fld_a0684e80ea9541428b902961b061471e
+    modified: 1649286756940
+    created: 1649286756940
+    name: Application
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1649286756940
+    _type: request_group
+  - _id: fld_a0684e80ea9541428b902961b061471e
+    parentId: wrk_167dc5aa07e64e449751fda0064c921c
+    modified: 1646360912374
+    created: 1644765394981
+    name: User
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1644765394981
+    _type: request_group
+  - _id: req_539eb7807aa443c396fb198f8e318911
+    parentId: fld_c7378de09cc346438f84ca439f0d370b
+    modified: 1649286985192
+    created: 1649286982677
+    url: http://localhost:8080/applications/624e1ef986f592edd7a43f46
+    name: Get Application
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTE4Nzg4MjksImlhdCI6MTY0OTI4NjgyOSwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIyMTc5ZDQ5ZWI3MzAxY2U2MzAyNzA1In0sIm5hbWUiOiJtaWxhIiwiZW1haWwiOiJtaWxhQG1haWwuY29tIn19.DbqangmGK4wOj1cx0LmHZI4g3PE813xF_c6aD9F2FcA
+    metaSortKey: -1647592048744.5625
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_4028ccb3ef5f4bec94713ff09e4ba361
+    parentId: fld_c7378de09cc346438f84ca439f0d370b
+    modified: 1649286932324
+    created: 1649286886793
+    url: http://localhost:8080/applications
+    name: Create Application
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"name": "My APP 2",
+        	"description": "Description"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_bb6872eb07d148c99a9038f97fa449b4
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTE4Nzg4MjksImlhdCI6MTY0OTI4NjgyOSwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIyMTc5ZDQ5ZWI3MzAxY2U2MzAyNzA1In0sIm5hbWUiOiJtaWxhIiwiZW1haWwiOiJtaWxhQG1haWwuY29tIn19.DbqangmGK4wOj1cx0LmHZI4g3PE813xF_c6aD9F2FcA
+    metaSortKey: -1646628649540.375
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_2f4627096f6446a9b7758b3e9f4a483c
+    parentId: fld_c7378de09cc346438f84ca439f0d370b
+    modified: 1649286953519
+    created: 1649286939158
+    url: http://localhost:8080/applications/624e1f0686f592edd7a43f59
+    name: Remove Application
+    description: ""
+    method: DELETE
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"name": "My APP 2",
+        	"description": "Description"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_bb6872eb07d148c99a9038f97fa449b4
+    authentication:
+      type: bearer
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTE4Nzg4MjksImlhdCI6MTY0OTI4NjgyOSwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIyMTc5ZDQ5ZWI3MzAxY2U2MzAyNzA1In0sIm5hbWUiOiJtaWxhIiwiZW1haWwiOiJtaWxhQG1haWwuY29tIn19.DbqangmGK4wOj1cx0LmHZI4g3PE813xF_c6aD9F2FcA
+    metaSortKey: -1645665250336.1875
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
   - _id: req_94f5371e41e64ffdb98aa582af731424
     parentId: fld_d273d430a7184e789268ba6c21e54fd6
     modified: 1646361524648
@@ -109,16 +239,6 @@ resources:
     environment: {}
     environmentPropertyOrder: null
     metaSortKey: -1646361520975
-    _type: request_group
-  - _id: fld_a0684e80ea9541428b902961b061471e
-    parentId: wrk_167dc5aa07e64e449751fda0064c921c
-    modified: 1646360912374
-    created: 1644765394981
-    name: User
-    description: ""
-    environment: {}
-    environmentPropertyOrder: null
-    metaSortKey: -1644765394981
     _type: request_group
   - _id: req_36d86b6788dc4640b8a78d19c28e21af
     parentId: fld_d273d430a7184e789268ba6c21e54fd6
@@ -192,7 +312,7 @@ resources:
     _type: request
   - _id: req_7826fc9297b043f7a658a5f3df0d6620
     parentId: fld_1188ef77438e4a6caa5a3d7332aaea70
-    modified: 1646436461214
+    modified: 1649286843912
     created: 1646361219875
     url: http://localhost:8080/webhooks
     name: Create Webhook
@@ -234,7 +354,7 @@ resources:
     _type: request_group
   - _id: req_8e4cc99d4bf24d79ba379c1c072b989e
     parentId: fld_1188ef77438e4a6caa5a3d7332aaea70
-    modified: 1646361485240
+    modified: 1649286841281
     created: 1644764464484
     url: http://localhost:8080/webhooks
     name: Query Webhooks
@@ -245,7 +365,7 @@ resources:
     headers: []
     authentication:
       type: bearer
-      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDczNTcwMjQsImlhdCI6MTY0NDc2NTAyNCwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIwOTFmNWEwNmM2Yzk3MmE0Mzc1MTY3In0sIm5hbWUiOiJnaWxsY2hyaXN0aWFuIiwiZW1haWwiOiJnQG1haWwuY29tIn19.mzVGJpBE29ypn4FR0qcz0hLtgJ3WjgXgFkIRORy1t-A
+      token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTE4Nzg4MjksImlhdCI6MTY0OTI4NjgyOSwidXNlciI6eyJpZCI6eyIkb2lkIjoiNjIyMTc5ZDQ5ZWI3MzAxY2U2MzAyNzA1In0sIm5hbWUiOiJtaWxhIiwiZW1haWwiOiJtaWxhQG1haWwuY29tIn19.DbqangmGK4wOj1cx0LmHZI4g3PE813xF_c6aD9F2FcA
     metaSortKey: -1644701850910.125
     isPrivate: false
     settingStoreCookies: true
@@ -285,7 +405,7 @@ resources:
     _type: request
   - _id: req_8d9daf2202cf48789f9a1a84eddb5b75
     parentId: fld_1188ef77438e4a6caa5a3d7332aaea70
-    modified: 1646361479375
+    modified: 1649286849154
     created: 1646361280413
     url: http://localhost:8080/webhooks/62217ab49eb7301ce6302706
     name: Update Webhook
@@ -376,7 +496,7 @@ resources:
     _type: request
   - _id: req_408d6268bdba4ce6be1d7569530018cd
     parentId: fld_a0684e80ea9541428b902961b061471e
-    modified: 1646361046158
+    modified: 1649286826938
     created: 1644701851082
     url: http://localhost:8080/users/authenticate
     name: Login
