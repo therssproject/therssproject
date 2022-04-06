@@ -57,6 +57,7 @@ async fn main() {
 
   let app = Router::new()
     .merge(routes::user::create_route())
+    .merge(routes::application::create_route())
     .merge(routes::subscription::create_route())
     .merge(routes::feed::create_route())
     .merge(routes::webhook::create_route())

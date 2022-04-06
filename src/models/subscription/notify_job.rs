@@ -30,6 +30,7 @@ pub async fn setup(subscription: SubscriptionModel, messenger: Messenger) -> Res
         }
       };
 
+      // TODO: Create a struct to represent the message payload.
       let data = delivery.data.clone();
       let data: [u8; 12] = match data.as_slice().try_into() {
         Ok(value) => value,
