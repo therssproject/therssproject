@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+#__next {
+  @apply h-full;
+}
+
 :root {
   /* #region  /**=========== Primary Color =========== */
   /* TODO Customize these variable, copy and paste from /styles/colors.css for list of colors */
