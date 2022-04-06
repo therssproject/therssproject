@@ -2,22 +2,19 @@ import * as React from 'react';
 
 import clsxm from '@/lib/clsxm';
 
-import UnstyledLink, {UnstyledLinkProps} from '@/components/links/UnstyledLink';
+import {
+  UnstyledLink,
+  Props as UnstyledLinkProps,
+} from '@/components/links/UnstyledLink';
 
-enum ButtonVariant {
-  'primary',
-  'outline',
-  'ghost',
-  'light',
-  'dark',
-}
+type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'light' | 'dark';
 
-type ButtonLinkProps = {
+type Props = {
   isDarkBg?: boolean;
-  variant?: keyof typeof ButtonVariant;
+  variant?: ButtonVariant;
 } & UnstyledLinkProps;
 
-const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
+export const ButtonLink = React.forwardRef<HTMLAnchorElement, Props>(
   (
     {children, className, variant = 'primary', isDarkBg = false, ...rest},
     ref,
@@ -31,7 +28,6 @@ const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
           'focus:outline-none focus-visible:ring focus-visible:ring-primary-500',
           'shadow-sm',
           'transition-colors duration-75',
-          //#region  //*=========== Variants ===========
           [
             variant === 'primary' && [
               'bg-primary-500 text-white',
@@ -66,7 +62,6 @@ const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
               'hover:bg-gray-800 active:bg-gray-700 disabled:bg-gray-700',
             ],
           ],
-          //#endregion  //*======== Variants ===========
           'disabled:cursor-not-allowed',
           className,
         )}
@@ -76,5 +71,3 @@ const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
     );
   },
 );
-
-export default ButtonLink;

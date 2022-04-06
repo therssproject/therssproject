@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import clsxm from '@/lib/clsxm';
 
-export type UnstyledLinkProps = {
+export type Props = {
   href: string;
   children: React.ReactNode;
   openNewTab?: boolean;
@@ -11,7 +11,8 @@ export type UnstyledLinkProps = {
   nextLinkProps?: Omit<LinkProps, 'href'>;
 } & React.ComponentPropsWithRef<'a'>;
 
-const UnstyledLink = React.forwardRef<HTMLAnchorElement, UnstyledLinkProps>(
+// TODO: use next/Link
+export const UnstyledLink = React.forwardRef<HTMLAnchorElement, Props>(
   ({children, href, openNewTab, className, nextLinkProps, ...rest}, ref) => {
     const isNewTab =
       openNewTab !== undefined
@@ -42,5 +43,3 @@ const UnstyledLink = React.forwardRef<HTMLAnchorElement, UnstyledLinkProps>(
     );
   },
 );
-
-export default UnstyledLink;

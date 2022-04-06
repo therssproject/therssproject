@@ -3,21 +3,16 @@ import {ImSpinner2} from 'react-icons/im';
 
 import clsxm from '@/lib/clsxm';
 
-enum ButtonVariant {
-  'primary',
-  'outline',
-  'ghost',
-  'light',
-  'dark',
-}
+type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'light' | 'dark';
 
-type ButtonProps = {
+type Props = {
   isLoading?: boolean;
   isDarkBg?: boolean;
-  variant?: keyof typeof ButtonVariant;
+  isFullWidth?: boolean;
+  variant?: ButtonVariant;
 } & React.ComponentPropsWithRef<'button'>;
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+export const Button = React.forwardRef<HTMLButtonElement, Props>(
   (
     {
       children,
@@ -26,6 +21,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       isLoading,
       variant = 'primary',
       isDarkBg = false,
+      isFullWidth = false,
       ...rest
     },
     ref,
@@ -42,7 +38,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           'focus:outline-none focus-visible:ring focus-visible:ring-primary-500',
           'shadow-sm',
           'transition-colors duration-75',
-          //#region  //*=========== Variants ===========
           [
             variant === 'primary' && [
               'bg-primary-500 text-white',
@@ -77,10 +72,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               'hover:bg-gray-800 active:bg-gray-700 disabled:bg-gray-700',
             ],
           ],
-          //#endregion  //*======== Variants ===========
           'disabled:cursor-not-allowed',
           isLoading &&
             'relative text-transparent transition-none hover:text-transparent disabled:cursor-wait',
+          isFullWidth && 'flex w-full justify-center',
           className,
         )}
         {...rest}
@@ -104,5 +99,3 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
   },
 );
-
-export default Button;
