@@ -1,5 +1,5 @@
 use axum::{
-  extract::{Extension, Path},
+  extract::{Extension, Path, Query},
   routing::{delete, get},
   Json, Router,
 };
@@ -14,7 +14,9 @@ use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::to_object_id::to_object_id;
+use crate::lib::to_url::to_url;
 use crate::lib::token::TokenUser;
+use crate::models::feed::Feed;
 use crate::models::feed::PublicFeed;
 use crate::models::subscription::PublicSubscription;
 
@@ -25,6 +27,7 @@ pub fn create_route() -> Router {
     .route("/feeds/:id", get(get_feed_by_id))
     // TODO: enable this rounte only in debug mode
     .route("/feeds/:id", delete(remove_feed_by_id))
+    .route("/parse-feed", get(parse_feed))
 }
 
 async fn query_feed(
@@ -109,4 +112,20 @@ async fn remove_feed_by_id(
   }
 
   Ok(())
+}
+
+async fn parse_feed(query: Query<ParseUrlQuery>) -> Result<Json<Feed>, Error> {
+  let url = query.url.clone();
+  let url = to_url(url)?;
+
+  let feed = Feed::from_url(url.to_string()).await;
+
+  // TODO: Return a proper response.
+  debug!("Returning feed");
+  Ok(Json(feed))
+}
+
+#[derive(Deserialize)]
+struct ParseUrlQuery {
+  url: String,
 }

@@ -14,6 +14,9 @@ pub enum Error {
   #[error("Failed to read application context")]
   ReadContext,
 
+  #[error("Failed to parse URL")]
+  ParseURL,
+
   #[error("{0}")]
   Wither(#[from] WitherError),
 
@@ -74,6 +77,7 @@ impl Error {
       Error::SerializeMongoResponse(_) => (StatusCode::INTERNAL_SERVER_ERROR, 5009),
       Error::RunSyncTask(_) => (StatusCode::INTERNAL_SERVER_ERROR, 5009),
       Error::HashPassword(_) => (StatusCode::INTERNAL_SERVER_ERROR, 5009),
+      Error::ParseURL => (StatusCode::INTERNAL_SERVER_ERROR, 5010),
     }
   }
 }
