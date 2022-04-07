@@ -86,29 +86,34 @@ pub struct Feed {
   pub feed_type: FeedType,
   pub url: String,
   pub title: Option<String>,
+  pub description: Option<String>,
   pub updated_at: Date,
   pub created_at: Date,
   pub synced_at: Date,
 }
 
 impl Feed {
-  pub fn new(public_id: String, feed_type: FeedType, url: String, title: Option<String>) -> Self {
+  pub async fn from_url(url: String) -> Self {
+    let raw_feed = fetch_rss(url.clone()).await;
+
+    let title = raw_feed.title.clone().map(|title| title.content);
+    let description = raw_feed
+      .description
+      .clone()
+      .map(|description| description.content);
     let now = now();
+
     Self {
       id: None,
-      public_id,
-      feed_type,
+      public_id: raw_feed.id,
+      feed_type: FeedType::from(raw_feed.feed_type),
       url,
       title,
+      description,
       updated_at: now,
       created_at: now,
       synced_at: now,
     }
-  }
-
-  pub async fn from_url(url: String) -> Self {
-    let raw_feed = fetch_rss(url.clone()).await;
-    Self::new(raw_feed.id, FeedType::from(raw_feed.feed_type), url, None)
   }
 }
 
