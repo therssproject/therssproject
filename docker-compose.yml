@@ -1,0 +1,23 @@
+version: '3.1'
+
+services:
+
+  mongo:
+    image: mongo
+    environment:
+      mongo_initdb_database: gillchristian
+      mongo_initdb_root_username: ''
+      mongo_initdb_root_password: ''
+    volumes:
+      - mongodb_data_container:/data/db
+    ports:
+      - '27017-27019:27017-27019'
+
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
+volumes:
+  mongodb_data_container:
