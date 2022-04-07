@@ -1,12 +1,43 @@
-import React from 'react';
+import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
+import {yupResolver} from '@hookform/resolvers/yup';
+import {useState} from 'react';
+import {SubmitHandler, useForm} from 'react-hook-form';
+import * as yup from 'yup';
 
 import {Button} from '@/components/buttons/Button';
 import {GitHub} from '@/components/icons/GitHub';
 import {Google} from '@/components/icons/Google';
 import {Rss} from '@/components/icons/Rss';
-import {Input} from '@/components/inputs/Input';
+import {Field} from '@/components/inputs/Field';
+
+type Inputs = {
+  name: string;
+  email: string;
+  password: string;
+  passwordCheck: string;
+};
+
+const Inputs = yup.object({
+  name: yup.string().required(),
+  email: yup.string().email().required(),
+  password: yup.string().min(3).max(50).required(),
+  passwordCheck: yup
+    .string()
+    .required()
+    .oneOf([yup.ref('password')], 'Passwords should match'),
+});
 
 const Register = () => {
+  const [showPassword, setShowPass] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: {errors},
+  } = useForm<Inputs>({resolver: yupResolver(Inputs)});
+
+  // eslint-disable-next-line no-console
+  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+
   return (
     <div className="flex min-h-full">
       <div className="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
@@ -24,14 +55,14 @@ const Register = () => {
                 <div className="mt-1 grid grid-cols-2 gap-3">
                   <div>
                     <Button variant="light" isFullWidth>
-                      <span className="sr-only">Sign in with Google</span>
+                      <span className="sr-only">Register in with Google</span>
                       <Google className="h-5 w-5" />
                     </Button>
                   </div>
 
                   <div>
                     <Button variant="light" isFullWidth>
-                      <span className="sr-only">Sign in with GitHub</span>
+                      <span className="sr-only">Register in with GitHub</span>
                       <GitHub className="h-5 w-5" />
                     </Button>
                   </div>
@@ -54,60 +85,66 @@ const Register = () => {
             </div>
 
             <div className="mt-6">
-              <form action="#" method="POST" className="space-y-6">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Name
-                  </label>
-                  <div className="mt-1">
-                    <Input
-                      id="name"
-                      name="name"
-                      type="name"
-                      autoComplete="name"
-                      required
-                    />
-                  </div>
-                </div>
+              <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+                <Field
+                  label="Name"
+                  input={{
+                    id: 'name',
+                    type: 'name',
+                    autoComplete: 'name',
+                    variant: errors.name ? 'error' : 'default',
+                    ...register('name', {required: true}),
+                  }}
+                  message={errors.name?.message}
+                />
 
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Email address
-                  </label>
-                  <div className="mt-1">
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      required
-                    />
-                  </div>
-                </div>
+                <Field
+                  label="Email"
+                  input={{
+                    id: 'email',
+                    type: 'email',
+                    autoComplete: 'email',
+                    variant: errors.email ? 'error' : 'default',
+                    ...register('email', {required: true}),
+                  }}
+                  message={errors.email?.message}
+                />
 
-                <div className="space-y-1">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Password
-                  </label>
-                  <div className="mt-1">
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      autoComplete="current-password"
-                      required
-                    />
-                  </div>
-                </div>
+                <Field
+                  label="Password"
+                  input={{
+                    id: 'password',
+                    type: showPassword ? 'text' : 'password',
+                    autoComplete: 'password',
+                    variant: errors.password ? 'error' : 'default',
+                    ...register('password', {required: true}),
+                  }}
+                  message={errors.password?.message}
+                  icon={{
+                    After: showPassword ? EyeIcon : EyeOffIcon,
+                    onClick: showPassword
+                      ? () => setShowPass(false)
+                      : () => setShowPass(true),
+                  }}
+                />
+
+                <Field
+                  label="Cofirm password"
+                  input={{
+                    id: 'passwordCheck',
+                    type: showPassword ? 'text' : 'password',
+                    autoComplete: 'passwordCheck',
+                    variant: errors.passwordCheck ? 'error' : 'default',
+                    ...register('passwordCheck', {required: true}),
+                  }}
+                  message={errors.passwordCheck?.message}
+                  icon={{
+                    After: showPassword ? EyeIcon : EyeOffIcon,
+                    onClick: showPassword
+                      ? () => setShowPass(false)
+                      : () => setShowPass(true),
+                  }}
+                />
 
                 <div>
                   <Button type="submit" isFullWidth>
