@@ -3,8 +3,8 @@ import * as React from 'react';
 import clsxm from '@/lib/clsxm';
 
 import {
-  UnstyledLink,
   Props as UnstyledLinkProps,
+  UnstyledLink,
 } from '@/components/links/UnstyledLink';
 
 type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'light' | 'dark';
