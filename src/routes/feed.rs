@@ -127,5 +127,5 @@ async fn parse_feed(query: Query<ParseUrlQuery>) -> Result<Json<Feed>, Error> {
 
 #[derive(Deserialize)]
 struct ParseUrlQuery {
-    url: String,
+  url: String,
 }
