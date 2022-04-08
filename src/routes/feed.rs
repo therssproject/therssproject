@@ -20,7 +20,7 @@ use crate::models::feed::Feed;
 use crate::models::feed::PublicFeed;
 use crate::models::subscription::PublicSubscription;
 
-pub fn create_route() -> Router {
+pub fn create_router() -> Router {
   Router::new()
     // TODO: make these routes only accesibble by admins
     .route("/feeds", get(query_feed))

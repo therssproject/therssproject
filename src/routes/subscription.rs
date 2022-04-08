@@ -17,7 +17,7 @@ use crate::models::feed::Feed;
 use crate::models::subscription::{PublicSubscription, Subscription};
 use crate::models::webhook::Webhook;
 
-pub fn create_route() -> Router {
+pub fn create_router() -> Router {
   Router::new()
     .route("/subscriptions", post(create_subscription))
     .route("/subscriptions", get(query_subscription))
