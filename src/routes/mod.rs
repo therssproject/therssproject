@@ -6,17 +6,21 @@ pub mod webhook;
 
 use axum::Router;
 
-pub fn create() -> Router {
+pub fn create_router() -> Router {
   Router::new()
-    .merge(user::create_route())
-    .merge(feed::create_route())
+    .merge(user::create_router())
+    .merge(feed::create_router())
     .merge(
       Router::new().nest(
-        "/application/:application_id",
-        Router::new()
-          .merge(application::create_route())
-          .merge(subscription::create_route())
-          .merge(webhook::create_route()),
+        "/applications",
+        Router::new().merge(application::create_router()).merge(
+          Router::new().nest(
+            "/:application_id",
+            Router::new()
+              .merge(subscription::create_router())
+              .merge(webhook::create_router()),
+          ),
+        ),
       ),
     )
 }

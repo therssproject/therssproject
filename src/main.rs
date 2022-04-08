@@ -1,5 +1,4 @@
 use axum::extract::Extension;
-use axum::Router;
 use bson::doc;
 use futures::stream;
 use futures::StreamExt;
@@ -55,12 +54,7 @@ async fn main() {
 
   let context = Context::new(settings.clone(), models.clone());
 
-  let app = Router::new()
-    .merge(routes::user::create_route())
-    .merge(routes::application::create_route())
-    .merge(routes::subscription::create_route())
-    .merge(routes::feed::create_route())
-    .merge(routes::webhook::create_route())
+  let app = routes::create_router()
     // High level logging of requests and responses
     .layer(
       trace::TraceLayer::new_for_http()
