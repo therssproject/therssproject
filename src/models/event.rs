@@ -29,13 +29,13 @@ impl ModelExt for Model {
 
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(
-  keys = r#"doc!{ "user": 1, "url": 1 }"#,
+  keys = r#"doc!{ "application": 1, "url": 1 }"#,
   options = r#"doc!{ "unique": true }"#
 ))]
 pub struct Event {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
-  pub user: ObjectId,
+  pub application: ObjectId,
   pub subscription: ObjectId,
   pub webhook: ObjectId,
   // The webhook might change its URL, we want to keep a record of the original
@@ -45,10 +45,15 @@ pub struct Event {
 }
 
 impl Event {
-  pub fn new(user: ObjectId, subscription: ObjectId, webhook: ObjectId, url: String) -> Self {
+  pub fn new(
+    application: ObjectId,
+    subscription: ObjectId,
+    webhook: ObjectId,
+    url: String,
+  ) -> Self {
     Self {
       id: None,
-      user,
+      application,
       subscription,
       webhook,
       url,
@@ -62,7 +67,7 @@ pub struct PublicEvent {
   #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub id: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
-  pub user: ObjectId,
+  pub application: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub webhook: ObjectId,
   pub url: String,
@@ -74,7 +79,7 @@ impl From<Event> for PublicEvent {
   fn from(event: Event) -> Self {
     Self {
       id: event.id.unwrap(),
-      user: event.user,
+      application: event.application,
       webhook: event.webhook,
       url: event.url,
       created_at: event.created_at,

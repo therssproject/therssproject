@@ -50,7 +50,7 @@ impl Model {
       }
     };
 
-    let event = Event::new(webhook.user, subscription, id, webhook.url.clone());
+    let event = Event::new(webhook.application, subscription, id, webhook.url.clone());
 
     let mut map = HashMap::new();
     map.insert("foo", "baz");
@@ -74,13 +74,13 @@ impl ModelExt for Model {
 
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(
-  keys = r#"doc!{ "user": 1, "url": 1 }"#,
+  keys = r#"doc!{ "application": 1, "url": 1 }"#,
   options = r#"doc!{ "unique": true }"#
 ))]
 pub struct Webhook {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
-  pub user: ObjectId,
+  pub application: ObjectId,
   pub url: String,
   pub title: String,
   pub updated_at: Date,
@@ -88,11 +88,11 @@ pub struct Webhook {
 }
 
 impl Webhook {
-  pub fn new(user: ObjectId, url: String, title: String) -> Self {
+  pub fn new(application: ObjectId, url: String, title: String) -> Self {
     let now = now();
     Self {
       id: None,
-      user,
+      application,
       url,
       title,
       updated_at: now,
@@ -106,7 +106,7 @@ pub struct PublicWebhook {
   #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub id: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
-  pub user: ObjectId,
+  pub application: ObjectId,
   pub url: String,
   pub title: String,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
@@ -118,10 +118,8 @@ pub struct PublicWebhook {
 impl From<Webhook> for PublicWebhook {
   fn from(webhook: Webhook) -> Self {
     Self {
-      id: webhook
-        .id
-        .expect("PublicWebhook From<Webhook> expects an id"),
-      user: webhook.user,
+      id: webhook.id.unwrap(),
+      application: webhook.application,
       url: webhook.url,
       title: webhook.title,
       updated_at: webhook.updated_at,

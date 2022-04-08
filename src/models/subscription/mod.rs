@@ -114,7 +114,7 @@ impl ModelExt for Model {
 pub struct Subscription {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
-  pub user: ObjectId,
+  pub application: ObjectId,
   pub url: String,
   pub feed: ObjectId,
   pub webhook: ObjectId,
@@ -128,11 +128,11 @@ pub struct Subscription {
 }
 
 impl Subscription {
-  pub fn new(user: ObjectId, feed: ObjectId, webhook: ObjectId, url: String) -> Self {
+  pub fn new(application: ObjectId, feed: ObjectId, webhook: ObjectId, url: String) -> Self {
     let now = now();
     Self {
       id: None,
-      user,
+      application,
       url,
       feed,
       webhook,
@@ -150,7 +150,7 @@ pub struct PublicSubscription {
   #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub id: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
-  pub user: ObjectId,
+  pub application: ObjectId,
   pub url: String,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub feed: ObjectId,
@@ -165,10 +165,8 @@ pub struct PublicSubscription {
 impl From<Subscription> for PublicSubscription {
   fn from(subscription: Subscription) -> Self {
     Self {
-      id: subscription
-        .id
-        .expect("PublicSubscription From<Subscription> expects an id"),
-      user: subscription.user,
+      id: subscription.id.unwrap(),
+      application: subscription.application,
       url: subscription.url.clone(),
       feed: subscription.feed,
       webhook: subscription.webhook,
