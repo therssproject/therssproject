@@ -73,7 +73,10 @@ async fn get_webhook_by_id(
   let webhook = context
     .models
     .webhook
-    .find_one(doc! { "_id": webhook_id, "application": application_id }, None)
+    .find_one(
+      doc! { "_id": webhook_id, "application": application_id },
+      None,
+    )
     .await?
     .map(PublicWebhook::from);
 
