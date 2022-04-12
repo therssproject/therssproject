@@ -17,7 +17,7 @@ use crate::models::webhook::{PublicWebhook, Webhook};
 
 pub fn create_router() -> Router {
   // TODO: Authenticate these requests based on the user and application
-  // relationship / membership.
+  // relationship / membership and make sure the application exists.
   Router::new()
     .route("/webhooks", post(create_webhook))
     .route("/webhooks", get(query_webhook))
