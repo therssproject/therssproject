@@ -9,7 +9,7 @@ type NextImageProps = (
 ) &
   ImageProps;
 
-export default function NextImage({
+export const NextImage = ({
   className,
   src,
   width,
@@ -17,26 +17,24 @@ export default function NextImage({
   layout,
   alt,
   ...rest
-}: NextImageProps) {
-  return (
-    <div className={clsxm(className)}>
-      <Image
-        className="transition-all duration-200"
-        src={src}
-        width={width}
-        height={height}
-        layout={layout}
-        alt={alt}
-        loader={customLoader}
-        placeholder="blur"
-        blurDataURL={`data:image/svg+xml;base64,${toBase64(
-          shimmer(width ? +width : 700, height ? +height : 475),
-        )}`}
-        {...rest}
-      />
-    </div>
-  );
-}
+}: NextImageProps) => (
+  <div className={clsxm(className)}>
+    <Image
+      className="transition-all duration-200"
+      src={src}
+      width={width}
+      height={height}
+      layout={layout}
+      alt={alt}
+      loader={customLoader}
+      placeholder="blur"
+      blurDataURL={`data:image/svg+xml;base64,${toBase64(
+        shimmer(width ? +width : 700, height ? +height : 475),
+      )}`}
+      {...rest}
+    />
+  </div>
+);
 
 const customLoader = ({src, width, quality}: ImageLoaderProps): string => {
   return `${src}?w=${width}&q=${quality || 75}`;
