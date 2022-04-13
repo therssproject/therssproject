@@ -5,6 +5,7 @@ use axum::{
 };
 use bson::doc;
 use serde::Deserialize;
+use std::collections::HashMap;
 use tracing::debug;
 
 use crate::context::Context;
@@ -12,12 +13,13 @@ use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::to_object_id::to_object_id;
-use crate::lib::token::TokenUser;
 use crate::models::feed::Feed;
 use crate::models::subscription::{PublicSubscription, Subscription};
 use crate::models::webhook::Webhook;
 
-pub fn create_route() -> Router {
+pub fn create_router() -> Router {
+  // TODO: Authenticate these requests based on the user and application
+  // relationship / membership and make sure the application exists.
   Router::new()
     .route("/subscriptions", post(create_subscription))
     .route("/subscriptions", get(query_subscription))
@@ -26,19 +28,12 @@ pub fn create_route() -> Router {
 }
 
 async fn create_subscription(
-  user: TokenUser,
   Extension(context): Extension<Context>,
   Json(payload): Json<CreateSubscription>,
+  Path(params): Path<HashMap<String, String>>,
 ) -> Result<Json<PublicSubscription>, Error> {
-  let subscription = context
-    .models
-    .subscription
-    .find_one(doc! { "user": &user.id, "url": &payload.url }, None)
-    .await?;
-
-  if let Some(subscription) = subscription {
-    return Ok(Json(PublicSubscription::from(subscription)));
-  }
+  let application_id = params.get("application_id").unwrap().to_owned();
+  let application_id = to_object_id(application_id).unwrap();
 
   let feed = context
     .models
@@ -57,7 +52,7 @@ async fn create_subscription(
 
   let webhook = match payload.webhook {
     SubscriptionWebhook::Url { url, title } => {
-      let webhook = Webhook::new(user.id, url, title);
+      let webhook = Webhook::new(application_id, url, title);
       context.models.webhook.create(webhook).await?
     }
 
@@ -66,7 +61,10 @@ async fn create_subscription(
       let webhook = context
         .models
         .webhook
-        .find_one(doc! { "user": &user.id, "_id": webhook_id }, None)
+        .find_one(
+          doc! { "application": &application_id, "_id": webhook_id },
+          None,
+        )
         .await?;
 
       match webhook {
@@ -78,9 +76,9 @@ async fn create_subscription(
     }
   };
 
-  let feed_id = feed.id.expect("existing feed should have an id");
-  let webhook_id = webhook.id.expect("existing webhook should have an id");
-  let subscription = Subscription::new(user.id, feed_id, webhook_id, payload.url);
+  let feed_id = feed.id.unwrap();
+  let webhook_id = webhook.id.unwrap();
+  let subscription = Subscription::new(application_id, feed_id, webhook_id, payload.url);
   let subscription = context.models.subscription.create(subscription).await?;
   let res = PublicSubscription::from(subscription);
 
@@ -88,13 +86,16 @@ async fn create_subscription(
 }
 
 async fn query_subscription(
-  user: TokenUser,
   Extension(context): Extension<Context>,
+  Path(params): Path<HashMap<String, String>>,
 ) -> Result<Json<Vec<PublicSubscription>>, Error> {
+  let application_id = params.get("application_id").unwrap().to_owned();
+  let application_id = to_object_id(application_id).unwrap();
+
   let subscriptions = context
     .models
     .subscription
-    .find(doc! { "user": &user.id }, None)
+    .find(doc! { "application": &application_id }, None)
     .await?
     .into_iter()
     .map(Into::into)
@@ -105,15 +106,22 @@ async fn query_subscription(
 }
 
 async fn get_subscription_by_id(
-  user: TokenUser,
   Extension(context): Extension<Context>,
-  Path(id): Path<String>,
+  Path(params): Path<HashMap<String, String>>,
 ) -> Result<Json<PublicSubscription>, Error> {
-  let subscription_id = to_object_id(id)?;
+  let application_id = params.get("application_id").unwrap().to_owned();
+  let application_id = to_object_id(application_id).unwrap();
+
+  let subscription_id = params.get("id").unwrap().to_owned();
+  let subscription_id = to_object_id(subscription_id)?;
+
   let subscription = context
     .models
     .subscription
-    .find_one(doc! { "_id": subscription_id, "user": &user.id }, None)
+    .find_one(
+      doc! { "_id": subscription_id, "application": &application_id },
+      None,
+    )
     .await?
     .map(PublicSubscription::from);
 
@@ -130,15 +138,19 @@ async fn get_subscription_by_id(
 }
 
 async fn remove_subscription_by_id(
-  user: TokenUser,
   Extension(context): Extension<Context>,
-  Path(id): Path<String>,
+  Path(params): Path<HashMap<String, String>>,
 ) -> Result<(), Error> {
-  let subscription_id = to_object_id(id)?;
+  let application_id = params.get("application_id").unwrap().to_owned();
+  let application_id = to_object_id(application_id).unwrap();
+
+  let subscription_id = params.get("id").unwrap().to_owned();
+  let subscription_id = to_object_id(subscription_id)?;
+
   let delete_result = context
     .models
     .subscription
-    .delete_one(doc! { "_id": subscription_id, "user": &user.id })
+    .delete_one(doc! { "_id": subscription_id, "application": &application_id })
     .await?;
 
   if delete_result.deleted_count == 0 {

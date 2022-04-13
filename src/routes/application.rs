@@ -15,12 +15,12 @@ use crate::lib::to_object_id::to_object_id;
 use crate::lib::token::TokenUser;
 use crate::models::application::{Application, PublicApplication};
 
-pub fn create_route() -> Router {
+pub fn create_router() -> Router {
   Router::new()
-    .route("/applications", post(create_application))
-    .route("/applications", get(query_application))
-    .route("/applications/:id", get(get_application_by_id))
-    .route("/applications/:id", delete(remove_application_by_id))
+    .route("/", post(create_application))
+    .route("/", get(query_application))
+    .route("/:application_id", get(get_application_by_id))
+    .route("/:application_id", delete(remove_application_by_id))
 }
 
 async fn create_application(

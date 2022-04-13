@@ -4,6 +4,7 @@ use axum::Json;
 use axum::Router;
 use bson::doc;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use tracing::debug;
 
 use crate::context::Context;
@@ -12,10 +13,11 @@ use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::lib::to_object_id::to_object_id;
-use crate::lib::token::TokenUser;
 use crate::models::webhook::{PublicWebhook, Webhook};
 
-pub fn create_route() -> Router {
+pub fn create_router() -> Router {
+  // TODO: Authenticate these requests based on the user and application
+  // relationship / membership and make sure the application exists.
   Router::new()
     .route("/webhooks", post(create_webhook))
     .route("/webhooks", get(query_webhook))
@@ -25,37 +27,30 @@ pub fn create_route() -> Router {
 }
 
 async fn create_webhook(
-  user: TokenUser,
   Extension(context): Extension<Context>,
   Json(payload): Json<CreateWebhook>,
+  Path(params): Path<HashMap<String, String>>,
 ) -> Result<Json<PublicWebhook>, Error> {
-  let webhook = context
-    .models
-    .webhook
-    .find_one(doc! { "url": &payload.url, "user": &user.id }, None)
-    .await?;
+  let application_id = params.get("application_id").unwrap().to_owned();
+  let application_id = to_object_id(application_id).unwrap();
+  let webhook = Webhook::new(application_id, payload.url, payload.title);
+  let webhook = context.models.webhook.create(webhook).await?;
+  let res = PublicWebhook::from(webhook);
 
-  match webhook {
-    Some(webhook) => Ok(Json(PublicWebhook::from(webhook))),
-
-    None => {
-      let webhook = Webhook::new(user.id, payload.url, payload.title);
-      let webhook = context.models.webhook.create(webhook).await?;
-      let res = PublicWebhook::from(webhook);
-
-      Ok(Json(res))
-    }
-  }
+  Ok(Json(res))
 }
 
 async fn query_webhook(
-  user: TokenUser,
   Extension(context): Extension<Context>,
+  Path(params): Path<HashMap<String, String>>,
 ) -> Result<Json<Vec<PublicWebhook>>, Error> {
+  let application_id = params.get("application_id").unwrap().to_owned();
+  let application_id = to_object_id(application_id).unwrap();
+
   let webhooks = context
     .models
     .webhook
-    .find(doc! { "user": &user.id }, None)
+    .find(doc! { "application": application_id }, None)
     .await?
     .into_iter()
     .map(Into::into)
@@ -66,16 +61,22 @@ async fn query_webhook(
 }
 
 async fn get_webhook_by_id(
-  user: TokenUser,
   Extension(context): Extension<Context>,
-  Path(id): Path<String>,
+  Path(params): Path<HashMap<String, String>>,
 ) -> Result<Json<PublicWebhook>, Error> {
-  let webhook_id = to_object_id(id)?;
+  let application_id = params.get("application_id").unwrap().to_owned();
+  let application_id = to_object_id(application_id).unwrap();
+
+  let webhook_id = params.get("id").unwrap().to_owned();
+  let webhook_id = to_object_id(webhook_id)?;
 
   let webhook = context
     .models
     .webhook
-    .find_one(doc! { "_id": webhook_id, "user": &user.id }, None)
+    .find_one(
+      doc! { "_id": webhook_id, "application": application_id },
+      None,
+    )
     .await?
     .map(PublicWebhook::from);
 
@@ -91,12 +92,16 @@ async fn get_webhook_by_id(
 }
 
 async fn update_webhook_by_id(
-  user: TokenUser,
   Extension(context): Extension<Context>,
-  Path(id): Path<String>,
+  Path(params): Path<HashMap<String, String>>,
   Json(payload): Json<CreateWebhook>,
 ) -> Result<(), Error> {
-  let webhook_id = to_object_id(id)?;
+  let application_id = params.get("application_id").unwrap().to_owned();
+  let application_id = to_object_id(application_id).unwrap();
+
+  let webhook_id = params.get("id").unwrap().to_owned();
+  let webhook_id = to_object_id(webhook_id)?;
+
   let update = UpdateWebhook::new(payload.title, payload.url);
   let update = bson::to_document(&update).unwrap();
 
@@ -104,7 +109,7 @@ async fn update_webhook_by_id(
     .models
     .webhook
     .update_one(
-      doc! { "_id": webhook_id, "user": &user.id },
+      doc! { "_id": webhook_id, "application": application_id },
       doc! { "$set": update },
       None,
     )
@@ -119,15 +124,19 @@ async fn update_webhook_by_id(
 }
 
 async fn remove_webhook_by_id(
-  user: TokenUser,
   Extension(context): Extension<Context>,
-  Path(id): Path<String>,
+  Path(params): Path<HashMap<String, String>>,
 ) -> Result<(), Error> {
-  let webhook_id = to_object_id(id)?;
+  let application_id = params.get("application_id").unwrap().to_owned();
+  let application_id = to_object_id(application_id).unwrap();
+
+  let webhook_id = params.get("id").unwrap().to_owned();
+  let webhook_id = to_object_id(webhook_id)?;
+
   let delete_result = context
     .models
     .webhook
-    .delete_one(doc! { "_id": webhook_id, "user": &user.id })
+    .delete_one(doc! { "_id": webhook_id, "application": application_id })
     .await?;
 
   if delete_result.deleted_count == 0 {

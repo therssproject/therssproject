@@ -12,7 +12,7 @@ use crate::lib::token;
 use crate::models::user;
 use crate::models::user::{PublicUser, User};
 
-pub fn create_route() -> Router {
+pub fn create_router() -> Router {
   Router::new()
     .route("/users", post(create_user))
     .route("/users/authenticate", post(authenticate_user))
