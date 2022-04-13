@@ -12,7 +12,7 @@ use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::to_object_id::to_object_id;
-use crate::lib::token::TokenUser;
+use crate::lib::token::UserFromToken;
 use crate::models::application::{Application, PublicApplication};
 
 pub fn create_router() -> Router {
@@ -24,7 +24,7 @@ pub fn create_router() -> Router {
 }
 
 async fn create_application(
-  user: TokenUser,
+  user: UserFromToken,
   Extension(context): Extension<Context>,
   Json(payload): Json<CreateApplication>,
 ) -> Result<Json<PublicApplication>, Error> {
@@ -36,7 +36,7 @@ async fn create_application(
 }
 
 async fn query_application(
-  user: TokenUser,
+  user: UserFromToken,
   Extension(context): Extension<Context>,
 ) -> Result<Json<Vec<PublicApplication>>, Error> {
   let applications = context
@@ -53,7 +53,7 @@ async fn query_application(
 }
 
 async fn get_application_by_id(
-  user: TokenUser,
+  user: UserFromToken,
   Extension(context): Extension<Context>,
   Path(id): Path<String>,
 ) -> Result<Json<PublicApplication>, Error> {
@@ -78,7 +78,7 @@ async fn get_application_by_id(
 }
 
 async fn remove_application_by_id(
-  user: TokenUser,
+  user: UserFromToken,
   Extension(context): Extension<Context>,
   Path(id): Path<String>,
 ) -> Result<(), Error> {

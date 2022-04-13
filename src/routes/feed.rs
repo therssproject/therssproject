@@ -15,7 +15,7 @@ use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::to_object_id::to_object_id;
 use crate::lib::to_url::to_url;
-use crate::lib::token::TokenUser;
+use crate::lib::token::UserFromToken;
 use crate::models::feed::Feed;
 use crate::models::feed::PublicFeed;
 use crate::models::subscription::PublicSubscription;
@@ -31,7 +31,7 @@ pub fn create_router() -> Router {
 }
 
 async fn query_feed(
-  _user: TokenUser,
+  _user: UserFromToken,
   Extension(context): Extension<Context>,
 ) -> Result<Json<Vec<PublicFeed>>, Error> {
   let feeds = context
@@ -56,7 +56,7 @@ pub struct FeedResponse {
 }
 
 async fn get_feed_by_id(
-  _user: TokenUser,
+  _user: UserFromToken,
   Extension(context): Extension<Context>,
   Path(id): Path<String>,
 ) -> Result<Json<FeedResponse>, Error> {
@@ -95,7 +95,7 @@ async fn get_feed_by_id(
 }
 
 async fn remove_feed_by_id(
-  _user: TokenUser,
+  _user: UserFromToken,
   Extension(context): Extension<Context>,
   Path(id): Path<String>,
 ) -> Result<(), Error> {

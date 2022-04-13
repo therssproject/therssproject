@@ -10,17 +10,17 @@ type TokenResult = Result<TokenData<Claims>, Error>;
 static VALIDATION: Lazy<Validation> = Lazy::new(Validation::default);
 static HEADER: Lazy<Header> = Lazy::new(Header::default);
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct TokenUser {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserFromToken {
   pub id: ObjectId,
   pub name: String,
   pub email: String,
 }
 
-impl From<User> for TokenUser {
+impl From<User> for UserFromToken {
   fn from(user: User) -> Self {
     Self {
-      id: user.id.expect("TokenUser From<User> expects an id"),
+      id: user.id.unwrap(),
       name: user.name.clone(),
       email: user.email,
     }
@@ -31,7 +31,7 @@ impl From<User> for TokenUser {
 pub struct Claims {
   pub exp: usize, // Expiration time (as UTC timestamp). validate_exp defaults to true in validation
   pub iat: usize, // Issued at (as UTC timestamp)
-  pub user: TokenUser,
+  pub user: UserFromToken,
 }
 
 impl Claims {
@@ -39,7 +39,7 @@ impl Claims {
     Self {
       exp: (chrono::Local::now() + chrono::Duration::days(30)).timestamp() as usize,
       iat: chrono::Local::now().timestamp() as usize,
-      user: TokenUser::from(user),
+      user: UserFromToken::from(user),
     }
   }
 }
