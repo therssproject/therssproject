@@ -16,6 +16,7 @@ module.exports = {
     'no-unused-vars': 'off',
     'no-console': 'warn',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-empty-interface': 'off',
 
     'react/display-name': 'off',
     'react/no-children-prop': 'off',
@@ -24,7 +25,6 @@ module.exports = {
       {props: 'never', children: 'never'},
     ],
 
-    //#region  //*=========== Unused Import ===========
     '@typescript-eslint/no-unused-vars': 'off',
     'unused-imports/no-unused-imports': 'warn',
     'unused-imports/no-unused-vars': [
@@ -36,9 +36,7 @@ module.exports = {
         argsIgnorePattern: '^_',
       },
     ],
-    //#endregion  //*======== Unused Import ===========
 
-    //#region  //*=========== Import Sort ===========
     'simple-import-sort/exports': 'warn',
     'simple-import-sort/imports': [
       'warn',
@@ -75,7 +73,6 @@ module.exports = {
         ],
       },
     ],
-    //#endregion  //*======== Import Sort ===========
   },
   globals: {
     React: true,
