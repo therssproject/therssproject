@@ -1,8 +1,12 @@
 import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
 import {yupResolver} from '@hookform/resolvers/yup';
+import {pipe} from 'fp-ts/function';
 import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
+import * as RD from 'remote-data-ts';
 import * as yup from 'yup';
+
+import * as http from '@/lib/fetch';
 
 import {Button} from '@/components/buttons/Button';
 import {GitHub} from '@/components/icons/GitHub';
@@ -11,6 +15,8 @@ import {Rss} from '@/components/icons/Rss';
 import {Checkbox} from '@/components/inputs/Checkbox';
 import {Field} from '@/components/inputs/Field';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
+
+import {AuthResponse} from '@/models/user';
 
 type Inputs = {
   email: string;
@@ -25,14 +31,25 @@ const Inputs = yup.object({
 
 const Login = () => {
   const [showPassword, setShowPass] = useState(false);
+  const [rememberSession, setRememberSession] = useState(true);
   const {
     register,
     handleSubmit,
     formState: {errors},
   } = useForm<Inputs>({resolver: yupResolver(Inputs)});
 
-  // eslint-disable-next-line no-console
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = ({email, password}) =>
+    // TODO: session to global state and local storage
+    http
+      .post<AuthResponse>(
+        'http://localhost:8080/users/authenticate',
+        {email, password},
+        AuthResponse,
+      )()
+      .then((res) =>
+        // eslint-disable-next-line no-console
+        pipe(res, RD.FromEither.fromEither, (user) => console.log(user)),
+      );
 
   return (
     <div className="flex min-h-full">
@@ -114,7 +131,12 @@ const Login = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <Checkbox id="remember-me" name="remember-me" />
+                    <Checkbox
+                      id="remember-me"
+                      name="remember-me"
+                      checked={rememberSession}
+                      onChange={() => setRememberSession((x) => !x)}
+                    />
                     <label
                       htmlFor="remember-me"
                       className="ml-2 block text-sm text-gray-900"
