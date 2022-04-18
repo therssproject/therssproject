@@ -4,6 +4,7 @@ use futures::stream;
 use futures::StreamExt;
 use http::header;
 use std::net::SocketAddr;
+use tower_http::cors::CorsLayer;
 use tower_http::{
   compression::CompressionLayer, propagate_header::PropagateHeaderLayer,
   sensitive_headers::SetSensitiveHeadersLayer, trace,
@@ -55,6 +56,9 @@ async fn main() {
   let context = Context::new(settings.clone(), models.clone());
 
   let app = routes::create_router()
+    // TODO change to production CORS before going live
+    // @reference https://docs.rs/tower-http/latest/tower_http/cors/struct.CorsLayer.html#method.permissive
+    .layer(CorsLayer::permissive())
     // High level logging of requests and responses
     .layer(
       trace::TraceLayer::new_for_http()
