@@ -11,13 +11,22 @@ import {
   UsersIcon,
   XIcon,
 } from '@heroicons/react/outline';
-import {FC, Fragment} from 'react';
+import {ComponentType, FC, Fragment} from 'react';
 
 import clsxm from '@/lib/clsxm';
 
 import {Rss} from '@/components/icons/Rss';
 
-const navigation = [
+import {PublicUser} from '@/models/user';
+
+type NavLink = {
+  name: string;
+  href: string;
+  icon: ComponentType<{className: string}>;
+  current: boolean;
+};
+
+const navigation: NavLink[] = [
   {name: 'Dashboard', icon: HomeIcon, href: '#', current: true},
   {name: 'Team', icon: UsersIcon, href: '#', current: false},
   {name: 'Projects', icon: FolderIcon, href: '#', current: false},
@@ -26,29 +35,47 @@ const navigation = [
   {name: 'Reports', icon: ChartBarIcon, href: '#', current: false},
 ];
 
-const secondaryNavigation = [
-  {name: 'Documentation', icon: DocumentTextIcon, href: '#', current: false},
+type SecondaryNavItem =
+  | ({type: 'link'} & NavLink)
+  | {
+      type: 'action';
+      name: string;
+      icon: ComponentType<{className: string}>;
+      action: () => void;
+    };
+
+const secondaryNavigation = (onLogout: () => void): SecondaryNavItem[] => [
   {
+    type: 'link',
+    name: 'Documentation',
+    icon: DocumentTextIcon,
+    href: '#',
+    current: false,
+  },
+  {
+    type: 'link',
     name: 'Share feedback',
     icon: InformationCircleIcon,
     href: '#',
     current: false,
   },
-  {name: 'Sign out', icon: LogoutIcon, href: '#', current: false},
+  {
+    type: 'action',
+    name: 'Sign out',
+    icon: LogoutIcon,
+    action: onLogout,
+  },
 ];
 
 type Props = {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
+  onLogout: () => void;
+  user: PublicUser;
 };
 
-export const Sidebar: FC<Props> = ({isOpen, onClose}) => {
-  const avatar =
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
-
-  const username = 'Nico Gato';
-
+export const Sidebar: FC<Props> = ({isOpen, onClose, onLogout, user}) => {
   return (
     <>
       <Transition.Root show={isOpen} as={Fragment}>
@@ -105,8 +132,8 @@ export const Sidebar: FC<Props> = ({isOpen, onClose}) => {
                   <MainNav />
                 </nav>
               </div>
-              <SecondaryNav />
-              <Profile username={username} avatar={avatar} />
+              <SecondaryNav onLogout={onLogout} />
+              <Profile username={user.name} />
             </div>
           </Transition.Child>
           <div className="w-14 flex-shrink-0">
@@ -130,8 +157,8 @@ export const Sidebar: FC<Props> = ({isOpen, onClose}) => {
               </div>
             </nav>
           </div>
-          <SecondaryNav />
-          <Profile username={username} avatar={avatar} />
+          <SecondaryNav onLogout={onLogout} />
+          <Profile username={user.name} />
         </div>
       </div>
     </>
@@ -173,49 +200,77 @@ const MainNav = () => (
   </>
 );
 
-const SecondaryNav = () => (
+const SecondaryNav = ({onLogout}: {onLogout: () => void}) => (
   <div
     className="space-y-1 px-2"
     role="group"
     aria-labelledby="projects-headline"
   >
-    {secondaryNavigation.map((item) => (
-      <a
-        key={item.name}
-        href={item.href}
-        className={clsxm(
-          item.current
-            ? 'bg-gray-100 text-gray-700'
-            : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700',
-          'group flex items-center rounded-md px-2 py-2 text-base font-medium',
-        )}
-      >
-        <item.icon
+    {secondaryNavigation(onLogout).map((item) =>
+      item.type === 'link' ? (
+        <a
+          key={item.name}
+          href={item.href}
           className={clsxm(
             item.current
-              ? 'text-gray-600'
-              : 'text-gray-400 group-hover:text-gray-600',
-            'mr-4 h-5 w-5 flex-shrink-0',
+              ? 'bg-gray-100 text-gray-700'
+              : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700',
+            'group flex items-center rounded-md px-2 py-2 text-base font-medium',
           )}
-          aria-hidden="true"
-        />
-        {item.name}
-      </a>
-    ))}
+        >
+          <item.icon
+            className={clsxm(
+              item.current
+                ? 'text-gray-600'
+                : 'text-gray-400 group-hover:text-gray-600',
+              'mr-4 h-5 w-5 flex-shrink-0',
+            )}
+            aria-hidden="true"
+          />
+          {item.name}
+        </a>
+      ) : (
+        <button
+          key={item.name}
+          onClick={item.action}
+          className={clsxm(
+            'text-gray-400 hover:bg-gray-50 hover:text-gray-700',
+            'group flex w-full items-center rounded-md px-2 py-2 text-base font-medium',
+          )}
+        >
+          <item.icon
+            className={clsxm(
+              'text-gray-400 group-hover:text-gray-600',
+              'mr-4 h-5 w-5 flex-shrink-0',
+            )}
+            aria-hidden="true"
+          />
+          {item.name}
+        </button>
+      ),
+    )}
   </div>
 );
 
-const Profile = ({username, avatar}: {username: string; avatar: string}) => (
+const Profile = ({username, avatar}: {username: string; avatar?: string}) => (
   <div className="mt-4 flex flex-shrink-0 border-t border-gray-200 p-4">
     <a href="#" className="group block w-full flex-shrink-0">
       <div className="flex items-center">
         <div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            className="inline-block h-9 w-9 rounded-full"
-            src={avatar}
-            alt=""
-          />
+          {avatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              className="inline-block h-9 w-9 rounded-full"
+              src={avatar}
+              alt=""
+            />
+          ) : (
+            <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 leading-none">
+              <div className="text-xl font-bold text-gray-400">
+                {username.charAt(0)}
+              </div>
+            </div>
+          )}
         </div>
         <div className="ml-3">
           <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">

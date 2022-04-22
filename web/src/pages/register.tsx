@@ -1,11 +1,15 @@
 import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
 import {yupResolver} from '@hookform/resolvers/yup';
+import * as E from 'fp-ts/Either';
 import {pipe} from 'fp-ts/function';
+import * as O from 'fp-ts/Option';
+import * as TE from 'fp-ts/TaskEither';
+import {useAtom} from 'jotai';
 import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
-import * as RD from 'remote-data-ts';
 import * as yup from 'yup';
 
+import {useOnlyLoggedOut} from '@/lib/auth';
 import * as http from '@/lib/fetch';
 
 import {Button} from '@/components/buttons/Button';
@@ -14,7 +18,9 @@ import {Google} from '@/components/icons/Google';
 import {Rss} from '@/components/icons/Rss';
 import {Field} from '@/components/inputs/Field';
 
-import {PublicUser} from '@/models/user';
+import {SessionAtom} from '@/store/session';
+
+import {AuthResponse, PublicUser} from '@/models/user';
 
 type Inputs = {
   name: string;
@@ -34,6 +40,8 @@ const Inputs = yup.object({
 });
 
 const Register = () => {
+  useOnlyLoggedOut();
+
   const [showPassword, setShowPass] = useState(false);
   const {
     register,
@@ -41,18 +49,28 @@ const Register = () => {
     formState: {errors},
   } = useForm<Inputs>({resolver: yupResolver(Inputs)});
 
+  const [_session, setSession] = useAtom(SessionAtom);
+
   const onSubmit: SubmitHandler<Inputs> = ({name, email, password}) =>
-    // TODO: login on success
-    http
-      .post<PublicUser>(
-        'http://localhost:8080/users',
-        {name, email, password},
-        PublicUser,
-      )()
-      .then((res) =>
-        // eslint-disable-next-line no-console
-        pipe(res, RD.FromEither.fromEither, (user) => console.log(user)),
-      );
+    // TODO: handle resgiter errors as well
+    pipe(
+      http.post<PublicUser>('/users', {name, email, password}, PublicUser),
+      TE.chain(() =>
+        http.post('/users/authenticate', {email, password}, AuthResponse),
+      ),
+      (run) => run(),
+    ).then(
+      E.match(
+        (error) => {
+          // TODO: show a toast or inline error
+          // eslint-disable-next-line no-console
+          console.log('Failed to login', error);
+        },
+        (user) => {
+          setSession(O.some(user));
+        },
+      ),
+    );
 
   return (
     <div className="flex min-h-full">

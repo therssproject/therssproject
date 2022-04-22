@@ -4,6 +4,8 @@ import * as TE from 'fp-ts/TaskEither';
 import * as t from 'io-ts';
 import reporter from 'io-ts-reporters';
 
+import * as CONFIG from '@/config';
+
 export type FetchError =
   | {tag: 'unknown'; message: string}
   | {tag: 'fetch'; code: number; message: string}
@@ -66,6 +68,8 @@ const handleResponse =
         ),
       ),
     );
+const addBaseUrl = (url: string) =>
+  url.startsWith('/') ? `${CONFIG.baseUrl}${url}` : url;
 
 const req =
   (method: 'GET' | 'DELETE') =>
@@ -75,7 +79,7 @@ const req =
     opts?: RequestInit,
   ): TE.TaskEither<FetchError, T> =>
     pipe(
-      TE.tryCatch(() => fetch(url, {...opts, method}), unknown),
+      TE.tryCatch(() => fetch(addBaseUrl(url), {...opts, method}), unknown),
       TE.chain(handleResponse(codec)),
     );
 
@@ -95,7 +99,7 @@ const reqWithBody =
       TE.chain((encodedBody) =>
         TE.tryCatch(
           () =>
-            fetch(url, {
+            fetch(addBaseUrl(url), {
               ...opts,
               method,
               body: encodedBody,

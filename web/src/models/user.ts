@@ -1,3 +1,6 @@
+import {contramap, Eq} from 'fp-ts/Eq';
+import {pipe} from 'fp-ts/function';
+import {Eq as eqString} from 'fp-ts/string';
 import * as t from 'io-ts';
 
 export const PublicUser = t.interface({
@@ -16,3 +19,8 @@ export const AuthResponse = t.interface({
 });
 
 export interface AuthResponse extends t.TypeOf<typeof AuthResponse> {}
+
+export const eqAuthResponse: Eq<AuthResponse> = pipe(
+  eqString,
+  contramap(({access_token}: AuthResponse) => access_token),
+);

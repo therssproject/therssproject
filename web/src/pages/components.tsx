@@ -31,12 +31,10 @@ export default function ComponentsPage() {
         description: 'Pre-built components with awesome default',
       }}
     >
-      <section
-        className={clsx(mode === 'dark' ? 'bg-dark' : 'bg-gray-50', color)}
-      >
+      <section className={clsx([mode === 'dark' && 'bg-dark'], color)}>
         <div
           className={clsx(
-            'layout min-h-screen py-20',
+            'min-h-screen py-20',
             mode === 'dark' ? 'text-white' : 'text-black',
           )}
         >

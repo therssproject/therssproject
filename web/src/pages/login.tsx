@@ -1,11 +1,13 @@
 import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
 import {yupResolver} from '@hookform/resolvers/yup';
-import {pipe} from 'fp-ts/function';
+import * as E from 'fp-ts/Either';
+import * as O from 'fp-ts/Option';
+import {useAtom} from 'jotai';
 import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
-import * as RD from 'remote-data-ts';
 import * as yup from 'yup';
 
+import {useOnlyLoggedOut} from '@/lib/auth';
 import * as http from '@/lib/fetch';
 
 import {Button} from '@/components/buttons/Button';
@@ -15,6 +17,8 @@ import {Rss} from '@/components/icons/Rss';
 import {Checkbox} from '@/components/inputs/Checkbox';
 import {Field} from '@/components/inputs/Field';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
+
+import {SessionAtom} from '@/store/session';
 
 import {AuthResponse} from '@/models/user';
 
@@ -30,6 +34,8 @@ const Inputs = yup.object({
 });
 
 const Login = () => {
+  useOnlyLoggedOut();
+
   const [showPassword, setShowPass] = useState(false);
   const [rememberSession, setRememberSession] = useState(true);
   const {
@@ -38,17 +44,22 @@ const Login = () => {
     formState: {errors},
   } = useForm<Inputs>({resolver: yupResolver(Inputs)});
 
+  const [_session, setSession] = useAtom(SessionAtom);
+
   const onSubmit: SubmitHandler<Inputs> = ({email, password}) =>
-    // TODO: session to global state and local storage
     http
-      .post<AuthResponse>(
-        'http://localhost:8080/users/authenticate',
-        {email, password},
-        AuthResponse,
-      )()
-      .then((res) =>
-        // eslint-disable-next-line no-console
-        pipe(res, RD.FromEither.fromEither, (user) => console.log(user)),
+      .post('/users/authenticate', {email, password}, AuthResponse)()
+      .then(
+        E.match(
+          (error) => {
+            // TODO: show a toast or inline error
+            // eslint-disable-next-line no-console
+            console.log('Failed to login', error);
+          },
+          (user) => {
+            setSession(O.some(user));
+          },
+        ),
       );
 
   return (
