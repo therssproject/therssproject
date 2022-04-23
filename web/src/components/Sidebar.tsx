@@ -11,11 +11,12 @@ import {
   UsersIcon,
   XIcon,
 } from '@heroicons/react/outline';
-import {ComponentType, FC, Fragment} from 'react';
+import {ComponentType, FC, Fragment, useState} from 'react';
 
 import clsxm from '@/lib/clsxm';
 
 import {Rss} from '@/components/icons/Rss';
+import {Combobox, Option as ComboboxOption} from '@/components/Combobox';
 
 import {PublicUser} from '@/models/user';
 
@@ -73,9 +74,20 @@ type Props = {
   onClose: () => void;
   onLogout: () => void;
   user: PublicUser;
+  apps: ComboboxOption[];
+  selectedApp?: ComboboxOption;
+  onSelectApp: (app?: ComboboxOption) => void;
 };
 
-export const Sidebar: FC<Props> = ({isOpen, onClose, onLogout, user}) => {
+export const Sidebar: FC<Props> = ({
+  isOpen,
+  onClose,
+  onLogout,
+  user,
+  apps,
+  selectedApp,
+  onSelectApp,
+}) => {
   return (
     <>
       <Transition.Root show={isOpen} as={Fragment}>
@@ -147,6 +159,13 @@ export const Sidebar: FC<Props> = ({isOpen, onClose, onLogout, user}) => {
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <div className="flex flex-grow flex-col overflow-y-auto border-r border-gray-200 bg-white pt-5">
           <Logo />
+          <div className="mx-2 mt-5">
+            <Combobox
+              options={apps}
+              selected={selectedApp}
+              onSelect={onSelectApp}
+            />
+          </div>
           <div className="mt-5 flex flex-grow flex-col">
             <nav
               className="flex-1 space-y-8 bg-white px-2"

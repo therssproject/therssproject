@@ -8,8 +8,15 @@ import {useOnlyLoggedIn} from '@/lib/auth';
 
 import {Props as SeoProps, Seo} from '@/components/Seo';
 import {Sidebar} from '@/components/Sidebar';
+import {Combobox, Option as ComboboxOption} from '@/components/Combobox';
 
 import {SessionAtom} from '@/store/session';
+
+const options: ComboboxOption[] = [
+  {id: 'default', label: 'Default'},
+  {id: 'listas', label: 'Listas.io'},
+  {id: 'tsplay.dev', label: 'Tsplay.dev'},
+];
 
 type Props = {
   title: string;
@@ -23,6 +30,8 @@ export const Dashboard = ({title, children, seo}: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [session, setSession] = useAtom(SessionAtom);
+
+  const [option, setOption] = useState<ComboboxOption | undefined>(undefined);
 
   return pipe(
     session,
@@ -38,9 +47,12 @@ export const Dashboard = ({title, children, seo}: Props) => {
             onOpen={() => setSidebarOpen(true)}
             onClose={() => setSidebarOpen(false)}
             onLogout={() => setSession(O.none)}
+            apps={options}
+            selectedApp={option}
+            onSelectApp={setOption}
           />
           <div className="flex flex-1 flex-col md:pl-64">
-            <div className="sticky top-0 z-10 bg-white pl-1 pt-1 sm:pl-3 sm:pt-3 md:hidden">
+            <div className="sticky top-0 z-10 bg-white pl-1 pt-1 sm:pl-3 sm:pt-3 md:hidden flex">
               <button
                 type="button"
                 className="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
@@ -49,6 +61,14 @@ export const Dashboard = ({title, children, seo}: Props) => {
                 <span className="sr-only">Open sidebar</span>
                 <MenuIcon className="h-6 w-6" aria-hidden="true" />
               </button>
+
+              <div className="mx-2">
+                <Combobox
+                  options={options}
+                  selected={option}
+                  onSelect={setOption}
+                />
+              </div>
             </div>
             <main className="flex-1">
               <div className="py-6">
