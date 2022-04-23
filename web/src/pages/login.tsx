@@ -1,7 +1,7 @@
-import {pipe} from 'fp-ts/function';
 import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as E from 'fp-ts/Either';
+import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import {useAtom} from 'jotai';
 import {useState} from 'react';
