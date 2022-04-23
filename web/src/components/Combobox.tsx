@@ -1,6 +1,6 @@
-import {useState} from 'react';
-import {CheckIcon, SelectorIcon} from '@heroicons/react/solid';
 import {Combobox as ComboboxHeadless} from '@headlessui/react';
+import {CheckIcon, SelectorIcon} from '@heroicons/react/solid';
+import {useState} from 'react';
 
 import clsxm from '@/lib/clsxm';
 

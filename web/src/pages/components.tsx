@@ -23,18 +23,11 @@ export default function ComponentsPage() {
   const textColor = mode === 'dark' ? 'text-gray-300' : 'text-gray-600';
 
   return (
-    <Layout
-      variant="dashboard"
-      title="Components"
-      seo={{
-        templateTitle: 'Components',
-        description: 'Pre-built components with awesome default',
-      }}
-    >
+    <Layout variant="clean">
       <section className={clsx([mode === 'dark' && 'bg-dark'], color)}>
         <div
           className={clsx(
-            'min-h-screen py-20',
+            'layout min-h-screen py-20',
             mode === 'dark' ? 'text-white' : 'text-black',
           )}
         >

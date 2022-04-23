@@ -11,14 +11,16 @@ import {
   UsersIcon,
   XIcon,
 } from '@heroicons/react/outline';
-import {ComponentType, FC, Fragment, useState} from 'react';
+import {ComponentType, FC, Fragment} from 'react';
 
 import clsxm from '@/lib/clsxm';
 
-import {Rss} from '@/components/icons/Rss';
 import {Combobox, Option as ComboboxOption} from '@/components/Combobox';
+import {Rss} from '@/components/icons/Rss';
 
 import {PublicUser} from '@/models/user';
+
+import {UnstyledLink} from './links/UnstyledLink';
 
 type NavLink = {
   name: string;
@@ -185,10 +187,12 @@ export const Sidebar: FC<Props> = ({
 };
 
 const Logo = () => (
-  <div className="flex flex-shrink-0 items-center px-4">
-    <Rss className="h-8 w-auto text-red-300" />
-    <h2 className="ml-2 text-gray-600">rss</h2>
-  </div>
+  <UnstyledLink href="/">
+    <div className="flex flex-shrink-0 items-center px-4">
+      <Rss className="h-8 w-auto text-red-300" />
+      <h2 className="ml-2 text-gray-600">rss</h2>
+    </div>
+  </UnstyledLink>
 );
 
 const MainNav = () => (
