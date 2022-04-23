@@ -1,3 +1,4 @@
+import {pipe} from 'fp-ts/function';
 import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as E from 'fp-ts/Either';
@@ -36,6 +37,7 @@ const Inputs = yup.object({
 const Login = () => {
   useOnlyLoggedOut();
 
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPass] = useState(false);
   const [rememberSession, setRememberSession] = useState(true);
   const {
@@ -46,21 +48,25 @@ const Login = () => {
 
   const [_session, setSession] = useAtom(SessionAtom);
 
-  const onSubmit: SubmitHandler<Inputs> = ({email, password}) =>
-    http
-      .post('/users/authenticate', {email, password}, AuthResponse)()
-      .then(
-        E.match(
-          (error) => {
-            // TODO: show a toast or inline error
-            // eslint-disable-next-line no-console
-            console.log('Failed to login', error);
-          },
-          (user) => {
-            setSession(O.some(user));
-          },
-        ),
-      );
+  const onSubmit: SubmitHandler<Inputs> = async ({email, password}) => {
+    setLoading(true);
+
+    pipe(
+      await http.post('/users/authenticate', {email, password}, AuthResponse)(),
+      E.match(
+        (error) => {
+          // TODO: show a toast or inline error
+          // eslint-disable-next-line no-console
+          console.log('Failed to login', error);
+        },
+        (user) => {
+          setSession(O.some(user));
+        },
+      ),
+    );
+
+    setLoading(false);
+  };
 
   return (
     <div className="flex min-h-full">
@@ -78,14 +84,14 @@ const Login = () => {
               <div>
                 <div className="mt-1 grid grid-cols-2 gap-3">
                   <div>
-                    <Button variant="light" isFullWidth>
+                    <Button variant="light" isFullWidth disabled>
                       <span className="sr-only">Sign in with Google</span>
                       <Google className="h-5 w-5" />
                     </Button>
                   </div>
 
                   <div>
-                    <Button variant="light" isFullWidth>
+                    <Button variant="light" isFullWidth disabled>
                       <span className="sr-only">Sign in with GitHub</span>
                       <GitHub className="h-5 w-5" />
                     </Button>
@@ -162,7 +168,12 @@ const Login = () => {
                 </div>
 
                 <div>
-                  <Button type="submit" isFullWidth>
+                  <Button
+                    type="submit"
+                    isFullWidth
+                    isLoading={loading}
+                    disabled={loading}
+                  >
                     Sign in
                   </Button>
                 </div>

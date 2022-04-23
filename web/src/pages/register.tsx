@@ -42,6 +42,7 @@ const Inputs = yup.object({
 const Register = () => {
   useOnlyLoggedOut();
 
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPass] = useState(false);
   const {
     register,
@@ -51,15 +52,17 @@ const Register = () => {
 
   const [_session, setSession] = useAtom(SessionAtom);
 
-  const onSubmit: SubmitHandler<Inputs> = ({name, email, password}) =>
-    // TODO: handle resgiter errors as well
+  const onSubmit: SubmitHandler<Inputs> = async ({name, email, password}) => {
+    setLoading(true);
+
     pipe(
-      http.post<PublicUser>('/users', {name, email, password}, PublicUser),
-      TE.chain(() =>
-        http.post('/users/authenticate', {email, password}, AuthResponse),
-      ),
-      (run) => run(),
-    ).then(
+      await pipe(
+        // TODO: handle resgiter errors as well
+        http.post<PublicUser>('/users', {name, email, password}, PublicUser),
+        TE.chain(() =>
+          http.post('/users/authenticate', {email, password}, AuthResponse),
+        ),
+      )(),
       E.match(
         (error) => {
           // TODO: show a toast or inline error
@@ -71,6 +74,9 @@ const Register = () => {
         },
       ),
     );
+
+    setLoading(false);
+  };
 
   return (
     <div className="flex min-h-full">
@@ -88,14 +94,14 @@ const Register = () => {
               <div>
                 <div className="mt-1 grid grid-cols-2 gap-3">
                   <div>
-                    <Button variant="light" isFullWidth>
+                    <Button variant="light" isFullWidth disabled>
                       <span className="sr-only">Register in with Google</span>
                       <Google className="h-5 w-5" />
                     </Button>
                   </div>
 
                   <div>
-                    <Button variant="light" isFullWidth>
+                    <Button variant="light" isFullWidth disabled>
                       <span className="sr-only">Register in with GitHub</span>
                       <GitHub className="h-5 w-5" />
                     </Button>
@@ -181,7 +187,12 @@ const Register = () => {
                 />
 
                 <div>
-                  <Button type="submit" isFullWidth>
+                  <Button
+                    type="submit"
+                    isFullWidth
+                    isLoading={loading}
+                    disabled={loading}
+                  >
                     Register
                   </Button>
                 </div>
