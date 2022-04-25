@@ -104,6 +104,9 @@ async fn main() {
 
           async move {
             info!("Syncing feed with ID {} and URL {}", &id, url);
+            // TODO: Sync should return if there was a new entry to the feed,
+            // based on that we should queue the subscriptions from this feed
+            // for notification sending.
             models.feed.sync(id).await.unwrap();
             id
           }
@@ -113,6 +116,8 @@ async fn main() {
           let models = context.models.clone();
 
           async move {
+            // TODO: We should just return the cursor instead of getting the
+            // subscriptions into an array and then converting it to a stream.
             let subscriptions = models
               .subscription
               .find(doc! { "feed": feed_id }, None)
