@@ -29,9 +29,9 @@ pub fn create_router() -> Router {
               // Authorize the user before allowing access to the application
               // routes.
               .route_layer(extractor_middleware::<Application>()),
-              // TODO: Create middleware to make sure the user has access to the
-              // application that is querying. The above middleware is only
-              // checking that the application exists.
+            // TODO: Create middleware to make sure the user has access to the
+            // application that is querying. The above middleware is only
+            // checking that the application exists.
           ),
         )
         // Authenticate the user before allowing access to the application
