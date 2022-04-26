@@ -80,7 +80,7 @@ async fn main() {
     .layer(Extension(context.clone()));
 
   let port = settings.server.port;
-  let address = SocketAddr::from(([127, 0, 0, 1], port));
+  let address = SocketAddr::from(([0, 0, 0, 0], port));
 
   tokio::spawn(async move {
     use tokio::time::{sleep, Duration};
