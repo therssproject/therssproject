@@ -4,7 +4,7 @@ pub mod subscription;
 pub mod user;
 pub mod webhook;
 
-use axum::extract::extractor_middleware;
+use axum::middleware::from_extractor;
 use axum::Router;
 
 use crate::lib::token::UserFromToken;
@@ -28,7 +28,7 @@ pub fn create_router() -> Router {
               )
               // Authorize the user before allowing access to the application
               // routes.
-              .route_layer(extractor_middleware::<Application>()),
+              .route_layer(from_extractor::<Application>()),
             // TODO: Create middleware to make sure the user has access to the
             // application that is querying. The above middleware is only
             // checking that the application exists.
@@ -36,6 +36,6 @@ pub fn create_router() -> Router {
         )
         // Authenticate the user before allowing access to the application
         // routes.
-        .route_layer(extractor_middleware::<UserFromToken>()),
+        .route_layer(from_extractor::<UserFromToken>()),
     )
 }
