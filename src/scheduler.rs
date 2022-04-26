@@ -2,6 +2,7 @@ use crate::lib::database_model::ModelExt;
 use bson::doc;
 use futures::stream;
 use futures::StreamExt;
+use tokio::time::{sleep, Duration};
 use tracing::info;
 
 use crate::messenger::Messenger;
@@ -9,8 +10,6 @@ use crate::models::Models;
 
 pub fn start(models: Models, messenger: Messenger) {
   tokio::spawn(async move {
-    use tokio::time::{sleep, Duration};
-
     loop {
       info!("Running scheduler");
 
