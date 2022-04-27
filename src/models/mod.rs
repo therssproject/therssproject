@@ -1,6 +1,6 @@
 pub mod application;
+pub mod endpoint;
 pub mod entry;
-pub mod event;
 pub mod feed;
 pub mod subscription;
 pub mod user;
@@ -17,7 +17,7 @@ pub struct Models {
   pub subscription: subscription::Model,
   pub feed: feed::Model,
   pub entry: entry::Model,
-  pub webhook: webhook::Model,
+  pub endpoint: endpoint::Model,
 }
 
 impl Models {
@@ -27,7 +27,7 @@ impl Models {
     let subscription = subscription::Model::setup(db.clone(), messenger.clone()).await;
     let feed = feed::Model::new(db.clone());
     let entry = entry::Model::new(db.clone());
-    let webhook = webhook::Model::new(db);
+    let endpoint = endpoint::Model::new(db);
 
     let this = Self {
       user,
@@ -35,7 +35,7 @@ impl Models {
       subscription,
       feed,
       entry,
-      webhook,
+      endpoint,
     };
 
     this.sync_indexes().await?;
@@ -48,7 +48,7 @@ impl Models {
     self.subscription.sync_indexes().await?;
     self.feed.sync_indexes().await?;
     self.entry.sync_indexes().await?;
-    self.webhook.sync_indexes().await?;
+    self.endpoint.sync_indexes().await?;
 
     Ok(())
   }

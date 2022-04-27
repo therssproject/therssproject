@@ -13,13 +13,11 @@ use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::to_object_id::to_object_id;
+use crate::models::endpoint::Endpoint;
 use crate::models::feed::Feed;
 use crate::models::subscription::{PublicSubscription, Subscription};
-use crate::models::webhook::Webhook;
 
 pub fn create_router() -> Router {
-  // TODO: Authenticate these requests based on the user and application
-  // relationship / membership and make sure the application exists.
   Router::new()
     .route("/subscriptions", post(create_subscription))
     .route("/subscriptions", get(query_subscription))
@@ -50,35 +48,35 @@ async fn create_subscription(
     }
   };
 
-  let webhook = match payload.webhook {
-    SubscriptionWebhook::Url { url, title } => {
-      let webhook = Webhook::new(application_id, url, title);
-      context.models.webhook.create(webhook).await?
+  let endpoint = match payload.endpoint {
+    SubscriptionEndpoint::Url { url, title } => {
+      let endpoint = Endpoint::new(application_id, url, title);
+      context.models.endpoint.create(endpoint).await?
     }
 
-    SubscriptionWebhook::Webhook { id } => {
-      let webhook_id = to_object_id(id)?;
-      let webhook = context
+    SubscriptionEndpoint::Endpoint { id } => {
+      let endpoint_id = to_object_id(id)?;
+      let endpoint = context
         .models
-        .webhook
+        .endpoint
         .find_one(
-          doc! { "application": &application_id, "_id": webhook_id },
+          doc! { "application": &application_id, "_id": endpoint_id },
           None,
         )
         .await?;
 
-      match webhook {
-        Some(webhook) => webhook,
+      match endpoint {
+        Some(endpoint) => endpoint,
         None => {
-          return Err(Error::NotFound(NotFound::new("webhook")));
+          return Err(Error::NotFound(NotFound::new("endpoint")));
         }
       }
     }
   };
 
   let feed_id = feed.id.unwrap();
-  let webhook_id = webhook.id.unwrap();
-  let subscription = Subscription::new(application_id, feed_id, webhook_id, payload.url);
+  let endpoint_id = endpoint.id.unwrap();
+  let subscription = Subscription::new(application_id, feed_id, endpoint_id, payload.url);
   let subscription = context.models.subscription.create(subscription).await?;
   let res = PublicSubscription::from(subscription);
 
@@ -163,13 +161,13 @@ async fn remove_subscription_by_id(
 
 #[derive(Deserialize)]
 #[serde(untagged)]
-enum SubscriptionWebhook {
+enum SubscriptionEndpoint {
   Url { url: String, title: String },
-  Webhook { id: String },
+  Endpoint { id: String },
 }
 
 #[derive(Deserialize)]
 struct CreateSubscription {
   url: String,
-  webhook: SubscriptionWebhook,
+  endpoint: SubscriptionEndpoint,
 }
