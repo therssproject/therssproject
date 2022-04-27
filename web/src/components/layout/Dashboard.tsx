@@ -6,16 +6,17 @@ import {ReactNode, useState} from 'react';
 
 import {useOnlyLoggedIn} from '@/lib/auth';
 
-import {Combobox, Option as ComboboxOption} from '@/components/Combobox';
+import {Select, Option as SelectOption} from '@/components/Select';
 import {Props as SeoProps, Seo} from '@/components/Seo';
 import {Sidebar} from '@/components/Sidebar';
 
 import {SessionAtom} from '@/store/session';
 
-const options: ComboboxOption[] = [
+const options: SelectOption[] = [
   {id: 'tsplay.dev', label: 'Tsplay.dev'},
   {id: 'listas', label: 'Listas.io'},
   {id: 'rss', label: 'Rss'},
+  {id: '__add_new__', label: 'New application', image: () => '+'},
 ];
 
 type Props = {
@@ -31,7 +32,7 @@ export const Dashboard = ({title, children, seo}: Props) => {
 
   const [session, setSession] = useAtom(SessionAtom);
 
-  const [option, setOption] = useState<ComboboxOption | undefined>(options[0]);
+  const [option, setOption] = useState<SelectOption | undefined>(options[0]);
 
   return pipe(
     session,
@@ -63,7 +64,7 @@ export const Dashboard = ({title, children, seo}: Props) => {
               </button>
 
               <div className="mx-2">
-                <Combobox
+                <Select
                   options={options}
                   selected={option}
                   onSelect={setOption}

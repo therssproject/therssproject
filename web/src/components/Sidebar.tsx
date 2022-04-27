@@ -15,7 +15,7 @@ import {ComponentType, FC, Fragment} from 'react';
 
 import clsxm from '@/lib/clsxm';
 
-import {Combobox, Option as ComboboxOption} from '@/components/Combobox';
+import {Select, Option as SelectOption} from '@/components/Select';
 import {Rss} from '@/components/icons/Rss';
 
 import {PublicUser} from '@/models/user';
@@ -76,9 +76,9 @@ type Props = {
   onClose: () => void;
   onLogout: () => void;
   user: PublicUser;
-  apps: ComboboxOption[];
-  selectedApp?: ComboboxOption;
-  onSelectApp: (app?: ComboboxOption) => void;
+  apps: SelectOption[];
+  selectedApp?: SelectOption;
+  onSelectApp: (app?: SelectOption) => void;
 };
 
 export const Sidebar: FC<Props> = ({
@@ -162,7 +162,7 @@ export const Sidebar: FC<Props> = ({
         <div className="flex flex-grow flex-col overflow-y-auto border-r border-gray-200 bg-white pt-5">
           <Logo />
           <div className="mx-2 mt-5">
-            <Combobox
+            <Select
               options={apps}
               selected={selectedApp}
               onSelect={onSelectApp}
