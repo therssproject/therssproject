@@ -13,154 +13,152 @@ use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::lib::to_object_id::to_object_id;
-use crate::models::webhook::{PublicWebhook, Webhook};
+use crate::models::endpoint::{Endpoint, PublicEndpoint};
 
 pub fn create_router() -> Router {
-  // TODO: Authenticate these requests based on the user and application
-  // relationship / membership and make sure the application exists.
   Router::new()
-    .route("/webhooks", post(create_webhook))
-    .route("/webhooks", get(query_webhook))
-    .route("/webhooks/:id", get(get_webhook_by_id))
-    .route("/webhooks/:id", put(update_webhook_by_id))
-    .route("/webhooks/:id", delete(remove_webhook_by_id))
+    .route("/endpoints", post(create_endpoint))
+    .route("/endpoints", get(query_endpoint))
+    .route("/endpoints/:id", get(get_endpoint_by_id))
+    .route("/endpoints/:id", put(update_endpoint_by_id))
+    .route("/endpoints/:id", delete(remove_endpoint_by_id))
 }
 
-async fn create_webhook(
+async fn create_endpoint(
   Extension(context): Extension<Context>,
-  Json(payload): Json<CreateWebhook>,
+  Json(payload): Json<CreateEndpoint>,
   Path(params): Path<HashMap<String, String>>,
-) -> Result<Json<PublicWebhook>, Error> {
+) -> Result<Json<PublicEndpoint>, Error> {
   let application_id = params.get("application_id").unwrap().to_owned();
   let application_id = to_object_id(application_id).unwrap();
-  let webhook = Webhook::new(application_id, payload.url, payload.title);
-  let webhook = context.models.webhook.create(webhook).await?;
-  let res = PublicWebhook::from(webhook);
+  let endpoint = Endpoint::new(application_id, payload.url, payload.title);
+  let endpoint = context.models.endpoint.create(endpoint).await?;
+  let res = PublicEndpoint::from(endpoint);
 
   Ok(Json(res))
 }
 
-async fn query_webhook(
+async fn query_endpoint(
   Extension(context): Extension<Context>,
   Path(params): Path<HashMap<String, String>>,
-) -> Result<Json<Vec<PublicWebhook>>, Error> {
+) -> Result<Json<Vec<PublicEndpoint>>, Error> {
   let application_id = params.get("application_id").unwrap().to_owned();
   let application_id = to_object_id(application_id).unwrap();
 
-  let webhooks = context
+  let endpoints = context
     .models
-    .webhook
+    .endpoint
     .find(doc! { "application": application_id }, None)
     .await?
     .into_iter()
     .map(Into::into)
-    .collect::<Vec<PublicWebhook>>();
+    .collect::<Vec<PublicEndpoint>>();
 
-  debug!("Returning webhooks");
-  Ok(Json(webhooks))
+  debug!("Returning endpoints");
+  Ok(Json(endpoints))
 }
 
-async fn get_webhook_by_id(
+async fn get_endpoint_by_id(
   Extension(context): Extension<Context>,
   Path(params): Path<HashMap<String, String>>,
-) -> Result<Json<PublicWebhook>, Error> {
+) -> Result<Json<PublicEndpoint>, Error> {
   let application_id = params.get("application_id").unwrap().to_owned();
   let application_id = to_object_id(application_id).unwrap();
 
-  let webhook_id = params.get("id").unwrap().to_owned();
-  let webhook_id = to_object_id(webhook_id)?;
+  let endpoint_id = params.get("id").unwrap().to_owned();
+  let endpoint_id = to_object_id(endpoint_id)?;
 
-  let webhook = context
+  let endpoint = context
     .models
-    .webhook
+    .endpoint
     .find_one(
-      doc! { "_id": webhook_id, "application": application_id },
+      doc! { "_id": endpoint_id, "application": application_id },
       None,
     )
     .await?
-    .map(PublicWebhook::from);
+    .map(PublicEndpoint::from);
 
-  let webhook = match webhook {
-    Some(webhook) => webhook,
+  let endpoint = match endpoint {
+    Some(endpoint) => endpoint,
     None => {
-      debug!("webhook not found, returning 404 status code");
-      return Err(Error::NotFound(NotFound::new("webhook")));
+      debug!("endpoint not found, returning 404 status code");
+      return Err(Error::NotFound(NotFound::new("endpoint")));
     }
   };
 
-  Ok(Json(webhook))
+  Ok(Json(endpoint))
 }
 
-async fn update_webhook_by_id(
+async fn update_endpoint_by_id(
   Extension(context): Extension<Context>,
   Path(params): Path<HashMap<String, String>>,
-  Json(payload): Json<CreateWebhook>,
+  Json(payload): Json<CreateEndpoint>,
 ) -> Result<(), Error> {
   let application_id = params.get("application_id").unwrap().to_owned();
   let application_id = to_object_id(application_id).unwrap();
 
-  let webhook_id = params.get("id").unwrap().to_owned();
-  let webhook_id = to_object_id(webhook_id)?;
+  let endpoint_id = params.get("id").unwrap().to_owned();
+  let endpoint_id = to_object_id(endpoint_id)?;
 
-  let update = UpdateWebhook::new(payload.title, payload.url);
+  let update = UpdateEndpoint::new(payload.title, payload.url);
   let update = bson::to_document(&update).unwrap();
 
   let result = context
     .models
-    .webhook
+    .endpoint
     .update_one(
-      doc! { "_id": webhook_id, "application": application_id },
+      doc! { "_id": endpoint_id, "application": application_id },
       doc! { "$set": update },
       None,
     )
     .await?;
 
   if result.modified_count == 0 {
-    debug!("webhook not found, returning 404 status code");
-    return Err(Error::NotFound(NotFound::new("webhook")));
+    debug!("endpoint not found, returning 404 status code");
+    return Err(Error::NotFound(NotFound::new("endpoint")));
   }
 
   Ok(())
 }
 
-async fn remove_webhook_by_id(
+async fn remove_endpoint_by_id(
   Extension(context): Extension<Context>,
   Path(params): Path<HashMap<String, String>>,
 ) -> Result<(), Error> {
   let application_id = params.get("application_id").unwrap().to_owned();
   let application_id = to_object_id(application_id).unwrap();
 
-  let webhook_id = params.get("id").unwrap().to_owned();
-  let webhook_id = to_object_id(webhook_id)?;
+  let endpoint_id = params.get("id").unwrap().to_owned();
+  let endpoint_id = to_object_id(endpoint_id)?;
 
   let delete_result = context
     .models
-    .webhook
-    .delete_one(doc! { "_id": webhook_id, "application": application_id })
+    .endpoint
+    .delete_one(doc! { "_id": endpoint_id, "application": application_id })
     .await?;
 
   if delete_result.deleted_count == 0 {
-    debug!("webhook not found, returning 404 status code");
-    return Err(Error::NotFound(NotFound::new("webhook")));
+    debug!("endpoint not found, returning 404 status code");
+    return Err(Error::NotFound(NotFound::new("endpoint")));
   }
 
   Ok(())
 }
 
 #[derive(Deserialize)]
-struct CreateWebhook {
+struct CreateEndpoint {
   url: String,
   title: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct UpdateWebhook {
+pub struct UpdateEndpoint {
   pub title: Option<String>,
   pub url: Option<String>,
   pub updated_at: Date,
 }
 
-impl UpdateWebhook {
+impl UpdateEndpoint {
   pub fn new<S>(title: S, url: S) -> Self
   where
     S: Into<Option<String>>,
