@@ -6,7 +6,7 @@ import {ReactNode, useState} from 'react';
 
 import {useOnlyLoggedIn} from '@/lib/auth';
 
-import {Select, Option as SelectOption} from '@/components/Select';
+import {Option as SelectOption, Select} from '@/components/Select';
 import {Props as SeoProps, Seo} from '@/components/Seo';
 import {Sidebar} from '@/components/Sidebar';
 
