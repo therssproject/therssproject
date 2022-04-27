@@ -9,6 +9,7 @@ use crate::errors::NotFound;
 use crate::errors::{AuthenticateError, Error};
 use crate::lib::database_model::ModelExt;
 use crate::lib::token;
+use crate::models::application::Application;
 use crate::models::user;
 use crate::models::user::{PublicUser, User};
 
@@ -25,8 +26,12 @@ async fn create_user(
   let password_hash = user::hash_password(body.password).await?;
   let user = User::new(body.name, body.email, password_hash);
   let user = context.models.user.create(user).await?;
-  let res = PublicUser::from(user);
+  let user_id = user.id.unwrap();
 
+  let application = Application::new(user_id, String::from("My first application"), None);
+  context.models.application.create(application).await?;
+
+  let res = PublicUser::from(user);
   Ok(Json(res))
 }
 
