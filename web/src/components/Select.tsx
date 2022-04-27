@@ -1,6 +1,6 @@
-import ColorHash from 'color-hash';
 import {Listbox as ListboxHeadless} from '@headlessui/react';
 import {CheckIcon, SelectorIcon} from '@heroicons/react/solid';
+import ColorHash from 'color-hash';
 
 import clsxm from '@/lib/clsxm';
 

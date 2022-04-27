@@ -15,8 +15,8 @@ import {ComponentType, FC, Fragment} from 'react';
 
 import clsxm from '@/lib/clsxm';
 
-import {Select, Option as SelectOption} from '@/components/Select';
 import {Rss} from '@/components/icons/Rss';
+import {Option as SelectOption, Select} from '@/components/Select';
 
 import {PublicUser} from '@/models/user';
 
