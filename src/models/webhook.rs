@@ -8,6 +8,12 @@ use wither::Model as WitherModel;
 use crate::database::Database;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
+use crate::models::entry::Entry;
+
+// This model represents a request sent to the user's endpoint and its response
+// status. The webhook representation stored on the database is a reduced
+// version of the actual payload sent to the user. We send all new entries for a
+// specific feed and we are not interested in storing that.
 
 #[derive(Clone)]
 pub struct Model {
@@ -28,10 +34,7 @@ impl ModelExt for Model {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
-#[model(index(
-  keys = r#"doc!{ "application": 1, "url": 1 }"#,
-  options = r#"doc!{ "unique": true }"#
-))]
+#[model(index(keys = r#"doc!{ "application": 1, "subscription": 1 }"#))]
 pub struct Webhook {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
@@ -39,7 +42,7 @@ pub struct Webhook {
   pub subscription: ObjectId,
   pub webhook: ObjectId,
   // The webhook might change its URL, we want to keep a record of the original
-  // URL where this is webhook was sent.
+  // URL where this webhook was sent.
   pub url: String,
   pub created_at: Date,
 }
@@ -85,4 +88,13 @@ impl From<Webhook> for PublicWebhook {
       created_at: webhook.created_at,
     }
   }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WebhookSendPayload {
+  pub application: ObjectId,
+  pub subscription: ObjectId,
+  pub webhook: ObjectId,
+  pub retry_count: u32,
+  pub entries: Vec<Entry>,
 }

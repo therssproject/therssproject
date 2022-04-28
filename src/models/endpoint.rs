@@ -27,12 +27,7 @@ impl Model {
     Self { db, webhook }
   }
 
-  // TODO:
-  // * Create webhook payload struct
-  // * Store a database record with the failed or successful webhook
-  // * Return the webhook notification date so we can store it in the
-  //   subscription.
-  pub async fn notify(
+  pub async fn send_webhook(
     &self,
     id: ObjectId,
     subscription: ObjectId,

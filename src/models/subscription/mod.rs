@@ -14,21 +14,25 @@ use crate::errors::{Error, NotFound};
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::messenger::Messenger;
-use crate::models::endpoint::Model as WebhookModel;
+use crate::models::endpoint::Model as EndpointModel;
 use crate::models::entry::Model as EntryModel;
 
 #[derive(Clone)]
 pub struct Model {
   pub db: Database,
   pub entry: EntryModel,
-  pub webhook: WebhookModel,
+  pub endpoint: EndpointModel,
 }
 
 impl Model {
   pub async fn setup(db: Database, messenger: Messenger) -> Self {
     let entry = EntryModel::new(db.clone());
-    let webhook = WebhookModel::new(db.clone());
-    let this = Self { db, entry, webhook };
+    let endpoint = EndpointModel::new(db.clone());
+    let this = Self {
+      db,
+      entry,
+      endpoint,
+    };
 
     notify_job::setup(this.clone(), messenger).await.unwrap();
     this
@@ -46,25 +50,29 @@ impl Model {
       }
     };
 
-    let mut query = doc! { "feed": subscription.feed };
+    let mut get_entries_query = doc! { "feed": subscription.feed };
     // Query entries that are newer than the last notified feed entry. If this
     // is the first time we're notifying, we'll query all entries.
-    if let Some(last_notified_feed) = subscription.last_notified_feed {
-      query.insert("_id", doc! { "$gt": last_notified_feed });
+    if let Some(last_notified_entry) = subscription.last_notified_entry {
+      get_entries_query.insert("_id", doc! { "$gt": last_notified_entry });
     }
 
-    let entries = self.entry.find(query, sort_by_id()).await?;
+    let entries = self.entry.find(get_entries_query, sort_by_id()).await?;
     let has_entries = !entries.is_empty();
     if !has_entries {
       debug!("No new entries found for subscription {}", &id);
       return Ok(());
     }
 
-    self
-      .webhook
-      .notify(subscription.webhook, id, &entries)
-      .await
-      .unwrap();
+    let result = self
+      .endpoint
+      .send_webhook(subscription.endpoint, id, &entries)
+      .await;
+
+    if let Err(err) = result {
+      debug!("Failed to send webhook to subscription {}", &id);
+      return Err(err);
+    }
 
     let last_entry = entries.last().unwrap();
 
@@ -73,16 +81,17 @@ impl Model {
         doc! {
           "_id": &id,
           // We might have concurrent jobs processing the same subscription.
-          // Store the last sent notification feed.
+          // Make sure the update is applied only if the last notified entry is
+          // newer than the last entry on the database.
           "$or": [
-              { "last_notified_feed": Bson::Null },
-              { "last_notified_feed": { "$lt": last_entry.id } }
+              { "last_notified_entry": Bson::Null },
+              { "last_notified_entry": { "$lt": last_entry.id } }
           ]
         },
         doc! {
           "$set": {
-            "last_notified_feed": last_entry.id,
-            // TODO: Use the webhook notification date?
+            "last_notified_entry": last_entry.id,
+            // TODO: Use the webhook notification date
             "notified_at": now()
           }
         },
@@ -102,14 +111,7 @@ impl ModelExt for Model {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
-#[model(index(
-  keys = r#"doc!{ "user": 1, "url": 1 }"#,
-  options = r#"doc!{ "unique": true }"#
-))]
-#[model(index(
-  keys = r#"doc!{ "user": 1, "feed": 1 }"#,
-  options = r#"doc!{ "unique": true }"#
-))]
+#[model(index(keys = r#"doc!{ "application": 1 }"#))]
 #[model(index(keys = r#"doc!{ "feed": 1 }"#))]
 pub struct Subscription {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
@@ -117,29 +119,27 @@ pub struct Subscription {
   pub application: ObjectId,
   pub url: String,
   pub feed: ObjectId,
-  pub webhook: ObjectId,
+  pub endpoint: ObjectId,
 
-  pub last_notified_feed: Option<ObjectId>,
-  pub checked_at: Option<Date>,
-  pub notified_at: Option<Date>,
+  // Last time the subscription was notified and the last feed entry sent. The
+  // last entry is required to calculate what entries needs to be sent next.
+  pub last_notified_entry: Option<ObjectId>,
+  pub last_notified_at: Option<Date>,
 
-  pub updated_at: Date,
   pub created_at: Date,
 }
 
 impl Subscription {
-  pub fn new(application: ObjectId, feed: ObjectId, webhook: ObjectId, url: String) -> Self {
+  pub fn new(application: ObjectId, feed: ObjectId, endpoint: ObjectId, url: String) -> Self {
     let now = now();
     Self {
       id: None,
       application,
       url,
       feed,
-      webhook,
-      last_notified_feed: None,
-      notified_at: None,
-      checked_at: None,
-      updated_at: now,
+      endpoint,
+      last_notified_entry: None,
+      last_notified_at: None,
       created_at: now,
     }
   }
@@ -155,9 +155,7 @@ pub struct PublicSubscription {
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub feed: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
-  pub webhook: ObjectId,
-  #[serde(with = "bson_datetime_as_rfc3339_string")]
-  pub updated_at: Date,
+  pub endpoint: ObjectId,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub created_at: Date,
 }
@@ -169,8 +167,7 @@ impl From<Subscription> for PublicSubscription {
       application: subscription.application,
       url: subscription.url.clone(),
       feed: subscription.feed,
-      webhook: subscription.webhook,
-      updated_at: subscription.updated_at,
+      endpoint: subscription.endpoint,
       created_at: subscription.created_at,
     }
   }
