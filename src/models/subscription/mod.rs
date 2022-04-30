@@ -66,7 +66,12 @@ impl Model {
 
     let result = self
       .endpoint
-      .send_webhook(subscription.endpoint, id, &entries)
+      .send_webhook(
+        subscription.endpoint,
+        subscription.application,
+        id,
+        entries.clone(),
+      )
       .await;
 
     if let Err(err) = result {

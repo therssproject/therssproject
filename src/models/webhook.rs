@@ -33,6 +33,7 @@ impl ModelExt for Model {
   }
 }
 
+// TODO: Add response status to the webhook model.
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(keys = r#"doc!{ "application": 1, "subscription": 1 }"#))]
 pub struct Webhook {
@@ -44,6 +45,7 @@ pub struct Webhook {
   // The webhook might change its URL, we want to keep a record of the original
   // URL where this webhook was sent.
   pub url: String,
+  pub sent_at: Date,
   pub created_at: Date,
 }
 
@@ -53,6 +55,7 @@ impl Webhook {
     subscription: ObjectId,
     webhook: ObjectId,
     url: String,
+    sent_at: Date,
   ) -> Self {
     Self {
       id: None,
@@ -60,6 +63,7 @@ impl Webhook {
       subscription,
       webhook,
       url,
+      sent_at,
       created_at: now(),
     }
   }
@@ -90,11 +94,12 @@ impl From<Webhook> for PublicWebhook {
   }
 }
 
+// This is the actual data sent to the user's endpoint.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WebhookSendPayload {
+  pub id: String,
   pub application: ObjectId,
   pub subscription: ObjectId,
-  pub webhook: ObjectId,
-  pub retry_count: u32,
+  pub endpoint: ObjectId,
   pub entries: Vec<Entry>,
 }

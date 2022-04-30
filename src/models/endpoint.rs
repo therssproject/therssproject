@@ -2,6 +2,7 @@ use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
 use tracing::{debug, error};
+use uuid::Uuid;
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
@@ -14,6 +15,7 @@ use crate::lib::date::{now, Date};
 use crate::models::entry::Entry;
 use crate::models::webhook::Model as WebhookModel;
 use crate::models::webhook::Webhook;
+use crate::models::webhook::WebhookSendPayload;
 
 #[derive(Clone)]
 pub struct Model {
@@ -30,28 +32,41 @@ impl Model {
   pub async fn send_webhook(
     &self,
     id: ObjectId,
+    application: ObjectId,
     subscription: ObjectId,
-    _entries: &[Entry],
-  ) -> Result<(), Error> {
+    entries: Vec<Entry>,
+  ) -> Result<Webhook, Error> {
     debug!("Notifying endpoint");
 
     let endpoint = self.find_by_id(&id).await?;
     let endpoint = match endpoint {
       Some(endpoint) => endpoint,
       None => {
-        error!("Failed to notify, Endpoint with ID {} not found", &id);
+        error!("Failed to notify. Endpoint with ID {} not found", &id);
         return Err(Error::NotFound(NotFound::new("endpoint")));
       }
     };
 
-    let webhook = Webhook::new(endpoint.application, subscription, id, endpoint.url.clone());
-
     let client = reqwest::Client::new();
     let url = endpoint.url;
-    let _res = client.post(url).json(&webhook).send().await.unwrap();
-    self.webhook.create(webhook).await?;
+    let public_id = Uuid::new_v4();
 
-    Ok(())
+    let payload = WebhookSendPayload {
+      id: public_id.to_string(),
+      application,
+      subscription,
+      endpoint: id,
+      entries,
+    };
+
+    // TODO: Handle this res.
+    let sent_at = now();
+    let _res = client.post(&url).json(&payload).send().await.unwrap();
+
+    let webhook = Webhook::new(endpoint.application, subscription, id, url.clone(), sent_at);
+    let webhook = self.webhook.create(webhook).await?;
+
+    Ok(webhook)
   }
 }
 
