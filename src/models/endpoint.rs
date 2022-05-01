@@ -56,7 +56,7 @@ impl Model {
       application,
       subscription,
       endpoint: id,
-      entries,
+      entries: entries.into_iter().map(Into::into).collect(),
     };
 
     // TODO: Handle this res.

@@ -8,7 +8,7 @@ use wither::Model as WitherModel;
 use crate::database::Database;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
-use crate::models::entry::Entry;
+use crate::models::entry::PublicEntry;
 
 // This model represents a request sent to the user's endpoint and its response
 // status. The webhook representation stored on the database is a reduced
@@ -98,8 +98,11 @@ impl From<Webhook> for PublicWebhook {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WebhookSendPayload {
   pub id: String,
+  #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub application: ObjectId,
+  #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub subscription: ObjectId,
+  #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub endpoint: ObjectId,
-  pub entries: Vec<Entry>,
+  pub entries: Vec<PublicEntry>,
 }
