@@ -129,7 +129,7 @@ pub struct Subscription {
   // Last time the subscription was notified and the last feed entry sent. The
   // last entry is required to calculate what entries needs to be sent next.
   pub last_notified_entry: Option<ObjectId>,
-  pub last_notified_at: Option<Date>,
+  pub notified_at: Option<Date>,
 
   pub created_at: Date,
 }
@@ -144,7 +144,7 @@ impl Subscription {
       feed,
       endpoint,
       last_notified_entry: None,
-      last_notified_at: None,
+      notified_at: None,
       created_at: now,
     }
   }
