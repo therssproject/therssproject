@@ -8,6 +8,7 @@ use crate::database::Database;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::now;
 use crate::lib::date::Date;
+use crate::lib::serde::bson_datetime_option_as_rfc3339_string;
 
 #[derive(Clone)]
 pub struct Model {
@@ -64,6 +65,26 @@ impl Entry {
       description,
       published_at,
       created_at: now(),
+    }
+  }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PublicEntry {
+  pub url: Option<String>,
+  pub title: Option<String>,
+  pub description: Option<String>,
+  #[serde(serialize_with = "bson_datetime_option_as_rfc3339_string")]
+  pub published_at: Option<Date>,
+}
+
+impl From<Entry> for PublicEntry {
+  fn from(entry: Entry) -> Self {
+    Self {
+      url: entry.url,
+      title: entry.title,
+      description: entry.description,
+      published_at: entry.published_at,
     }
   }
 }

@@ -34,6 +34,7 @@ lapin = "2.1.1"
 tokio-executor-trait = "2.1.0"
 tokio-reactor-trait = "1.1.0"
 url = "2.2.2"
+uuid = { version = "1.0.0", features = ["v4"] }
 
 [dev-dependencies.cargo-husky]
 version = "1.5.0"

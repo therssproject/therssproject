@@ -66,7 +66,7 @@ pub fn start(models: Models, messenger: Messenger) {
         })
         .await;
 
-      sleep(Duration::from_millis(5_000_000)).await;
+      sleep(Duration::from_secs(60 * 5)).await;
     }
   });
 }
