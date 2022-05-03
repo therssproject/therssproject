@@ -19,17 +19,14 @@ pub fn create_router() -> Router {
     .route("/users/authenticate", post(authenticate_user))
 }
 
-async fn create_user(
-  Extension(context): Extension<Context>,
-  Json(body): Json<CreateBody>,
-) -> Result<Json<PublicUser>, Error> {
+async fn create_user(Json(body): Json<CreateBody>) -> Result<Json<PublicUser>, Error> {
   let password_hash = user::hash_password(body.password).await?;
   let user = User::new(body.name, body.email, password_hash);
-  let user = context.models.user.create(user).await?;
+  let user = User::create(user).await?;
   let user_id = user.id.unwrap();
 
   let application = Application::new(user_id, String::from("My first application"), None);
-  context.models.application.create(application).await?;
+  Application::create(application).await?;
 
   let res = PublicUser::from(user);
   Ok(Json(res))
@@ -58,11 +55,7 @@ async fn authenticate_user(
     )));
   }
 
-  let user = context
-    .models
-    .user
-    .find_one(doc! { "email": email }, None)
-    .await?;
+  let user = User::find_one(doc! { "email": email }, None).await?;
 
   let user = match user {
     Some(user) => user,

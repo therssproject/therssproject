@@ -1,5 +1,5 @@
 use axum::{
-  extract::{Extension, Path, Query},
+  extract::{Path, Query},
   routing::{delete, get},
   Json, Router,
 };
@@ -9,7 +9,6 @@ use serde::{Deserialize, Serialize};
 use tokio::try_join;
 use tracing::debug;
 
-use crate::context::Context;
 use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
@@ -19,6 +18,7 @@ use crate::lib::token::UserFromToken;
 use crate::models::feed::Feed;
 use crate::models::feed::PublicFeed;
 use crate::models::subscription::PublicSubscription;
+use crate::models::subscription::Subscription;
 
 pub fn create_router() -> Router {
   Router::new()
@@ -30,14 +30,8 @@ pub fn create_router() -> Router {
     .route("/parse-feed", get(parse_feed))
 }
 
-async fn query_feed(
-  _user: UserFromToken,
-  Extension(context): Extension<Context>,
-) -> Result<Json<Vec<PublicFeed>>, Error> {
-  let feeds = context
-    .models
-    .feed
-    .find(doc! {}, None)
+async fn query_feed(_user: UserFromToken) -> Result<Json<Vec<PublicFeed>>, Error> {
+  let feeds = Feed::find(doc! {}, None)
     .await?
     .into_iter()
     .map(Into::into)
@@ -57,17 +51,13 @@ pub struct FeedResponse {
 
 async fn get_feed_by_id(
   _user: UserFromToken,
-  Extension(context): Extension<Context>,
   Path(id): Path<String>,
 ) -> Result<Json<FeedResponse>, Error> {
   let feed_id = to_object_id(id)?;
 
-  let feed = context.models.feed.find_one(doc! { "_id": feed_id }, None);
+  let feed = Feed::find_one(doc! { "_id": feed_id }, None);
 
-  let subscriptions = context
-    .models
-    .subscription
-    .find(doc! { "feed": feed_id }, None);
+  let subscriptions = Subscription::find(doc! { "feed": feed_id }, None);
 
   let (feed, subscriptions) = try_join!(feed, subscriptions)?;
 
@@ -94,17 +84,9 @@ async fn get_feed_by_id(
   Ok(Json(res))
 }
 
-async fn remove_feed_by_id(
-  _user: UserFromToken,
-  Extension(context): Extension<Context>,
-  Path(id): Path<String>,
-) -> Result<(), Error> {
+async fn remove_feed_by_id(_user: UserFromToken, Path(id): Path<String>) -> Result<(), Error> {
   let feed_id = to_object_id(id)?;
-  let delete_result = context
-    .models
-    .feed
-    .delete_one(doc! { "_id": feed_id })
-    .await?;
+  let delete_result = Feed::delete_one(doc! { "_id": feed_id }).await?;
 
   if delete_result.deleted_count == 0 {
     debug!("feed not found, returning 404 status code");

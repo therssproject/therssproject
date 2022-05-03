@@ -7,74 +7,16 @@ use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
-use crate::database::Database;
 use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::models::entry::Entry;
-use crate::models::webhook::Model as WebhookModel;
 use crate::models::webhook::Webhook;
 use crate::models::webhook::WebhookSendPayload;
 
-#[derive(Clone)]
-pub struct Model {
-  pub db: Database,
-  pub webhook: WebhookModel,
-}
-
-impl Model {
-  pub fn new(db: Database) -> Self {
-    let webhook = WebhookModel::new(db.clone());
-    Self { db, webhook }
-  }
-
-  pub async fn send_webhook(
-    &self,
-    id: ObjectId,
-    application: ObjectId,
-    subscription: ObjectId,
-    entries: Vec<Entry>,
-  ) -> Result<Webhook, Error> {
-    debug!("Notifying endpoint");
-
-    let endpoint = self.find_by_id(&id).await?;
-    let endpoint = match endpoint {
-      Some(endpoint) => endpoint,
-      None => {
-        error!("Failed to notify. Endpoint with ID {} not found", &id);
-        return Err(Error::NotFound(NotFound::new("endpoint")));
-      }
-    };
-
-    let client = reqwest::Client::new();
-    let url = endpoint.url;
-    let public_id = Uuid::new_v4();
-
-    let payload = WebhookSendPayload {
-      id: public_id.to_string(),
-      application,
-      subscription,
-      endpoint: id,
-      entries: entries.into_iter().map(Into::into).collect(),
-    };
-
-    // TODO: Handle this res.
-    let sent_at = now();
-    let _res = client.post(&url).json(&payload).send().await.unwrap();
-
-    let webhook = Webhook::new(endpoint.application, subscription, id, url.clone(), sent_at);
-    let webhook = self.webhook.create(webhook).await?;
-
-    Ok(webhook)
-  }
-}
-
-impl ModelExt for Model {
+impl ModelExt for Endpoint {
   type T = Endpoint;
-  fn get_database(&self) -> &Database {
-    &self.db
-  }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
@@ -103,6 +45,45 @@ impl Endpoint {
       updated_at: now,
       created_at: now,
     }
+  }
+
+  pub async fn send_webhook(
+    id: ObjectId,
+    application: ObjectId,
+    subscription: ObjectId,
+    entries: Vec<Entry>,
+  ) -> Result<Webhook, Error> {
+    debug!("Notifying endpoint");
+
+    let endpoint = Self::find_by_id(&id).await?;
+    let endpoint = match endpoint {
+      Some(endpoint) => endpoint,
+      None => {
+        error!("Failed to notify. Endpoint with ID {} not found", &id);
+        return Err(Error::NotFound(NotFound::new("endpoint")));
+      }
+    };
+
+    let client = reqwest::Client::new();
+    let url = endpoint.url;
+    let public_id = Uuid::new_v4();
+
+    let payload = WebhookSendPayload {
+      id: public_id.to_string(),
+      application,
+      subscription,
+      endpoint: id,
+      entries: entries.into_iter().map(Into::into).collect(),
+    };
+
+    // TODO: Handle this res.
+    let sent_at = now();
+    let _res = client.post(&url).json(&payload).send().await.unwrap();
+
+    let webhook = Webhook::new(endpoint.application, subscription, id, url.clone(), sent_at);
+    let webhook = Webhook::create(webhook).await?;
+
+    Ok(webhook)
   }
 }
 

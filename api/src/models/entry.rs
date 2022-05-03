@@ -4,28 +4,13 @@ use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
-use crate::database::Database;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::now;
 use crate::lib::date::Date;
 use crate::lib::serde::bson_datetime_option_as_rfc3339_string;
 
-#[derive(Clone)]
-pub struct Model {
-  pub db: Database,
-}
-
-impl Model {
-  pub fn new(db: Database) -> Self {
-    Self { db }
-  }
-}
-
-impl ModelExt for Model {
+impl ModelExt for Entry {
   type T = Entry;
-  fn get_database(&self) -> &Database {
-    &self.db
-  }
 }
 
 // TODO: Get struct values from:

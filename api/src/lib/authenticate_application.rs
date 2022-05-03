@@ -8,7 +8,6 @@ use http::StatusCode;
 use std::collections::HashMap;
 use tracing::error;
 
-use crate::context::Context;
 use crate::lib::database_model::ModelExt;
 use crate::lib::to_object_id::to_object_id;
 use crate::lib::token::UserFromToken;
@@ -55,16 +54,7 @@ where
       Err(_) => return Err(StatusCode::BAD_REQUEST),
     };
 
-    let Extension(context): Extension<Context> =
-      Extension::from_request(req).await.map_err(|_err| {
-        error!("No context extension found in the req path on the application middleware");
-        StatusCode::INTERNAL_SERVER_ERROR
-      })?;
-
-    let application = context
-      .models
-      .application
-      .find_one(doc! { "_id": application_id, "user": &user.id }, None)
+    let application = Application::find_one(doc! { "_id": application_id, "user": &user.id }, None)
       .await
       .unwrap();
 

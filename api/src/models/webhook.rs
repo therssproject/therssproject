@@ -5,7 +5,6 @@ use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
-use crate::database::Database;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::models::entry::PublicEntry;
@@ -15,22 +14,8 @@ use crate::models::entry::PublicEntry;
 // version of the actual payload sent to the user. We send all new entries for a
 // specific feed and we are not interested in storing that.
 
-#[derive(Clone)]
-pub struct Model {
-  pub db: Database,
-}
-
-impl Model {
-  pub fn new(db: Database) -> Self {
-    Self { db }
-  }
-}
-
-impl ModelExt for Model {
+impl ModelExt for Webhook {
   type T = Webhook;
-  fn get_database(&self) -> &Database {
-    &self.db
-  }
 }
 
 // TODO: Add response status to the webhook model.
