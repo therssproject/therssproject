@@ -1,4 +1,4 @@
-import {Listbox as ListboxHeadless} from '@headlessui/react';
+import {Listbox} from '@headlessui/react';
 import {CheckIcon, SelectorIcon} from '@heroicons/react/solid';
 import ColorHash from 'color-hash';
 
@@ -12,19 +12,26 @@ export type Option = {
   id: string | number;
   label: string;
   image?: string | ((label: Option) => string);
+  disabled?: boolean;
 };
 
-type Props = {
-  options: Option[];
-  selected?: Option;
-  onSelect: (option?: Option) => void;
+type Props<O extends Option> = {
+  options: O[];
+  selected?: O;
+  onSelect: (option?: O) => void;
+  disabled?: boolean;
 };
 
-export const Select = ({options, selected: selectedO, onSelect}: Props) => {
+export const Select = <O extends Option>({
+  options,
+  selected: selectedO,
+  onSelect,
+  disabled,
+}: Props<O>) => {
   return (
-    <ListboxHeadless value={selectedO} onChange={onSelect}>
+    <Listbox value={selectedO} onChange={onSelect} disabled={disabled}>
       <div className="relative mt-1">
-        <ListboxHeadless.Button
+        <Listbox.Button
           className={clsxm(
             'flex items-center justify-between',
             'w-full rounded-md border border-gray-300 bg-white',
@@ -58,12 +65,12 @@ export const Select = ({options, selected: selectedO, onSelect}: Props) => {
           </div>
 
           <SelectorIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-        </ListboxHeadless.Button>
+        </Listbox.Button>
 
         {options.length > 0 && (
-          <ListboxHeadless.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+          <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
             {options.map((option) => (
-              <ListboxHeadless.Option
+              <Listbox.Option
                 key={option.id}
                 value={option}
                 className={({active}) =>
@@ -72,6 +79,7 @@ export const Select = ({options, selected: selectedO, onSelect}: Props) => {
                     active ? 'bg-indigo-600 text-white' : 'text-gray-900',
                   )
                 }
+                disabled={option.disabled}
               >
                 {({active, selected}) => (
                   <>
@@ -117,11 +125,11 @@ export const Select = ({options, selected: selectedO, onSelect}: Props) => {
                     )}
                   </>
                 )}
-              </ListboxHeadless.Option>
+              </Listbox.Option>
             ))}
-          </ListboxHeadless.Options>
+          </Listbox.Options>
         )}
       </div>
-    </ListboxHeadless>
+    </Listbox>
   );
 };

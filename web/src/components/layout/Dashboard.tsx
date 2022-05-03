@@ -1,23 +1,29 @@
 import {MenuIcon} from '@heroicons/react/outline';
+import * as A from 'fp-ts/Array';
+import * as E from 'fp-ts/Either';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
-import {useAtom} from 'jotai';
+import * as t from 'io-ts';
 import {ReactNode, useState} from 'react';
+import * as RD from 'remote-data-ts';
 
 import {useOnlyLoggedIn} from '@/lib/auth';
+import * as http from '@/lib/fetch';
+import {useAtom} from '@/lib/jotai';
+import {useAsyncEffect} from '@/lib/useAsyncEffect';
 
-import {Option as SelectOption, Select} from '@/components/Select';
+import {Select} from '@/components/Select';
 import {Props as SeoProps, Seo} from '@/components/Seo';
 import {Sidebar} from '@/components/Sidebar';
 
-import {SessionAtom} from '@/store/session';
-
-const options: SelectOption[] = [
-  {id: 'tsplay.dev', label: 'Tsplay.dev'},
-  {id: 'listas', label: 'Listas.io'},
-  {id: 'rss', label: 'Rss'},
-  {id: '__add_new__', label: 'New application', image: () => '+'},
-];
+import {
+  Application,
+  AppOption,
+  AppsAtom,
+  appToOption,
+  SOON,
+} from '@/models/application';
+import {SessionAtom} from '@/models/user';
 
 type Props = {
   title: string;
@@ -31,8 +37,46 @@ export const Dashboard = ({title, children, seo}: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [session, setSession] = useAtom(SessionAtom);
+  const [apps, setApps] = useAtom(AppsAtom);
 
-  const [option, setOption] = useState<SelectOption | undefined>(options[0]);
+  const [option, setOption] = useState<AppOption | undefined>();
+
+  useAsyncEffect(async () => {
+    setApps(RD.loading);
+
+    pipe(
+      await http.get('/applications', t.array(Application))(),
+      E.match(
+        () => setApps(RD.failure('Failed to fetch')),
+        (res) => {
+          setApps(RD.success(res));
+
+          pipe(
+            res,
+            A.head,
+            O.filter(() => Boolean(!option)),
+            O.map(appToOption),
+            O.getOrElseW(() => undefined),
+            setOption,
+          );
+        },
+      ),
+    );
+  }, []);
+
+  const appSelector = {
+    // TODO: use derived atom?
+    options: pipe(
+      apps,
+      RD.map(A.map(appToOption)),
+      RD.map((res) => res.concat(SOON)),
+      RD.toOption,
+      O.getOrElse((): AppOption[] => []),
+    ),
+    selected: option,
+    onSelect: setOption,
+    disabled: !RD.isSuccess(apps),
+  };
 
   return pipe(
     session,
@@ -48,9 +92,7 @@ export const Dashboard = ({title, children, seo}: Props) => {
             onOpen={() => setSidebarOpen(true)}
             onClose={() => setSidebarOpen(false)}
             onLogout={() => setSession(O.none)}
-            apps={options}
-            selectedApp={option}
-            onSelectApp={setOption}
+            appSelector={appSelector}
           />
           <div className="flex flex-1 flex-col md:pl-64">
             <div className="sticky top-0 z-10 flex bg-white pl-1 pt-1 sm:pl-3 sm:pt-3 md:hidden">
@@ -64,11 +106,7 @@ export const Dashboard = ({title, children, seo}: Props) => {
               </button>
 
               <div className="mx-2">
-                <Select
-                  options={options}
-                  selected={option}
-                  onSelect={setOption}
-                />
+                <Select {...appSelector} />
               </div>
             </div>
             <main className="flex-1">

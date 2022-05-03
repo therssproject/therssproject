@@ -6,7 +6,7 @@ import {Rss} from '@/components/icons/Rss';
 import {Layout} from '@/components/layout/Layout';
 import {UnderlineLink} from '@/components/links/UnderlineLink';
 
-import {SessionAtom} from '@/store/session';
+import {SessionAtom} from '@/models/user';
 
 const HomePage = () => {
   const [session] = useAtom(SessionAtom);

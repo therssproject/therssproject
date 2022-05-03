@@ -1,7 +1,9 @@
-import {contramap, Eq} from 'fp-ts/Eq';
-import {pipe} from 'fp-ts/function';
-import {Eq as eqString} from 'fp-ts/string';
+import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
+import * as tt from 'io-ts-types'
+import {atomWithStorage} from 'jotai/utils';
+
+import * as http from '@/lib/fetch';
 
 export const PublicUser = t.interface({
   id: t.string,
@@ -20,7 +22,19 @@ export const AuthResponse = t.interface({
 
 export interface AuthResponse extends t.TypeOf<typeof AuthResponse> {}
 
-export const eqAuthResponse: Eq<AuthResponse> = pipe(
-  eqString,
-  contramap(({access_token}: AuthResponse) => access_token),
-);
+export type Session = O.Option<AuthResponse>;
+
+export const Session = tt.option(AuthResponse)
+
+export const SESSION_KEY = '__user_session';
+
+export const SessionAtom = atomWithStorage<Session>(SESSION_KEY, O.none);
+
+export const authenticate = (payload: {email: string; password: string}) =>
+  http.post('/users/authenticate', payload, AuthResponse);
+
+export const register = (payload: {
+  name: string;
+  email: string;
+  password: string;
+}) => http.post<PublicUser>('/users', payload, PublicUser);

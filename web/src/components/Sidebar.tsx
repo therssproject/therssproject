@@ -16,8 +16,9 @@ import {ComponentType, FC, Fragment} from 'react';
 import clsxm from '@/lib/clsxm';
 
 import {Rss} from '@/components/icons/Rss';
-import {Option as SelectOption, Select} from '@/components/Select';
+import {Select} from '@/components/Select';
 
+import {AppOption} from '@/models/application';
 import {PublicUser} from '@/models/user';
 
 import {UnstyledLink} from './links/UnstyledLink';
@@ -76,9 +77,13 @@ type Props = {
   onClose: () => void;
   onLogout: () => void;
   user: PublicUser;
-  apps: SelectOption[];
-  selectedApp?: SelectOption;
-  onSelectApp: (app?: SelectOption) => void;
+
+  appSelector: {
+    options: AppOption[];
+    selected?: AppOption;
+    onSelect: (opt?: AppOption) => void;
+    disabled: boolean;
+  };
 };
 
 export const Sidebar: FC<Props> = ({
@@ -86,9 +91,7 @@ export const Sidebar: FC<Props> = ({
   onClose,
   onLogout,
   user,
-  apps,
-  selectedApp,
-  onSelectApp,
+  appSelector,
 }) => {
   return (
     <>
@@ -162,11 +165,7 @@ export const Sidebar: FC<Props> = ({
         <div className="flex flex-grow flex-col overflow-y-auto border-r border-gray-200 bg-white pt-5">
           <Logo />
           <div className="mx-2 mt-5">
-            <Select
-              options={apps}
-              selected={selectedApp}
-              onSelect={onSelectApp}
-            />
+            <Select {...appSelector} />
           </div>
           <div className="mt-5 flex flex-grow flex-col">
             <nav

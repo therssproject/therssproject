@@ -9,7 +9,6 @@ import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
 import {useOnlyLoggedOut} from '@/lib/auth';
-import * as http from '@/lib/fetch';
 
 import {Button} from '@/components/buttons/Button';
 import {GitHub} from '@/components/icons/GitHub';
@@ -19,9 +18,7 @@ import {Checkbox} from '@/components/inputs/Checkbox';
 import {Field} from '@/components/inputs/Field';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
 
-import {SessionAtom} from '@/store/session';
-
-import {AuthResponse} from '@/models/user';
+import {authenticate, SessionAtom} from '@/models/user';
 
 type Inputs = {
   email: string;
@@ -52,7 +49,7 @@ const Login = () => {
     setLoading(true);
 
     pipe(
-      await http.post('/users/authenticate', {email, password}, AuthResponse)(),
+      await authenticate({email, password})(),
       E.match(
         (error) => {
           // TODO: show a toast or inline error
