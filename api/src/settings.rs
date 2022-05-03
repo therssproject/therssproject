@@ -43,9 +43,9 @@ impl Settings {
     let mut settings = Config::new();
     let env = env::var("RUN_MODE").unwrap_or_else(|_| "development".into());
 
-    settings.merge(config::File::with_name("config/default"))?;
-    settings.merge(config::File::with_name(&format!("config/{}", env)).required(false))?;
-    settings.merge(config::File::with_name("config/local").required(false))?;
+    settings.merge(config::File::with_name("api/config/default"))?;
+    settings.merge(config::File::with_name(&format!("api/config/{}", env)).required(false))?;
+    settings.merge(config::File::with_name("api/config/local").required(false))?;
 
     // Merge config from the environment variables.
     // Eg: `LOGGER__LEVEL=info ./target/rss` would set the `logger.level`
