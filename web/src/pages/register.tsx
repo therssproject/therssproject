@@ -10,7 +10,6 @@ import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
 import {useOnlyLoggedOut} from '@/lib/auth';
-import * as http from '@/lib/fetch';
 
 import {Button} from '@/components/buttons/Button';
 import {GitHub} from '@/components/icons/GitHub';
@@ -18,9 +17,7 @@ import {Google} from '@/components/icons/Google';
 import {Rss} from '@/components/icons/Rss';
 import {Field} from '@/components/inputs/Field';
 
-import {SessionAtom} from '@/store/session';
-
-import {AuthResponse, PublicUser} from '@/models/user';
+import {authenticate, register, SessionAtom} from '@/models/user';
 
 type Inputs = {
   name: string;
@@ -45,7 +42,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPass] = useState(false);
   const {
-    register,
+    register: registerField,
     handleSubmit,
     formState: {errors},
   } = useForm<Inputs>({resolver: yupResolver(Inputs)});
@@ -56,12 +53,10 @@ const Register = () => {
     setLoading(true);
 
     pipe(
+      // TODO: handle resgiter errors as well
       await pipe(
-        // TODO: handle resgiter errors as well
-        http.post<PublicUser>('/users', {name, email, password}, PublicUser),
-        TE.chain(() =>
-          http.post('/users/authenticate', {email, password}, AuthResponse),
-        ),
+        register({name, email, password}),
+        TE.chain(() => authenticate({email, password})),
       )(),
       E.match(
         (error) => {
@@ -133,7 +128,7 @@ const Register = () => {
                     type: 'name',
                     autoComplete: 'name',
                     variant: errors.name ? 'error' : 'default',
-                    ...register('name', {required: true}),
+                    ...registerField('name', {required: true}),
                   }}
                   message={errors.name?.message}
                 />
@@ -145,7 +140,7 @@ const Register = () => {
                     type: 'email',
                     autoComplete: 'email',
                     variant: errors.email ? 'error' : 'default',
-                    ...register('email', {required: true}),
+                    ...registerField('email', {required: true}),
                   }}
                   message={errors.email?.message}
                 />
@@ -157,7 +152,7 @@ const Register = () => {
                     type: showPassword ? 'text' : 'password',
                     autoComplete: 'password',
                     variant: errors.password ? 'error' : 'default',
-                    ...register('password', {required: true}),
+                    ...registerField('password', {required: true}),
                   }}
                   message={errors.password?.message}
                   icon={{
@@ -175,7 +170,7 @@ const Register = () => {
                     type: showPassword ? 'text' : 'password',
                     autoComplete: 'passwordCheck',
                     variant: errors.passwordCheck ? 'error' : 'default',
-                    ...register('passwordCheck', {required: true}),
+                    ...registerField('passwordCheck', {required: true}),
                   }}
                   message={errors.passwordCheck?.message}
                   icon={{

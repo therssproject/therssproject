@@ -1,12 +1,18 @@
 import {getTupleEq} from 'fp-ts/Eq';
+import {contramap, Eq} from 'fp-ts/Eq';
+import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
+import {Eq as eqString} from 'fp-ts/string';
 import {useStableEffect} from 'fp-ts-react-stable-hooks';
 import {useAtom} from 'jotai';
 import {useRouter} from 'next/router';
 
-import {SessionAtom} from '@/store/session';
+import {AuthResponse, SessionAtom} from '@/models/user';
 
-import {eqAuthResponse} from '@/models/user';
+export const eqAuthResponse: Eq<AuthResponse> = pipe(
+  eqString,
+  contramap(({access_token}: AuthResponse) => access_token),
+);
 
 export const useOnlyLoggedOut = () => {
   const router = useRouter();

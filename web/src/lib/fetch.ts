@@ -1,10 +1,14 @@
 import * as E from 'fp-ts/Either';
-import {pipe} from 'fp-ts/function';
+import {pipe, Lazy} from 'fp-ts/function';
 import * as TE from 'fp-ts/TaskEither';
+import * as IOE from 'fp-ts/IOEither';
+import * as IO from 'fp-ts/IO';
+import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import reporter from 'io-ts-reporters';
 
 import * as CONFIG from '@/config';
+import {Session, SESSION_KEY} from '@/models/user';
 
 export type FetchError =
   | {tag: 'unknown'; message: string}
@@ -71,6 +75,51 @@ const handleResponse =
 const addBaseUrl = (url: string) =>
   url.startsWith('/') ? `${CONFIG.baseUrl}${url}` : url;
 
+const recover =
+  <A>(alt: Lazy<A>) =>
+  <E>(fa: TE.TaskEither<E, A>): TE.TaskEither<never, A> =>
+    pipe(
+      fa,
+      TE.match(() => E.right(alt()), E.right),
+    );
+
+// TODO: use IOOption & TaskOption
+const grabSession = pipe(
+  IOE.tryCatch(
+    () => JSON.parse(localStorage.getItem(SESSION_KEY) ?? ''),
+    () => 'Failed to get session from localStorage',
+  ),
+  IOE.chainEitherK((json) =>
+    pipe(
+      json,
+      Session.decode,
+      E.mapLeft(() => 'Failed to decode setored session'),
+    ),
+  ),
+  TE.fromIOEither,
+  recover((): Session => O.none),
+);
+
+const AppJson = {
+  'Content-Type': 'application/json',
+};
+
+const AuthToken = (token: string) => ({
+  Authorization: `Bearer ${token}`,
+});
+
+const mkHeaders = (session: Session, headers: RequestInit['headers']) => ({
+  ...AppJson,
+  ...pipe(
+    session,
+    O.match(
+      () => undefined,
+      ({access_token: token}) => AuthToken(token),
+    ),
+  ),
+  ...headers,
+});
+
 const req =
   (method: 'GET' | 'DELETE') =>
   <T>(
@@ -79,12 +128,20 @@ const req =
     opts?: RequestInit,
   ): TE.TaskEither<FetchError, T> =>
     pipe(
-      TE.tryCatch(() => fetch(addBaseUrl(url), {...opts, method}), unknown),
+      grabSession,
+      TE.chain((session) =>
+        TE.tryCatch(
+          () =>
+            fetch(addBaseUrl(url), {
+              ...opts,
+              method,
+              headers: mkHeaders(session, opts?.headers),
+            }),
+          unknown,
+        ),
+      ),
       TE.chain(handleResponse(codec)),
     );
-
-export const get = req('GET');
-export const del = req('DELETE');
 
 const reqWithBody =
   (method: 'POST' | 'PUT' | 'PATCH') =>
@@ -95,15 +152,21 @@ const reqWithBody =
     opts?: RequestInit,
   ): TE.TaskEither<FetchError, T> =>
     pipe(
-      TE.tryCatch(() => Promise.resolve(JSON.stringify(body)), encoding),
-      TE.chain((encodedBody) =>
+      grabSession,
+      TE.chain((session) =>
+        pipe(
+          TE.tryCatch(() => Promise.resolve(JSON.stringify(body)), encoding),
+          TE.map((encodedBody) => ({session, encodedBody})),
+        ),
+      ),
+      TE.chain(({encodedBody, session}) =>
         TE.tryCatch(
           () =>
             fetch(addBaseUrl(url), {
               ...opts,
               method,
               body: encodedBody,
-              headers: {...opts?.headers, 'Content-Type': 'application/json'},
+              headers: mkHeaders(session, opts?.headers),
             }),
           unknown,
         ),
@@ -111,6 +174,8 @@ const reqWithBody =
       TE.chain(handleResponse(codec)),
     );
 
+export const get = req('GET');
+export const del = req('DELETE');
 export const post = reqWithBody('POST');
 export const put = reqWithBody('PUT');
 export const patch = reqWithBody('PATCH');
