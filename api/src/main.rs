@@ -20,10 +20,7 @@ mod scheduler;
 mod settings;
 
 use context::Context;
-use database::Database;
-use logger::Logger;
 use messenger::Messenger;
-use models::Models;
 use settings::Settings;
 
 #[tokio::main]
@@ -33,24 +30,26 @@ async fn main() {
     Err(err) => panic!("Failed to setup configuration {}", err),
   };
 
-  Logger::setup(&settings);
+  logger::setup(&settings);
 
-  let db = match Database::setup(&settings).await {
-    Ok(value) => value,
-    Err(err) => panic!("Failed to setup database connection {}", err),
-  };
+  database::setup(&settings)
+    .await
+    .expect("Failed to setup database connection");
+
+  models::sync_indexes()
+    .await
+    .expect("Failed to sync database indexes");
 
   let messenger = match Messenger::setup(&settings).await {
     Ok(value) => value,
     Err(err) => panic!("Failed to setup message broker connection {}", err),
   };
 
-  let models = match Models::setup(db.clone(), messenger.clone()).await {
-    Ok(value) => value,
-    Err(err) => panic!("Failed to setup models {}", err),
-  };
+  models::subscription_job::setup(messenger.clone())
+    .await
+    .expect("Failed to setup subscription job");
 
-  let context = Context::new(settings.clone(), models.clone());
+  let context = Context::new(settings.clone());
 
   let app = routes::create_router()
     // TODO change to production CORS before going live
@@ -80,7 +79,7 @@ async fn main() {
   let address = SocketAddr::from(([0, 0, 0, 0], port));
 
   info!("Starting scheduler");
-  scheduler::start(models.clone(), messenger.clone());
+  scheduler::start(messenger.clone());
 
   info!("listening on {}", &address);
   axum::Server::bind(&address)

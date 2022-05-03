@@ -9,70 +9,15 @@ use wither::bson::{doc, oid::ObjectId};
 use wither::mongodb::options::InsertManyOptions;
 use wither::Model as WitherModel;
 
-use crate::database::Database;
 use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::lib::fetch_rss::fetch_rss;
 use crate::models::entry::Entry;
-use crate::models::entry::Model as EntryModel;
 
-#[derive(Clone)]
-pub struct Model {
-  pub db: Database,
-  pub entry: EntryModel,
-}
-
-impl Model {
-  pub fn new(db: Database) -> Self {
-    let entry = EntryModel::new(db.clone());
-    Self { db, entry }
-  }
-
-  pub async fn sync(&self, id: ObjectId) -> Result<(), Error> {
-    debug!("Syncing feed");
-
-    let feed = self.find_by_id(&id).await?;
-    let feed = match feed {
-      Some(feed) => feed,
-      None => {
-        error!("Failed to sync, Feed with ID {} not found", &id);
-        return Err(Error::NotFound(NotFound::new("feed")));
-      }
-    };
-
-    let url = feed.url;
-    let raw_feed = fetch_rss(url.clone()).await;
-    let entries = raw_feed
-      .entries
-      .into_iter()
-      .map(|raw_entry| Entry::from_raw_entry(id, raw_entry))
-      .collect::<Vec<Entry>>();
-
-    // When a write fails, continue with the remaining writes, if any.
-    // TODO: Check if there is a non duplicate failure and report. Duplicate
-    // failures are expected when the feed is updated.
-    let insert_options = InsertManyOptions::builder().ordered(false).build();
-    let _result = self.entry.insert_many(entries, insert_options).await;
-
-    self
-      .update_one(
-        doc! { "_id": &id },
-        doc! { "$set": { "synced_at": now() } },
-        None,
-      )
-      .await?;
-
-    Ok(())
-  }
-}
-
-impl ModelExt for Model {
+impl ModelExt for Feed {
   type T = Feed;
-  fn get_database(&self) -> &Database {
-    &self.db
-  }
 }
 
 // TODO: Get struct values from:
@@ -114,6 +59,42 @@ impl Feed {
       created_at: now,
       synced_at: now,
     }
+  }
+
+  pub async fn sync(id: ObjectId) -> Result<(), Error> {
+    debug!("Syncing feed");
+
+    let feed = Self::find_by_id(&id).await?;
+    let feed = match feed {
+      Some(feed) => feed,
+      None => {
+        error!("Failed to sync, Feed with ID {} not found", &id);
+        return Err(Error::NotFound(NotFound::new("feed")));
+      }
+    };
+
+    let url = feed.url;
+    let raw_feed = fetch_rss(url.clone()).await;
+    let entries = raw_feed
+      .entries
+      .into_iter()
+      .map(|raw_entry| Entry::from_raw_entry(id, raw_entry))
+      .collect::<Vec<Entry>>();
+
+    // When a write fails, continue with the remaining writes, if any.
+    // TODO: Check if there is a non duplicate failure and report. Duplicate
+    // failures are expected when the feed is updated.
+    let insert_options = InsertManyOptions::builder().ordered(false).build();
+    let _result = Entry::insert_many(entries, insert_options).await;
+
+    Self::update_one(
+      doc! { "_id": &id },
+      doc! { "$set": { "synced_at": now() } },
+      None,
+    )
+    .await?;
+
+    Ok(())
   }
 }
 

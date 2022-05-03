@@ -1,4 +1,4 @@
-use axum::extract::{Extension, Path};
+use axum::extract::Path;
 use axum::routing::{delete, get, post, put};
 use axum::Json;
 use axum::Router;
@@ -7,7 +7,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tracing::debug;
 
-use crate::context::Context;
 use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
@@ -25,30 +24,25 @@ pub fn create_router() -> Router {
 }
 
 async fn create_endpoint(
-  Extension(context): Extension<Context>,
   Json(payload): Json<CreateEndpoint>,
   Path(params): Path<HashMap<String, String>>,
 ) -> Result<Json<PublicEndpoint>, Error> {
   let application_id = params.get("application_id").unwrap().to_owned();
   let application_id = to_object_id(application_id).unwrap();
   let endpoint = Endpoint::new(application_id, payload.url, payload.title);
-  let endpoint = context.models.endpoint.create(endpoint).await?;
+  let endpoint = Endpoint::create(endpoint).await?;
   let res = PublicEndpoint::from(endpoint);
 
   Ok(Json(res))
 }
 
 async fn query_endpoint(
-  Extension(context): Extension<Context>,
   Path(params): Path<HashMap<String, String>>,
 ) -> Result<Json<Vec<PublicEndpoint>>, Error> {
   let application_id = params.get("application_id").unwrap().to_owned();
   let application_id = to_object_id(application_id).unwrap();
 
-  let endpoints = context
-    .models
-    .endpoint
-    .find(doc! { "application": application_id }, None)
+  let endpoints = Endpoint::find(doc! { "application": application_id }, None)
     .await?
     .into_iter()
     .map(Into::into)
@@ -59,7 +53,6 @@ async fn query_endpoint(
 }
 
 async fn get_endpoint_by_id(
-  Extension(context): Extension<Context>,
   Path(params): Path<HashMap<String, String>>,
 ) -> Result<Json<PublicEndpoint>, Error> {
   let application_id = params.get("application_id").unwrap().to_owned();
@@ -68,15 +61,12 @@ async fn get_endpoint_by_id(
   let endpoint_id = params.get("id").unwrap().to_owned();
   let endpoint_id = to_object_id(endpoint_id)?;
 
-  let endpoint = context
-    .models
-    .endpoint
-    .find_one(
-      doc! { "_id": endpoint_id, "application": application_id },
-      None,
-    )
-    .await?
-    .map(PublicEndpoint::from);
+  let endpoint = Endpoint::find_one(
+    doc! { "_id": endpoint_id, "application": application_id },
+    None,
+  )
+  .await?
+  .map(PublicEndpoint::from);
 
   let endpoint = match endpoint {
     Some(endpoint) => endpoint,
@@ -90,7 +80,6 @@ async fn get_endpoint_by_id(
 }
 
 async fn update_endpoint_by_id(
-  Extension(context): Extension<Context>,
   Path(params): Path<HashMap<String, String>>,
   Json(payload): Json<CreateEndpoint>,
 ) -> Result<(), Error> {
@@ -103,15 +92,12 @@ async fn update_endpoint_by_id(
   let update = UpdateEndpoint::new(payload.title, payload.url);
   let update = bson::to_document(&update).unwrap();
 
-  let result = context
-    .models
-    .endpoint
-    .update_one(
-      doc! { "_id": endpoint_id, "application": application_id },
-      doc! { "$set": update },
-      None,
-    )
-    .await?;
+  let result = Endpoint::update_one(
+    doc! { "_id": endpoint_id, "application": application_id },
+    doc! { "$set": update },
+    None,
+  )
+  .await?;
 
   if result.modified_count == 0 {
     debug!("endpoint not found, returning 404 status code");
@@ -121,21 +107,15 @@ async fn update_endpoint_by_id(
   Ok(())
 }
 
-async fn remove_endpoint_by_id(
-  Extension(context): Extension<Context>,
-  Path(params): Path<HashMap<String, String>>,
-) -> Result<(), Error> {
+async fn remove_endpoint_by_id(Path(params): Path<HashMap<String, String>>) -> Result<(), Error> {
   let application_id = params.get("application_id").unwrap().to_owned();
   let application_id = to_object_id(application_id).unwrap();
 
   let endpoint_id = params.get("id").unwrap().to_owned();
   let endpoint_id = to_object_id(endpoint_id)?;
 
-  let delete_result = context
-    .models
-    .endpoint
-    .delete_one(doc! { "_id": endpoint_id, "application": application_id })
-    .await?;
+  let delete_result =
+    Endpoint::delete_one(doc! { "_id": endpoint_id, "application": application_id }).await?;
 
   if delete_result.deleted_count == 0 {
     debug!("endpoint not found, returning 404 status code");

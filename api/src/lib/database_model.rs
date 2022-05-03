@@ -20,7 +20,7 @@ use wither::mongodb::Collection;
 use wither::Model as WitherModel;
 use wither::ModelCursor;
 
-use crate::database::Database;
+use crate::database;
 use crate::errors::BadRequest;
 use crate::errors::Error;
 
@@ -30,48 +30,45 @@ use crate::errors::Error;
 pub trait ModelExt {
   type T: WitherModel + Send + Validate;
 
-  fn get_database(&self) -> &Database;
-
-  async fn create(&self, mut model: Self::T) -> Result<Self::T, Error> {
+  async fn create(mut model: Self::T) -> Result<Self::T, Error> {
     model
       .validate()
       .map_err(|_error| Error::BadRequest(BadRequest::empty()))?;
 
-    let db = self.get_database();
-    model.save(&db.conn, None).await.map_err(Error::Wither)?;
+    let connection = database::get_connection();
+    model.save(connection, None).await.map_err(Error::Wither)?;
 
     Ok(model)
   }
 
-  async fn collection(&self) -> Collection<Self::T> {
-    let db = self.get_database();
-    Self::T::collection(&db.conn)
+  async fn collection() -> Collection<Self::T> {
+    let connection = database::get_connection();
+    Self::T::collection(connection)
   }
 
-  async fn find_by_id(&self, id: &ObjectId) -> Result<Option<Self::T>, Error> {
-    let db = self.get_database();
-    Self::T::find_one(&db.conn, doc! { "_id": id }, None)
+  async fn find_by_id(id: &ObjectId) -> Result<Option<Self::T>, Error> {
+    let connection = database::get_connection();
+    Self::T::find_one(connection, doc! { "_id": id }, None)
       .await
       .map_err(Error::Wither)
   }
 
   async fn find_one(
-    &self,
     query: Document,
     options: Option<FindOneOptions>,
   ) -> Result<Option<Self::T>, Error> {
-    let db = self.get_database();
-    Self::T::find_one(&db.conn, query, options)
+    let connection = database::get_connection();
+    Self::T::find_one(connection, query, options)
       .await
       .map_err(Error::Wither)
   }
 
-  async fn find<O>(&self, query: Document, options: O) -> Result<Vec<Self::T>, Error>
+  async fn find<O>(query: Document, options: O) -> Result<Vec<Self::T>, Error>
   where
     O: Into<Option<FindOptions>> + Send,
   {
-    let db = self.get_database();
-    Self::T::find(&db.conn, query, options.into())
+    let connection = database::get_connection();
+    Self::T::find(connection, query, options.into())
       .await
       .map_err(Error::Wither)?
       .try_collect::<Vec<Self::T>>()
@@ -80,84 +77,80 @@ pub trait ModelExt {
   }
 
   async fn cursor(
-    &self,
     query: Document,
     options: Option<FindOptions>,
   ) -> Result<ModelCursor<Self::T>, Error> {
-    let db = self.get_database();
-    Self::T::find(&db.conn, query, options)
+    let connection = database::get_connection();
+    Self::T::find(connection, query, options)
       .await
       .map_err(Error::Wither)
   }
 
   async fn find_one_and_update(
-    &self,
     query: Document,
     update: Document,
   ) -> Result<Option<Self::T>, Error> {
-    let db = self.get_database();
+    let connection = database::get_connection();
 
     let options = FindOneAndUpdateOptions::builder()
       .return_document(ReturnDocument::After)
       .build();
 
-    Self::T::find_one_and_update(&db.conn, query, update, options)
+    Self::T::find_one_and_update(connection, query, update, options)
       .await
       .map_err(Error::Wither)
   }
 
   async fn update_one(
-    &self,
     query: Document,
     update: Document,
     options: Option<UpdateOptions>,
   ) -> Result<UpdateResult, Error> {
-    let db = self.get_database();
-    Self::T::collection(&db.conn)
+    let connection = database::get_connection();
+    Self::T::collection(connection)
       .update_one(query, update, options)
       .await
       .map_err(Error::Mongo)
   }
 
   async fn update_many(
-    &self,
     query: Document,
     update: Document,
     options: Option<UpdateOptions>,
   ) -> Result<UpdateResult, Error> {
-    let db = self.get_database();
-    Self::T::collection(&db.conn)
+    let connection = database::get_connection();
+    Self::T::collection(connection)
       .update_many(query, update, options)
       .await
       .map_err(Error::Mongo)
   }
 
-  async fn delete_many(&self, query: Document) -> Result<DeleteResult, Error> {
-    let db = self.get_database();
-    Self::T::delete_many(&db.conn, query, None)
+  async fn delete_many(query: Document) -> Result<DeleteResult, Error> {
+    let connection = database::get_connection();
+    Self::T::delete_many(connection, query, None)
       .await
       .map_err(Error::Wither)
   }
 
-  async fn delete_one(&self, query: Document) -> Result<DeleteResult, Error> {
-    let db = self.get_database();
-    Self::T::collection(&db.conn)
+  async fn delete_one(query: Document) -> Result<DeleteResult, Error> {
+    let connection = database::get_connection();
+    Self::T::collection(connection)
       .delete_one(query, None)
       .await
       .map_err(Error::Mongo)
   }
 
-  async fn count(&self, query: Document) -> Result<u64, Error> {
-    let db = self.get_database();
-    Self::T::collection(&db.conn)
+  async fn count(query: Document) -> Result<u64, Error> {
+    let connection = database::get_connection();
+    Self::T::collection(connection)
       .count_documents(query, None)
       .await
       .map_err(Error::Mongo)
   }
 
-  async fn exists(&self, query: Document) -> Result<bool, Error> {
-    let db = self.get_database();
-    let count = Self::T::collection(&db.conn)
+  async fn exists(query: Document) -> Result<bool, Error> {
+    let connection = database::get_connection();
+    let count = Self::T::collection(connection)
       .count_documents(query, None)
       .await
       .map_err(Error::Mongo)?;
@@ -166,23 +159,22 @@ pub trait ModelExt {
   }
 
   async fn insert_many(
-    &self,
     documents: Vec<Self::T>,
     options: InsertManyOptions,
   ) -> Result<InsertManyResult, Error> {
-    let db = self.get_database();
-    Self::T::collection(&db.conn)
+    let connection = database::get_connection();
+    Self::T::collection(connection)
       .insert_many(documents, options)
       .await
       .map_err(Error::Mongo)
   }
 
-  async fn aggregate<A>(&self, pipeline: Vec<Document>) -> Result<Vec<A>, Error>
+  async fn aggregate<A>(pipeline: Vec<Document>) -> Result<Vec<A>, Error>
   where
     A: Serialize + DeserializeOwned,
   {
-    let db = self.get_database();
-    let documents = Self::T::collection(&db.conn)
+    let connection = database::get_connection();
+    let documents = Self::T::collection(connection)
       .aggregate(pipeline, None)
       .await
       .map_err(Error::Mongo)?
@@ -199,9 +191,9 @@ pub trait ModelExt {
     Ok(documents)
   }
 
-  async fn sync_indexes(&self) -> Result<(), Error> {
-    let db = self.get_database();
-    Self::T::sync(&db.conn).await.map_err(Error::Wither)?;
+  async fn sync_indexes() -> Result<(), Error> {
+    let connection = database::get_connection();
+    Self::T::sync(connection).await.map_err(Error::Wither)?;
 
     Ok(())
   }

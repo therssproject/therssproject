@@ -6,22 +6,20 @@ use tokio::time::{sleep, Duration};
 use tracing::info;
 
 use crate::messenger::Messenger;
-use crate::models::Models;
+use crate::models::feed::Feed;
+use crate::models::subscription::Subscription;
 
-pub fn start(models: Models, messenger: Messenger) {
+pub fn start(messenger: Messenger) {
   tokio::spawn(async move {
     loop {
       info!("Running scheduler");
 
       let concurrency = 100;
-      models
-        .feed
-        // TODO: Retrieve only the Feed ID from the database.
-        .cursor(doc! {}, None)
+      // TODO: Retrieve only the Feed ID from the database.
+      Feed::cursor(doc! {}, None)
         .await
         .unwrap()
         .map(|feed| {
-          let models = models.clone();
           let feed = feed.unwrap();
           let id = feed.id.unwrap();
           let url = feed.url;
@@ -31,20 +29,16 @@ pub fn start(models: Models, messenger: Messenger) {
             // TODO: Sync should return if there was a new entry to the feed,
             // based on that we should queue the subscriptions from this feed
             // for notification sending.
-            models.feed.sync(id).await.unwrap();
+            Feed::sync(id).await.unwrap();
             id
           }
         })
         .buffer_unordered(concurrency)
         .map(|feed_id| {
-          let models = models.clone();
-
           async move {
             // TODO: We should just return the cursor instead of getting the
             // subscriptions into an array and then converting it to a stream.
-            let subscriptions = models
-              .subscription
-              .find(doc! { "feed": feed_id }, None)
+            let subscriptions = Subscription::find(doc! { "feed": feed_id }, None)
               .await
               .unwrap();
 
