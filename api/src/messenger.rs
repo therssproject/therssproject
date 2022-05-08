@@ -8,7 +8,7 @@ use lapin::{Channel, Connection, ConnectionProperties};
 use std::ops::Deref;
 use std::sync::Arc;
 
-use crate::settings::Settings;
+use crate::settings::get_settings;
 
 #[derive(Clone)]
 pub struct Messenger {
@@ -28,7 +28,8 @@ pub struct MessengerInner {
 }
 
 impl Messenger {
-  pub async fn setup(settings: &Settings) -> Result<Self, lapin::Error> {
+  pub async fn setup() -> Result<Self, lapin::Error> {
+    let settings = get_settings();
     let uri = settings.rabbitmq.uri.as_str();
 
     let options = ConnectionProperties::default()
