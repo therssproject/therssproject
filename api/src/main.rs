@@ -21,8 +21,6 @@ use messenger::Messenger;
 
 #[tokio::main]
 async fn main() {
-  let settings = settings::setup().expect("Failed to setup settings");
-
   logger::setup();
 
   database::setup()
@@ -65,6 +63,7 @@ async fn main() {
       "x-request-id",
     )));
 
+  let settings = settings::get_settings();
   let port = settings.server.port;
   let address = SocketAddr::from(([0, 0, 0, 0], port));
 

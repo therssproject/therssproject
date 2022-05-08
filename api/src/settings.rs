@@ -1,12 +1,20 @@
 use config::{Config, ConfigError, Environment, File};
+use lazy_static::lazy_static;
 use serde::Deserialize;
 use std::{env, fmt};
 
-// The Rust compiler is allowed to assume that the value a shared reference
-// points to will not change while that reference lives. In this case, settings
-// is a singleton that is only changed once by the main thread.
+lazy_static! {
+  static ref SETTINGS: Settings = {
+    match Settings::new() {
+      Ok(settings) => settings,
+      Err(err) => panic!("Failed to setup settings: {}", err),
+    }
+  };
+}
 
-static mut SETTINGS: Option<Settings> = None;
+pub fn get_settings() -> &'static Settings {
+  &SETTINGS
+}
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Server {
@@ -71,22 +79,4 @@ impl fmt::Display for Server {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "http://localhost:{}", &self.port)
   }
-}
-
-pub fn setup() -> Result<&'static Settings, ConfigError> {
-  unsafe {
-    if SETTINGS.is_some() {
-      panic!("Settings already initialized");
-    }
-  };
-
-  let settings = Settings::new()?;
-  unsafe {
-    SETTINGS = Some(settings);
-    Ok(SETTINGS.as_ref().unwrap())
-  }
-}
-
-pub fn get_settings() -> &'static Settings {
-  unsafe { SETTINGS.as_ref().expect("Settings not initialized") }
 }
