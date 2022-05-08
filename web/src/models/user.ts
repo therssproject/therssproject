@@ -1,6 +1,6 @@
 import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
-import * as tt from 'io-ts-types'
+import * as tt from 'io-ts-types';
 import {atomWithStorage} from 'jotai/utils';
 
 import * as http from '@/lib/fetch';
@@ -24,7 +24,7 @@ export interface AuthResponse extends t.TypeOf<typeof AuthResponse> {}
 
 export type Session = O.Option<AuthResponse>;
 
-export const Session = tt.option(AuthResponse)
+export const Session = tt.option(AuthResponse);
 
 export const SESSION_KEY = '__user_session';
 
