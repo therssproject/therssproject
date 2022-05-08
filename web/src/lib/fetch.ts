@@ -75,14 +75,6 @@ const handleResponse =
 const addBaseUrl = (url: string) =>
   url.startsWith('/') ? `${CONFIG.baseUrl}${url}` : url;
 
-const recover =
-  <A>(alt: Lazy<A>) =>
-  <E>(fa: TE.TaskEither<E, A>): TE.TaskEither<never, A> =>
-    pipe(
-      fa,
-      TE.match(() => E.right(alt()), E.right),
-    );
-
 // TODO: use IOOption & TaskOption
 const grabSession = pipe(
   IOE.tryCatch(
@@ -97,7 +89,7 @@ const grabSession = pipe(
     ),
   ),
   TE.fromIOEither,
-  recover((): Session => O.none),
+  TE.orElse(() => TE.right<never, Session>(O.none)),
 );
 
 const AppJson = {
