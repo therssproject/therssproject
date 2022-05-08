@@ -2,6 +2,12 @@ use config::{Config, ConfigError, Environment, File};
 use serde::Deserialize;
 use std::{env, fmt};
 
+// The Rust compiler is allowed to assume that the value a shared reference
+// points to will not change while that reference lives. In this case, settings
+// is a singleton that is only changed once by the main thread.
+
+static mut SETTINGS: Option<Settings> = None;
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct Server {
   pub port: u16,
@@ -39,7 +45,7 @@ pub struct Settings {
 }
 
 impl Settings {
-  pub fn new() -> Result<Self, ConfigError> {
+  fn new() -> Result<Self, ConfigError> {
     let run_mode = env::var("RUN_MODE").unwrap_or_else(|_| "development".into());
 
     let mut builder = Config::builder()
@@ -65,4 +71,22 @@ impl fmt::Display for Server {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "http://localhost:{}", &self.port)
   }
+}
+
+pub fn setup() -> Result<&'static Settings, ConfigError> {
+  unsafe {
+    if SETTINGS.is_some() {
+      panic!("Settings already initialized");
+    }
+  };
+
+  let settings = Settings::new()?;
+  unsafe {
+    SETTINGS = Some(settings);
+    Ok(SETTINGS.as_ref().unwrap())
+  }
+}
+
+pub fn get_settings() -> &'static Settings {
+  unsafe { SETTINGS.as_ref().expect("Settings not initialized") }
 }

@@ -1,4 +1,3 @@
-use axum::extract::Extension;
 use http::header;
 use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
@@ -8,7 +7,6 @@ use tower_http::{
 };
 use tracing::info;
 
-mod context;
 mod database;
 mod errors;
 mod lib;
@@ -19,20 +17,15 @@ mod routes;
 mod scheduler;
 mod settings;
 
-use context::Context;
 use messenger::Messenger;
-use settings::Settings;
 
 #[tokio::main]
 async fn main() {
-  let settings = match Settings::new() {
-    Ok(value) => value,
-    Err(err) => panic!("Failed to setup configuration {}", err),
-  };
+  let settings = settings::setup().expect("Failed to setup settings");
 
-  logger::setup(&settings);
+  logger::setup();
 
-  database::setup(&settings)
+  database::setup()
     .await
     .expect("Failed to setup database connection");
 
@@ -40,7 +33,7 @@ async fn main() {
     .await
     .expect("Failed to sync database indexes");
 
-  let messenger = match Messenger::setup(&settings).await {
+  let messenger = match Messenger::setup().await {
     Ok(value) => value,
     Err(err) => panic!("Failed to setup message broker connection {}", err),
   };
@@ -48,8 +41,6 @@ async fn main() {
   models::subscription_job::setup(messenger.clone())
     .await
     .expect("Failed to setup subscription job");
-
-  let context = Context::new(settings.clone());
 
   let app = routes::create_router()
     // TODO change to production CORS before going live
@@ -72,8 +63,7 @@ async fn main() {
     // Propagate `X-Request-Id`s from requests to responses
     .layer(PropagateHeaderLayer::new(header::HeaderName::from_static(
       "x-request-id",
-    )))
-    .layer(Extension(context.clone()));
+    )));
 
   let port = settings.server.port;
   let address = SocketAddr::from(([0, 0, 0, 0], port));

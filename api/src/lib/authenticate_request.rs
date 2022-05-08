@@ -1,15 +1,15 @@
 // TODO: Move this logic and token logic to a separate authentication file.
 use axum::{
   async_trait,
-  extract::{Extension, FromRequest, RequestParts, TypedHeader},
+  extract::{FromRequest, RequestParts, TypedHeader},
   headers::{authorization::Bearer, Authorization},
 };
 
-use crate::context::Context;
 use crate::errors::AuthenticateError;
 use crate::errors::Error;
 use crate::lib::token;
 use crate::lib::token::UserFromToken;
+use crate::settings::get_settings;
 
 #[async_trait]
 impl<B> FromRequest<B> for UserFromToken
@@ -24,11 +24,8 @@ where
         .await
         .map_err(|_| AuthenticateError::InvalidToken)?;
 
-    let Extension(context): Extension<Context> = Extension::from_request(req)
-      .await
-      .map_err(|_| Error::ReadContext)?;
-
-    let secret = context.settings.auth.secret.as_str();
+    let settings = get_settings();
+    let secret = settings.auth.secret.as_str();
     let token_data =
       token::decode(bearer.token(), secret).map_err(|_| AuthenticateError::InvalidToken)?;
 

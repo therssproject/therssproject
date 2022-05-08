@@ -1,9 +1,8 @@
-use axum::{extract::Extension, routing::post, Json, Router};
+use axum::{routing::post, Json, Router};
 use bson::doc;
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
-use crate::context::Context;
 use crate::errors::BadRequest;
 use crate::errors::NotFound;
 use crate::errors::{AuthenticateError, Error};
@@ -12,6 +11,7 @@ use crate::lib::token;
 use crate::models::application::Application;
 use crate::models::user;
 use crate::models::user::{PublicUser, User};
+use crate::settings::get_settings;
 
 pub fn create_router() -> Router {
   Router::new()
@@ -33,7 +33,6 @@ async fn create_user(Json(body): Json<CreateBody>) -> Result<Json<PublicUser>, E
 }
 
 async fn authenticate_user(
-  Extension(context): Extension<Context>,
   Json(body): Json<AuthorizeBody>,
 ) -> Result<Json<AuthenticateResponse>, Error> {
   let email = &body.email;
@@ -75,7 +74,8 @@ async fn authenticate_user(
     return Err(Error::Authenticate(AuthenticateError::Locked));
   }
 
-  let secret = context.settings.auth.secret.as_str();
+  let settings = get_settings();
+  let secret = settings.auth.secret.as_str();
   let token = token::create(user.clone(), secret)
     .map_err(|_| Error::Authenticate(AuthenticateError::TokenCreation))?;
 
