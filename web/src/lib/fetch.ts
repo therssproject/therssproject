@@ -1,9 +1,8 @@
 import * as E from 'fp-ts/Either';
-import {pipe, Lazy} from 'fp-ts/function';
-import * as TE from 'fp-ts/TaskEither';
+import {pipe} from 'fp-ts/function';
 import * as IOE from 'fp-ts/IOEither';
-import * as IO from 'fp-ts/IO';
 import * as O from 'fp-ts/Option';
+import * as TE from 'fp-ts/TaskEither';
 import * as t from 'io-ts';
 import reporter from 'io-ts-reporters';
 

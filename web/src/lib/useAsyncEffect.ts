@@ -4,7 +4,11 @@ export const useAsyncEffect = (
   effect: () => Promise<void>,
   deps: DependencyList,
 ) => {
-  useEffect(() => {
-    effect();
-  }, deps);
+  useEffect(
+    () => {
+      effect();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    deps,
+  );
 };

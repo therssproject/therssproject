@@ -1,5 +1,6 @@
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
+
 import {useAtom} from '@/lib/jotai';
 
 import {Layout} from '@/components/layout/Layout';
