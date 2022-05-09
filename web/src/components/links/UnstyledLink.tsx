@@ -19,8 +19,6 @@ export const UnstyledLink = forwardRef<HTMLAnchorElement, Props>(
   ) => {
     const href = format(safeHref);
 
-    console.log({href, safeHref});
-
     const isNewTab =
       openNewTab !== undefined
         ? openNewTab
