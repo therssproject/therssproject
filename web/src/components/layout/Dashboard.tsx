@@ -7,7 +7,6 @@ import * as t from 'io-ts';
 import {ReactNode, useState} from 'react';
 import * as RD from 'remote-data-ts';
 
-import {useOnlyLoggedIn} from '@/lib/auth';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 import {useAsyncEffect} from '@/lib/useAsyncEffect';
@@ -32,8 +31,6 @@ type Props = {
 };
 
 export const Dashboard = ({title, children, seo}: Props) => {
-  useOnlyLoggedIn();
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [session, setSession] = useAtom(SessionAtom);

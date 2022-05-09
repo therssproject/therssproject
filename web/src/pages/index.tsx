@@ -2,6 +2,9 @@ import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import {useAtom} from 'jotai';
 
+import {external} from '@/lib/href';
+import {Route} from '@/lib/routes';
+
 import {Rss} from '@/components/icons/Rss';
 import {Layout} from '@/components/layout/Layout';
 import {UnderlineLink} from '@/components/links/UnderlineLink';
@@ -18,20 +21,24 @@ const HomePage = () => {
           <Rss className="mt-4 h-24 w-auto text-red-300" />
           <h1 className="mt-2 text-gray-500">RSS</h1>
           <div className="mt-4">
-            <UnderlineLink href="/components">Components</UnderlineLink>
+            <UnderlineLink href={Route.components}>Components</UnderlineLink>
             {' / '}
             {pipe(
               session,
               O.match(
                 () => (
                   <>
-                    <UnderlineLink href="/login">Login</UnderlineLink>
+                    <UnderlineLink href={Route.login()}>Login</UnderlineLink>
                     {' / '}
-                    <UnderlineLink href="/register">Register</UnderlineLink>
+                    <UnderlineLink href={Route.register()}>
+                      Register
+                    </UnderlineLink>
                   </>
                 ),
                 () => (
-                  <UnderlineLink href="/dashboard">Dashboard</UnderlineLink>
+                  <UnderlineLink href={Route.dashboard}>
+                    Dashboard
+                  </UnderlineLink>
                 ),
               ),
             )}
@@ -39,11 +46,11 @@ const HomePage = () => {
 
           <footer className="absolute bottom-2 text-gray-700">
             © {new Date().getFullYear()} By{' '}
-            <UnderlineLink href="https://gillchristian.xyz">
+            <UnderlineLink href={external('https://gillchristian.xyz')}>
               gillchristian
             </UnderlineLink>
             {' & '}
-            <UnderlineLink href="https://github.com/ndelvalle">
+            <UnderlineLink href={external('https://github.com/ndelvalle')}>
               ndelvalle
             </UnderlineLink>
           </footer>
