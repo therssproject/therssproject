@@ -8,7 +8,7 @@ import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
-import {useOnlyLoggedOut} from '@/lib/auth';
+import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
 import {GitHub} from '@/components/icons/GitHub';
@@ -32,8 +32,6 @@ const Inputs = yup.object({
 });
 
 const Login = () => {
-  useOnlyLoggedOut();
-
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPass] = useState(false);
   const [rememberSession, setRememberSession] = useState(true);
@@ -160,7 +158,9 @@ const Login = () => {
                   </div>
 
                   <div className="text-sm">
-                    <PrimaryLink href="#">Forgot your password?</PrimaryLink>
+                    <PrimaryLink href={Route.resetPasswordRequest}>
+                      Forgot your password?
+                    </PrimaryLink>
                   </div>
                 </div>
 

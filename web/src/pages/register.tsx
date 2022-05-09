@@ -9,8 +9,6 @@ import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
-import {useOnlyLoggedOut} from '@/lib/auth';
-
 import {Button} from '@/components/buttons/Button';
 import {GitHub} from '@/components/icons/GitHub';
 import {Google} from '@/components/icons/Google';
@@ -37,8 +35,6 @@ const Inputs = yup.object({
 });
 
 const Register = () => {
-  useOnlyLoggedOut();
-
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPass] = useState(false);
   const {

@@ -28,6 +28,7 @@
     "color-hash": "^2.0.1",
     "fp-ts": "^2.11.10",
     "fp-ts-react-stable-hooks": "^1.5.0",
+    "fp-ts-routing": "^0.5.4",
     "io-ts": "^2.2.16",
     "io-ts-extra": "^0.11.6",
     "io-ts-reporters": "^2.0.1",

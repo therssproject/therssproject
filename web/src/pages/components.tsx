@@ -1,6 +1,9 @@
 import clsx from 'clsx';
 import * as React from 'react';
 
+import {external} from '@/lib/href';
+import {Route} from '@/lib/routes';
+
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {ArrowLink} from '@/components/links/ArrowLink';
@@ -32,7 +35,7 @@ export default function ComponentsPage() {
           )}
         >
           <h1>Built-in Components</h1>
-          <ArrowLink direction="left" className="mt-2" href="/">
+          <ArrowLink direction="left" className="mt-2" href={Route.index}>
             Back to Home
           </ArrowLink>
 
@@ -73,7 +76,11 @@ export default function ComponentsPage() {
                     </option>
                   ))}
                 </select>
-                <ButtonLink href="https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/blob/main/src/styles/colors.css">
+                <ButtonLink
+                  href={external(
+                    'https://github.com/theodorusclarence/ts-nextjs-tailwind-starter/blob/main/src/styles/colors.css',
+                  )}
+                >
                   Check list of colors
                 </ButtonLink>
               </div>
@@ -117,8 +124,8 @@ export default function ComponentsPage() {
                 custom cursor for outside links.
               </p>
               <div className="space-x-2">
-                <UnstyledLink href="/">Internal Links</UnstyledLink>
-                <UnstyledLink href="https://theodorusclarence.com">
+                <UnstyledLink href={Route.index}>Internal Links</UnstyledLink>
+                <UnstyledLink href={external('https://theodorusclarence.com')}>
                   Outside Links
                 </UnstyledLink>
               </div>
@@ -130,8 +137,8 @@ export default function ComponentsPage() {
                 the link.
               </p>
               <div className="space-x-2">
-                <PrimaryLink href="/">Internal Links</PrimaryLink>
-                <PrimaryLink href="https://theodorusclarence.com">
+                <PrimaryLink href={Route.index}>Internal Links</PrimaryLink>
+                <PrimaryLink href={external('https://theodorusclarence.com')}>
                   Outside Links
                 </PrimaryLink>
               </div>
@@ -143,8 +150,8 @@ export default function ComponentsPage() {
                 underline.
               </p>
               <div className="space-x-2">
-                <UnderlineLink href="/">Internal Links</UnderlineLink>
-                <UnderlineLink href="https://theodorusclarence.com">
+                <UnderlineLink href={Route.index}>Internal Links</UnderlineLink>
+                <UnderlineLink href={external('https://theodorusclarence.com')}>
                   Outside Links
                 </UnderlineLink>
               </div>
@@ -156,14 +163,14 @@ export default function ComponentsPage() {
                 not build a component with some whimsy touch?
               </p>
               <div className="flex flex-wrap items-center gap-4">
-                <ArrowLink href="/" direction="left">
+                <ArrowLink href={Route.index} direction="left">
                   Direction Left
                 </ArrowLink>
-                <ArrowLink href="/">Direction Right</ArrowLink>
+                <ArrowLink href={Route.index}>Direction Right</ArrowLink>
                 <ArrowLink
                   as={UnstyledLink}
                   className="inline-flex items-center"
-                  href="/"
+                  href={Route.index}
                 >
                   Polymorphic
                 </ArrowLink>
@@ -171,7 +178,7 @@ export default function ComponentsPage() {
                   as={ButtonLink}
                   variant="light"
                   className="inline-flex items-center"
-                  href="/"
+                  href={Route.index}
                 >
                   Polymorphic
                 </ArrowLink>
@@ -185,30 +192,33 @@ export default function ComponentsPage() {
               <div className="flex flex-wrap gap-2">
                 <ButtonLink
                   variant="primary"
-                  href="https://theodorusclarence.com"
+                  href={external('https://theodorusclarence.com')}
                 >
                   Primary Variant
                 </ButtonLink>
                 <ButtonLink
                   variant="outline"
                   isDarkBg={mode === 'dark'}
-                  href="https://theodorusclarence.com"
+                  href={external('https://theodorusclarence.com')}
                 >
                   Outline Variant
                 </ButtonLink>
                 <ButtonLink
                   variant="ghost"
                   isDarkBg={mode === 'dark'}
-                  href="https://theodorusclarence.com"
+                  href={external('https://theodorusclarence.com')}
                 >
                   Ghost Variant
                 </ButtonLink>
-                <ButtonLink variant="dark" href="https://theodorusclarence.com">
+                <ButtonLink
+                  variant="dark"
+                  href={external('https://theodorusclarence.com')}
+                >
                   Dark Variant
                 </ButtonLink>
                 <ButtonLink
                   variant="light"
-                  href="https://theodorusclarence.com"
+                  href={external('https://theodorusclarence.com')}
                 >
                   Light Variant
                 </ButtonLink>
@@ -271,7 +281,9 @@ export default function ComponentsPage() {
                 Styled 404 page with some animation.
               </p>
               <div className="flex flex-wrap gap-2">
-                <ButtonLink href="/404">Visit the 404 page</ButtonLink>
+                <ButtonLink href={Route.notFound}>
+                  Visit the 404 page
+                </ButtonLink>
               </div>
             </li>
             <li className="space-y-2">

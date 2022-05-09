@@ -14,6 +14,7 @@ import {
 import {ComponentType, FC, Fragment} from 'react';
 
 import clsxm from '@/lib/clsxm';
+import {Route} from '@/lib/routes';
 
 import {Rss} from '@/components/icons/Rss';
 import {Select} from '@/components/Select';
@@ -25,18 +26,18 @@ import {UnstyledLink} from './links/UnstyledLink';
 
 type NavLink = {
   name: string;
-  href: string;
+  href: Route;
   icon: ComponentType<{className: string}>;
   current: boolean;
 };
 
 const navigation: NavLink[] = [
-  {name: 'Dashboard', icon: HomeIcon, href: '#', current: true},
-  {name: 'Team', icon: UsersIcon, href: '#', current: false},
-  {name: 'Projects', icon: FolderIcon, href: '#', current: false},
-  {name: 'Calendar', icon: CalendarIcon, href: '#', current: false},
-  {name: 'Documents', icon: InboxIcon, href: '#', current: false},
-  {name: 'Reports', icon: ChartBarIcon, href: '#', current: false},
+  {name: 'Dashboard', icon: HomeIcon, href: Route.dashboard, current: true},
+  {name: 'Team', icon: UsersIcon, href: Route.notFound, current: false},
+  {name: 'Projects', icon: FolderIcon, href: Route.notFound, current: false},
+  {name: 'Calendar', icon: CalendarIcon, href: Route.notFound, current: false},
+  {name: 'Documents', icon: InboxIcon, href: Route.notFound, current: false},
+  {name: 'Reports', icon: ChartBarIcon, href: Route.notFound, current: false},
 ];
 
 type SecondaryNavItem =
@@ -53,14 +54,14 @@ const secondaryNavigation = (onLogout: () => void): SecondaryNavItem[] => [
     type: 'link',
     name: 'Documentation',
     icon: DocumentTextIcon,
-    href: '#',
+    href: Route.documentation,
     current: false,
   },
   {
     type: 'link',
     name: 'Share feedback',
     icon: InformationCircleIcon,
-    href: '#',
+    href: Route.notFound,
     current: false,
   },
   {
@@ -186,7 +187,7 @@ export const Sidebar: FC<Props> = ({
 };
 
 const Logo = () => (
-  <UnstyledLink href="/">
+  <UnstyledLink href={Route.index}>
     <div className="flex flex-shrink-0 items-center px-4">
       <Rss className="h-8 w-auto text-red-300" />
       <h2 className="ml-2 text-gray-600">rss</h2>
@@ -197,7 +198,7 @@ const Logo = () => (
 const MainNav = () => (
   <>
     {navigation.map((item) => (
-      <a
+      <UnstyledLink
         key={item.name}
         href={item.href}
         className={clsxm(
@@ -217,7 +218,7 @@ const MainNav = () => (
           aria-hidden="true"
         />
         {item.name}
-      </a>
+      </UnstyledLink>
     ))}
   </>
 );
@@ -230,7 +231,7 @@ const SecondaryNav = ({onLogout}: {onLogout: () => void}) => (
   >
     {secondaryNavigation(onLogout).map((item) =>
       item.type === 'link' ? (
-        <a
+        <UnstyledLink
           key={item.name}
           href={item.href}
           className={clsxm(
@@ -250,7 +251,7 @@ const SecondaryNav = ({onLogout}: {onLogout: () => void}) => (
             aria-hidden="true"
           />
           {item.name}
-        </a>
+        </UnstyledLink>
       ) : (
         <button
           key={item.name}
@@ -276,7 +277,11 @@ const SecondaryNav = ({onLogout}: {onLogout: () => void}) => (
 
 const Profile = ({username, avatar}: {username: string; avatar?: string}) => (
   <div className="mt-4 flex flex-shrink-0 border-t border-gray-200 p-4">
-    <a href="#" className="group block w-full flex-shrink-0">
+    {/* TODO: profile route */}
+    <UnstyledLink
+      href={Route.notFound}
+      className="group block w-full flex-shrink-0"
+    >
       <div className="flex items-center">
         <div>
           {avatar ? (
@@ -303,6 +308,6 @@ const Profile = ({username, avatar}: {username: string; avatar?: string}) => (
           </p>
         </div>
       </div>
-    </a>
+    </UnstyledLink>
   </div>
 );
