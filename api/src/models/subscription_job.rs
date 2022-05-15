@@ -4,10 +4,11 @@ use lapin::options::BasicAckOptions;
 use tracing::{error, info};
 
 use crate::errors::Error;
-use crate::messenger::Messenger;
+use crate::messenger::get_messenger;
 use crate::models::subscription::Subscription;
 
-pub async fn setup(messenger: Messenger) -> Result<(), Error> {
+pub async fn setup() -> Result<(), Error> {
+  let messenger = get_messenger();
   let queue_name = "send_webhook_event";
   let _queue = messenger.create_queue(queue_name).await.unwrap();
   let consumer = messenger.create_consumer(queue_name).await.unwrap();
