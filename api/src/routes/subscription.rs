@@ -67,7 +67,8 @@ async fn create_subscription(
 
   let feed_id = feed.id.unwrap();
   let endpoint_id = endpoint.id.unwrap();
-  let subscription = Subscription::new(application_id, feed_id, endpoint_id, payload.url);
+  let metadata = payload.metadata;
+  let subscription = Subscription::new(application_id, feed_id, endpoint_id, payload.url, metadata);
   let subscription = Subscription::create(subscription).await?;
   let res = PublicSubscription::from(subscription);
 
@@ -150,4 +151,5 @@ enum SubscriptionEndpoint {
 struct CreateSubscription {
   url: String,
   endpoint: SubscriptionEndpoint,
+  metadata: Option<String>,
 }
