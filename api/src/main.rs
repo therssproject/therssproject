@@ -17,8 +17,6 @@ mod routes;
 mod scheduler;
 mod settings;
 
-use messenger::Messenger;
-
 #[tokio::main]
 async fn main() {
   logger::setup();
@@ -31,12 +29,9 @@ async fn main() {
     .await
     .expect("Failed to sync database indexes");
 
-  let messenger = match Messenger::setup().await {
-    Ok(value) => value,
-    Err(err) => panic!("Failed to setup message broker connection {}", err),
-  };
+  messenger::setup().await.expect("Failed to setup messenger");
 
-  models::subscription_job::setup(messenger.clone())
+  models::subscription_job::setup()
     .await
     .expect("Failed to setup subscription job");
 
@@ -68,7 +63,7 @@ async fn main() {
   let address = SocketAddr::from(([0, 0, 0, 0], port));
 
   info!("Starting scheduler");
-  scheduler::start(messenger.clone());
+  scheduler::start();
 
   info!("listening on {}", &address);
   axum::Server::bind(&address)

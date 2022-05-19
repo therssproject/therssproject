@@ -5,25 +5,32 @@ use lapin::Error;
 use lapin::Queue;
 use lapin::{options::QueueDeclareOptions, types::FieldTable};
 use lapin::{Channel, Connection, ConnectionProperties};
-use std::ops::Deref;
-use std::sync::Arc;
 
 use crate::settings::get_settings;
 
-#[derive(Clone)]
+static mut MESSENGER: Option<Messenger> = None;
+
+pub async fn setup() -> Result<(), lapin::Error> {
+  unsafe {
+    if MESSENGER.is_some() {
+      panic!("Messenger already initialized");
+    }
+  };
+
+  let messenger = Messenger::setup().await?;
+  unsafe {
+    MESSENGER = Some(messenger);
+  };
+
+  Ok(())
+}
+
+pub fn get_messenger() -> &'static Messenger {
+  unsafe { MESSENGER.as_ref().expect("Messenger not initialized") }
+}
+
 pub struct Messenger {
-  inner: Arc<MessengerInner>,
-}
-
-impl Deref for Messenger {
-  type Target = Arc<MessengerInner>;
-  fn deref(&self) -> &Self::Target {
-    &self.inner
-  }
-}
-
-pub struct MessengerInner {
-  pub conn: Connection,
+  pub connection: Connection,
   pub channel: Channel,
 }
 
@@ -36,11 +43,12 @@ impl Messenger {
       .with_executor(tokio_executor_trait::Tokio::current())
       .with_reactor(tokio_reactor_trait::Tokio);
 
-    let conn = Connection::connect(uri, options).await?;
-    let channel = conn.create_channel().await?;
+    let connection = Connection::connect(uri, options).await?;
+    let channel = connection.create_channel().await?;
 
     Ok(Self {
-      inner: Arc::new(MessengerInner { conn, channel }),
+      connection,
+      channel,
     })
   }
 
