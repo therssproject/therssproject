@@ -5,6 +5,7 @@ use axum::{
 };
 use bson::doc;
 use serde::Deserialize;
+use serde_json::Value as JsonValue;
 use std::collections::HashMap;
 use tracing::debug;
 
@@ -151,5 +152,5 @@ enum SubscriptionEndpoint {
 struct CreateSubscription {
   url: String,
   endpoint: SubscriptionEndpoint,
-  metadata: Option<String>,
+  metadata: Option<JsonValue>,
 }
