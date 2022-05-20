@@ -1,6 +1,7 @@
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
+use serde_json::Value as Json;
 use tracing::{debug, error};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId, Bson};
@@ -27,6 +28,7 @@ pub struct Subscription {
   pub url: String,
   pub feed: ObjectId,
   pub endpoint: ObjectId,
+  pub metadata: Option<Json>,
 
   // Last time the subscription was notified and the last feed entry sent. The
   // last entry is required to calculate what entries needs to be sent next.
@@ -37,7 +39,13 @@ pub struct Subscription {
 }
 
 impl Subscription {
-  pub fn new(application: ObjectId, feed: ObjectId, endpoint: ObjectId, url: String) -> Self {
+  pub fn new(
+    application: ObjectId,
+    feed: ObjectId,
+    endpoint: ObjectId,
+    url: String,
+    metadata: Option<Json>,
+  ) -> Self {
     let now = now();
     Self {
       id: None,
@@ -45,6 +53,7 @@ impl Subscription {
       url,
       feed,
       endpoint,
+      metadata,
       last_notified_entry: None,
       notified_at: None,
       created_at: now,
