@@ -6,7 +6,6 @@ use tracing::debug;
 use tracing::error;
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
-use wither::mongodb::options::InsertManyOptions;
 use wither::Model as WitherModel;
 
 use crate::errors::Error;
@@ -15,6 +14,7 @@ use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::lib::fetch_rss::fetch_rss;
 use crate::models::entry::Entry;
+use crate::models::subscription::Subscription;
 
 impl ModelExt for Feed {
   type T = Feed;
@@ -33,9 +33,9 @@ pub struct Feed {
   pub url: String,
   pub title: Option<String>,
   pub description: Option<String>,
+  pub synced_at: Date,
   pub updated_at: Date,
   pub created_at: Date,
-  pub synced_at: Date,
 }
 
 impl Feed {
@@ -62,6 +62,8 @@ impl Feed {
     }
   }
 
+  /// Fetch the last RSS Feed version and store it's entries in the database.
+  /// If the feed has new entries, update the related subscriptions.
   pub async fn sync(id: ObjectId) -> Result<(), Error> {
     debug!("Syncing feed");
 
@@ -82,11 +84,8 @@ impl Feed {
       .map(|raw_entry| Entry::from_raw_entry(id, raw_entry))
       .collect::<Vec<Entry>>();
 
-    // When a write fails, continue with the remaining writes, if any.
-    // TODO: Check if there is a non duplicate failure and report. Duplicate
-    // failures are expected when the feed is updated.
-    let insert_options = InsertManyOptions::builder().ordered(false).build();
-    let _result = Entry::insert_many(entries, insert_options).await;
+    let inserted_count = Entry::try_insert_many(entries).await?;
+    let should_update_subscriptions = inserted_count > 0;
 
     Self::update_one(
       doc! { "_id": &id },
@@ -94,6 +93,15 @@ impl Feed {
       None,
     )
     .await?;
+
+    if should_update_subscriptions {
+      Subscription::update_many(
+        doc! { "feed": &id },
+        doc! { "$set": { "feed_synced_with_changes_at": now() } },
+        None,
+      )
+      .await?;
+    }
 
     Ok(())
   }

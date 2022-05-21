@@ -21,6 +21,7 @@ impl ModelExt for Subscription {
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(keys = r#"doc!{ "application": 1 }"#))]
 #[model(index(keys = r#"doc!{ "feed": 1 }"#))]
+#[model(index(keys = r#"doc!{ "feed_synced_with_changes_at": 1 }"#))]
 pub struct Subscription {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
@@ -34,6 +35,11 @@ pub struct Subscription {
   // last entry is required to calculate what entries needs to be sent next.
   pub last_notified_entry: Option<ObjectId>,
   pub notified_at: Option<Date>,
+
+  // This attribute is used by the subscription scheduler to determine if the
+  // subscription needs to be notified.
+  // When subscription is notyfied, this attribute is set to None.
+  pub feed_synced_with_changes_at: Option<Date>,
 
   pub created_at: Date,
 }
@@ -56,6 +62,7 @@ impl Subscription {
       metadata,
       last_notified_entry: None,
       notified_at: None,
+      feed_synced_with_changes_at: None,
       created_at: now,
     }
   }
@@ -72,22 +79,13 @@ impl Subscription {
       }
     };
 
-    let mut get_entries_query = doc! { "feed": subscription.feed };
-    // Query entries that are newer than the last notified feed entry. If this
-    // is the first time we're notifying, we'll query all entries.
-    if let Some(last_notified_entry) = subscription.last_notified_entry {
-      get_entries_query.insert("_id", doc! { "$gt": last_notified_entry });
-    }
-
-    let entries = <Entry as ModelExt>::find(get_entries_query, sort_by_id()).await?;
-
-    let has_entries = !entries.is_empty();
-    if !has_entries {
+    let (entries, has_more_entries) = find_entries(&subscription).await?;
+    if entries.is_empty() {
       debug!("No new entries found for subscription {}", &id);
       return Ok(());
     }
 
-    let result = Endpoint::send_webhook(
+    let webhook = Endpoint::send_webhook(
       subscription.endpoint,
       subscription.application,
       id,
@@ -95,12 +93,27 @@ impl Subscription {
     )
     .await;
 
-    if let Err(err) = result {
-      debug!("Failed to send webhook to subscription {}", &id);
-      return Err(err);
-    }
+    let webhook = match webhook {
+      Ok(webhook) => webhook,
+      Err(err) => {
+        debug!("Failed to send webhook to subscription {}", &id);
+        return Err(err);
+      }
+    };
 
     let last_entry = entries.last().unwrap();
+    let last_entry_id = last_entry.id.unwrap();
+
+    let mut update = doc! {
+      "$set": {
+        "last_notified_entry": last_entry_id,
+        "notified_at": webhook.sent_at,
+      },
+    };
+
+    if !has_more_entries {
+      update.insert("$unset", doc! { "feed_synced_with_changes_at": 1_i32 });
+    }
 
     Self::update_one(
       doc! {
@@ -110,16 +123,10 @@ impl Subscription {
         // newer than the last entry on the database.
         "$or": [
             { "last_notified_entry": Bson::Null },
-            { "last_notified_entry": { "$lt": last_entry.id } }
+            { "last_notified_entry": { "$lt": last_entry_id } }
         ]
       },
-      doc! {
-        "$set": {
-          "last_notified_entry": last_entry.id,
-          // TODO: Use the webhook notification date
-          "notified_at": now()
-        }
-      },
+      update,
       None,
     )
     .await?;
@@ -156,6 +163,27 @@ impl From<Subscription> for PublicSubscription {
   }
 }
 
-fn sort_by_id() -> FindOptions {
-  FindOptions::builder().sort(doc! { "_id": 1 }).build()
+async fn find_entries(subscription: &Subscription) -> Result<(Vec<Entry>, bool), Error> {
+  let limit = 5;
+
+  let options = FindOptions::builder()
+    .sort(doc! { "_id": 1_i32 })
+    .limit(limit + 1)
+    .build();
+
+  let mut query = doc! { "feed": subscription.feed };
+  // Query entries that are newer than the last notified feed entry. If this is
+  // the first time we're notifying, we'll query all entries.
+  if let Some(last_notified_entry) = subscription.last_notified_entry {
+    query.insert("_id", doc! { "$gt": last_notified_entry });
+  }
+
+  let mut entries = <Entry as ModelExt>::find(query, options).await?;
+  let has_more = entries.len() as i64 > limit;
+
+  if has_more {
+    entries.pop();
+  }
+
+  Ok((entries, has_more))
 }
