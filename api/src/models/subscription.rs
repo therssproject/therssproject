@@ -21,6 +21,7 @@ impl ModelExt for Subscription {
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(keys = r#"doc!{ "application": 1 }"#))]
 #[model(index(keys = r#"doc!{ "feed": 1 }"#))]
+// TODO: Create partial index (Only when feed_synced_with_changes_at exists).
 #[model(index(keys = r#"doc!{ "feed_synced_with_changes_at": 1 }"#))]
 pub struct Subscription {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
