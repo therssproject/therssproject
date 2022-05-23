@@ -9,13 +9,14 @@ use tracing::info;
 
 mod database;
 mod errors;
+mod feed_scheduler;
 mod lib;
 mod logger;
 mod messenger;
 mod models;
 mod routes;
-mod scheduler;
 mod settings;
+mod subscription_scheduler;
 
 #[tokio::main]
 async fn main() {
@@ -62,8 +63,9 @@ async fn main() {
   let port = settings.server.port;
   let address = SocketAddr::from(([0, 0, 0, 0], port));
 
-  info!("Starting scheduler");
-  scheduler::start();
+  info!("Starting schedulers");
+  feed_scheduler::start();
+  subscription_scheduler::start();
 
   info!("listening on {}", &address);
   axum::Server::bind(&address)

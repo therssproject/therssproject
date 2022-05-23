@@ -76,8 +76,8 @@ impl Endpoint {
       entries: entries.into_iter().map(Into::into).collect(),
     };
 
-    // TODO: Handle this res.
     let sent_at = now();
+    // TODO: Store the request response status.
     let _res = client.post(&url).json(&payload).send().await.unwrap();
 
     let webhook = Webhook::new(endpoint.application, subscription, id, url.clone(), sent_at);

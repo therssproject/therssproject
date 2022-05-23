@@ -2,8 +2,10 @@ use feed_rs::model::Entry as RawEntry;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
+use wither::mongodb::options::InsertManyOptions;
 use wither::Model as WitherModel;
 
+use crate::errors::Error;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::now;
 use crate::lib::date::Date;
@@ -51,6 +53,16 @@ impl Entry {
       published_at,
       created_at: now(),
     }
+  }
+
+  /// This function tries to insert as many entries as possible. When a write
+  /// fails, continue with the remaining writes, if any.
+  pub async fn try_insert_many(entries: Vec<Entry>) -> Result<i32, Error> {
+    let insert_options = InsertManyOptions::builder().ordered(false).build();
+    let _result = Self::insert_many(entries, insert_options).await;
+
+    // TODO: Return the actual count of inserted entries.
+    Ok(1)
   }
 }
 
