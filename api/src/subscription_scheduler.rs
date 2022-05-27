@@ -47,7 +47,7 @@ async fn run_job() {
 
 async fn find_subscriptions() -> Result<Cursor<Subscription>, Error> {
   let query = doc! {
-    "feed_synced_with_changes_at": {
+    "synced_with_changes_at": {
       "$exists": true
     }
   };

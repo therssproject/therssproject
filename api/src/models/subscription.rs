@@ -21,8 +21,10 @@ impl ModelExt for Subscription {
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(keys = r#"doc!{ "application": 1 }"#))]
 #[model(index(keys = r#"doc!{ "feed": 1 }"#))]
-// TODO: Create partial index (Only when feed_synced_with_changes_at exists).
-#[model(index(keys = r#"doc!{ "feed_synced_with_changes_at": 1 }"#))]
+#[model(index(
+  keys = r#"doc!{ "synced_with_changes_at": 1 }"#,
+  options = r#"doc!{ "sparse": true }"#
+))]
 pub struct Subscription {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
@@ -39,8 +41,11 @@ pub struct Subscription {
 
   // This attribute is used by the subscription scheduler to determine if the
   // subscription needs to be notified.
-  // When subscription is notyfied, this attribute is set to None.
-  pub feed_synced_with_changes_at: Option<Date>,
+  // When subscription is notified, this attribute is set to None.
+  // TODO: Update serde to insert "undefined" instead of null the None value
+  // because the sparse index.
+  pub synced_with_changes_at: Option<Date>,
+  pub synced_at: Option<Date>,
 
   pub created_at: Date,
 }
@@ -63,7 +68,8 @@ impl Subscription {
       metadata,
       last_notified_entry: None,
       notified_at: None,
-      feed_synced_with_changes_at: None,
+      synced_at: None,
+      synced_with_changes_at: None,
       created_at: now,
     }
   }
@@ -85,6 +91,9 @@ impl Subscription {
       debug!("No new entries found for subscription {}", &id);
       return Ok(());
     }
+
+    // TODO: Add check to make sure another concurrent job has not send these
+    // entries already.
 
     let webhook = Endpoint::send_webhook(
       subscription.endpoint,
@@ -113,7 +122,7 @@ impl Subscription {
     };
 
     if !has_more_entries {
-      update.insert("$unset", doc! { "feed_synced_with_changes_at": 1_i32 });
+      update.insert("$unset", doc! { "synced_with_changes_at": 1_i32 });
     }
 
     Self::update_one(
