@@ -92,9 +92,6 @@ impl Subscription {
       return Ok(());
     }
 
-    // TODO: Add check to make sure another concurrent job has not send these
-    // entries already.
-
     let webhook = Endpoint::send_webhook(
       subscription.endpoint,
       subscription.application,
