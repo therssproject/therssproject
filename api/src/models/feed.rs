@@ -94,10 +94,16 @@ impl Feed {
     )
     .await?;
 
+    // TODO: Set synced_at and synced_with_changes_at conditionally.
     if should_update_subscriptions {
+      let now = now();
       Subscription::update_many(
         doc! { "feed": &id },
-        doc! { "$set": { "feed_synced_with_changes_at": now() } },
+        doc! { "$set": {
+            "synced_at": now,
+            "synced_with_changes_at": now
+          }
+        },
         None,
       )
       .await?;
