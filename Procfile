@@ -1,1 +1,1 @@
-web: ./target/release/rss
+web: ./api/target/release/rss
