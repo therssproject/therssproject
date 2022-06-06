@@ -3,7 +3,13 @@ name: API CI
 env:
   CARGO_TERM_COLOR: always
 
-on: [push]
+on:
+  push:
+    branches:
+      - '*'
+    paths:
+      - 'api/**'
+      - '.github/workflows/api.yml'
 
 defaults:
   run:
@@ -12,6 +18,12 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      rabbitmq:
+        image: rabbitmq:3.8
+        ports:
+          - 5672:5672
 
     steps:
       - name: Checkout sources
@@ -40,3 +52,11 @@ jobs:
 
       - name: Run cargo check
         run: cargo check
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.7.0
+        with:
+          mongodb-version: 5.0
+
+      - name: Run cargo test
+        run: cargo test -- --test-threads=1

@@ -36,14 +36,3 @@ tokio-reactor-trait = "1.1.0"
 url = "2.2.2"
 uuid = { version = "1.0.0", features = ["v4"] }
 lazy_static = "1.4.0"
-
-[dev-dependencies.cargo-husky]
-version = "1.5.0"
-default-features = false
-features = [
-  "precommit-hook",
-  "run-cargo-check",
-  "run-cargo-clippy",
-  "run-cargo-fmt",
-  "run-cargo-test",
-]
