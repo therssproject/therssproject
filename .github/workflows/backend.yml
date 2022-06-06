@@ -8,12 +8,13 @@ on:
     branches:
       - master
 
+defaults:
+  run:
+    working-directory: api
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./api
 
     steps:
       - name: Checkout sources
