@@ -1,3 +1,4 @@
+use axum::Router;
 use http::header;
 use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
@@ -18,8 +19,30 @@ mod routes;
 mod settings;
 mod subscription_scheduler;
 
+#[cfg(test)]
+mod tests;
+
 #[tokio::main]
 async fn main() {
+  let settings = settings::get_settings();
+  let port = settings.server.port;
+  let address = SocketAddr::from(([0, 0, 0, 0], port));
+
+  info!("Starting APP");
+  let app = create_app().await;
+
+  info!("Starting schedulers");
+  feed_scheduler::start();
+  subscription_scheduler::start();
+
+  info!("listening on {}", &address);
+  axum::Server::bind(&address)
+    .serve(app.into_make_service())
+    .await
+    .expect("Failed to start server");
+}
+
+pub async fn create_app() -> Router {
   logger::setup();
 
   database::setup()
@@ -36,7 +59,7 @@ async fn main() {
     .await
     .expect("Failed to setup subscription job");
 
-  let app = routes::create_router()
+  routes::create_router()
     // TODO change to production CORS before going live
     // @reference https://docs.rs/tower-http/latest/tower_http/cors/struct.CorsLayer.html#method.permissive
     .layer(CorsLayer::permissive())
@@ -57,19 +80,5 @@ async fn main() {
     // Propagate `X-Request-Id`s from requests to responses
     .layer(PropagateHeaderLayer::new(header::HeaderName::from_static(
       "x-request-id",
-    )));
-
-  let settings = settings::get_settings();
-  let port = settings.server.port;
-  let address = SocketAddr::from(([0, 0, 0, 0], port));
-
-  info!("Starting schedulers");
-  feed_scheduler::start();
-  subscription_scheduler::start();
-
-  info!("listening on {}", &address);
-  axum::Server::bind(&address)
-    .serve(app.into_make_service())
-    .await
-    .expect("Failed to start server");
+    )))
 }
