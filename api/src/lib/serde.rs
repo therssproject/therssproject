@@ -7,7 +7,7 @@ pub fn bson_datetime_option_as_rfc3339_string<S: Serializer>(
 ) -> Result<S::Ok, S::Error> {
   match *date {
     Some(date) => {
-      let rfc3339_string = date.to_rfc3339_string();
+      let rfc3339_string = date.try_to_rfc3339_string().unwrap();
       serializer.serialize_str(&rfc3339_string)
     }
     None => serializer.serialize_none(),
