@@ -57,9 +57,9 @@ impl Settings {
     let run_mode = env::var("RUN_MODE").unwrap_or_else(|_| "development".into());
 
     let mut builder = Config::builder()
-      .add_source(File::with_name("api/config/default"))
-      .add_source(File::with_name(&format!("api/config/{}", run_mode)).required(false))
-      .add_source(File::with_name("api/config/local").required(false))
+      .add_source(File::with_name("config/default"))
+      .add_source(File::with_name(&format!("config/{}", run_mode)).required(false))
+      .add_source(File::with_name("config/local").required(false))
       .add_source(Environment::default().separator("__"));
 
     // Some cloud services like Heroku exposes a randomly assigned port in
@@ -72,6 +72,10 @@ impl Settings {
       .build()?
       // Deserialize (and thus freeze) the entire configuration.
       .try_deserialize()
+  }
+
+  pub fn is_test(&self) -> bool {
+    self.environment == "test"
   }
 }
 
