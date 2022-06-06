@@ -11,10 +11,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
@@ -23,7 +26,7 @@ jobs:
           override: true
           components: rustfmt, clippy
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/registry
