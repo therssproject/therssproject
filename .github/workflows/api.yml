@@ -1,12 +1,9 @@
-name: Backend CI
+name: API CI
 
 env:
   CARGO_TERM_COLOR: always
 
-on:
-  pull_request:
-    branches:
-      - master
+on: [push]
 
 defaults:
   run:
