@@ -38,7 +38,6 @@ pub struct Entry {
 impl Entry {
   pub fn from_raw_entry(feed: ObjectId, raw_entry: RawEntry) -> Self {
     let url = raw_entry.links.get(0).map(|link| link.href.clone());
-
     let title = raw_entry.title.clone().map(|title| title.content);
     let description = raw_entry.summary.clone().map(|summary| summary.content);
     let published_at = raw_entry.published.map(|published| published.into());
@@ -82,6 +81,24 @@ impl From<Entry> for PublicEntry {
       title: entry.title,
       description: entry.description,
       published_at: entry.published_at,
+    }
+  }
+}
+
+// TODO: Move this to a separate file where the conversion between raw feed and
+// feed happens
+impl From<RawEntry> for PublicEntry {
+  fn from(entry: RawEntry) -> Self {
+    let url = entry.links.get(0).map(|link| link.href.clone());
+    let title = entry.title.clone().map(|title| title.content);
+    let description = entry.summary.clone().map(|summary| summary.content);
+    let published_at = entry.published.map(|published| published.into());
+
+    Self {
+      url,
+      title,
+      description,
+      published_at,
     }
   }
 }
