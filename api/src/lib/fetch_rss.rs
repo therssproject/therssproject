@@ -2,6 +2,7 @@ use feed_rs::model::Feed;
 use feed_rs::parser;
 use reqwest;
 
+// TODO: Return Result<Feed, Error>
 pub async fn fetch_rss(url: String) -> Feed {
   let content = reqwest::get(url)
     .await

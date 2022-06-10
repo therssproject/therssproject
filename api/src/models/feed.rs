@@ -152,7 +152,7 @@ pub struct PublicFeed {
 impl From<Feed> for PublicFeed {
   fn from(feed: Feed) -> Self {
     Self {
-      id: feed.id.expect("PublicFeed From<Feed> expects an id"),
+      id: feed.id.unwrap(),
       public_id: feed.public_id,
       feed_type: feed.feed_type,
       url: feed.url,

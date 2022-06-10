@@ -1,113 +1,54 @@
-use axum::{
-  extract::{Path, Query},
-  routing::{delete, get},
-  Json, Router,
-};
+use axum::{extract::Query, routing::get, Json, Router};
 use bson::doc;
-use bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
-use tokio::try_join;
 use tracing::debug;
 
 use crate::errors::Error;
-use crate::errors::NotFound;
-use crate::lib::database_model::ModelExt;
-use crate::lib::to_object_id::to_object_id;
+use crate::lib::fetch_rss::fetch_rss;
 use crate::lib::to_url::to_url;
-use crate::lib::token::UserFromToken;
-use crate::models::feed::Feed;
-use crate::models::feed::PublicFeed;
-use crate::models::subscription::PublicSubscription;
-use crate::models::subscription::Subscription;
+use crate::models::entry::PublicEntry;
+use crate::models::feed::FeedType;
 
 pub fn create_router() -> Router {
-  Router::new()
-    // TODO: make these routes only accesibble by admins
-    .route("/feeds", get(query_feed))
-    .route("/feeds/:id", get(get_feed_by_id))
-    // TODO: enable this rounte only in debug mode
-    .route("/feeds/:id", delete(remove_feed_by_id))
-    .route("/parse-feed", get(parse_feed))
+  Router::new().route("/feeds", get(get_feed_by_url))
 }
 
-async fn query_feed(_user: UserFromToken) -> Result<Json<Vec<PublicFeed>>, Error> {
-  let feeds = Feed::find(doc! {}, None)
-    .await?
-    .into_iter()
-    .map(Into::into)
-    .collect::<Vec<PublicFeed>>();
-
-  debug!("Returning feeds");
-  Ok(Json(feeds))
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct FeedResponse {
-  pub feed: PublicFeed,
-  // TODO: how to use `serialize_with = "serialize_object_id_as_hex_string"`
-  //       on the elements of the vector?
-  pub subscriptions: Vec<ObjectId>,
-}
-
-async fn get_feed_by_id(
-  _user: UserFromToken,
-  Path(id): Path<String>,
-) -> Result<Json<FeedResponse>, Error> {
-  let feed_id = to_object_id(id)?;
-
-  let feed = Feed::find_one(doc! { "_id": feed_id }, None);
-
-  let subscriptions = Subscription::find(doc! { "feed": feed_id }, None);
-
-  let (feed, subscriptions) = try_join!(feed, subscriptions)?;
-
-  let feed = match feed.map(PublicFeed::from) {
-    Some(feed) => feed,
-    None => {
-      debug!("feed not found, returning 404 status code");
-      return Err(Error::NotFound(NotFound::new("feed")));
-    }
-  };
-
-  let subscriptions = subscriptions
-    .into_iter()
-    .map(Into::into)
-    .map(|s: PublicSubscription| s.id)
-    .collect::<Vec<ObjectId>>();
-
-  let res = FeedResponse {
-    feed,
-    subscriptions,
-  };
-
-  debug!("Returning feed");
-  Ok(Json(res))
-}
-
-async fn remove_feed_by_id(_user: UserFromToken, Path(id): Path<String>) -> Result<(), Error> {
-  let feed_id = to_object_id(id)?;
-  let delete_result = Feed::delete_one(doc! { "_id": feed_id }).await?;
-
-  if delete_result.deleted_count == 0 {
-    debug!("feed not found, returning 404 status code");
-    return Err(Error::NotFound(NotFound::new("feed")));
-  }
-
-  Ok(())
-}
-
-async fn parse_feed(query: Query<ParseUrlQuery>) -> Result<Json<Feed>, Error> {
+// TODO: Return proper error codes when something fails.
+async fn get_feed_by_url(query: Query<GetFeedQuery>) -> Result<Json<FeedResponse>, Error> {
   let url = query.url.clone();
   let url = to_url(url)?;
+  let raw_feed = fetch_rss(url.to_string()).await;
+  let feed = FeedResponse::from_raw_feed(raw_feed);
 
-  let feed = Feed::from_url(url.to_string()).await;
-
-  // TODO: Return a proper response.
   debug!("Returning feed");
   Ok(Json(feed))
 }
 
+#[derive(Serialize, Deserialize)]
+struct FeedResponse {
+  pub feed_type: FeedType,
+  pub title: Option<String>,
+  pub description: Option<String>,
+  pub entries: Vec<PublicEntry>,
+}
+
+impl FeedResponse {
+  pub fn from_raw_feed(feed: feed_rs::model::Feed) -> Self {
+    FeedResponse {
+      feed_type: feed.feed_type.into(),
+      title: feed.title.clone().map(|title| title.content),
+      description: feed
+        .description
+        .clone()
+        .map(|description| description.content),
+      entries: feed.entries.into_iter().map(Into::into).collect(),
+    }
+  }
+}
+
 #[derive(Deserialize)]
-struct ParseUrlQuery {
+struct GetFeedQuery {
   url: String,
+  // TODO: Implement limit for returned entries
+  // limit: Option<usize>,
 }
