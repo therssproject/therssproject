@@ -22,7 +22,7 @@ impl ModelExt for Subscription {
 #[model(index(keys = r#"doc!{ "application": 1 }"#))]
 #[model(index(keys = r#"doc!{ "feed": 1 }"#))]
 #[model(index(
-  keys = r#"doc!{ "synced_with_changes_at": 1 }"#,
+  keys = r#"doc!{ "scheduled_at": 1 }"#,
   options = r#"doc!{ "sparse": true }"#
 ))]
 pub struct Subscription {
@@ -40,13 +40,14 @@ pub struct Subscription {
   pub notified_at: Option<Date>,
 
   // This attribute is used by the subscription scheduler to determine if the
-  // subscription needs to be notified.
-  // When subscription is notified, this attribute is set to None.
-  // TODO: Update serde to insert "undefined" instead of null the None value
-  // because the sparse index.
-  pub synced_with_changes_at: Option<Date>,
-  pub synced_at: Option<Date>,
+  // subscription needs to be notified. When subscription is notified, this
+  // attribute is set to None.
+  // TODO: Update ser/de for this attribute to avoid inserting null values on
+  // the database when this value is None. This is because we have a sparse
+  // index on this field.
+  pub scheduled_at: Option<Date>,
 
+  pub synced_at: Option<Date>,
   pub created_at: Date,
 }
 
@@ -69,7 +70,7 @@ impl Subscription {
       last_notified_entry: None,
       notified_at: None,
       synced_at: None,
-      synced_with_changes_at: None,
+      scheduled_at: None,
       created_at: now,
     }
   }
@@ -119,7 +120,7 @@ impl Subscription {
     };
 
     if !has_more_entries {
-      update.insert("$unset", doc! { "synced_with_changes_at": 1_i32 });
+      update.insert("$unset", doc! { "scheduled_at": 1_i32 });
     }
 
     Self::update_one(
