@@ -98,6 +98,7 @@ impl Subscription {
       subscription.application,
       id,
       entries.clone(),
+      subscription.metadata,
     )
     .await;
 

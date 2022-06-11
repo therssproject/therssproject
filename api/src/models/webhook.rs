@@ -1,6 +1,7 @@
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
+use serde_json::Value as Json;
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
@@ -90,4 +91,5 @@ pub struct WebhookSendPayload {
   #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub endpoint: ObjectId,
   pub entries: Vec<PublicEntry>,
+  pub metadata: Option<Json>,
 }
