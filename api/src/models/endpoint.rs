@@ -1,6 +1,7 @@
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
+use serde_json::Value as Json;
 use tracing::{debug, error};
 use uuid::Uuid;
 use validator::Validate;
@@ -47,11 +48,15 @@ impl Endpoint {
     }
   }
 
+  // TODO: Update this API, I think is better to send the `WebhookSendPayload`
+  // as an argument in this function. The responsability of this function is
+  // just to send the webhook.
   pub async fn send_webhook(
     id: ObjectId,
     application: ObjectId,
     subscription: ObjectId,
     entries: Vec<Entry>,
+    metadata: Option<Json>,
   ) -> Result<Webhook, Error> {
     debug!("Notifying endpoint");
 
@@ -69,11 +74,14 @@ impl Endpoint {
     let public_id = Uuid::new_v4();
 
     let payload = WebhookSendPayload {
+      // TODO: Update this ID. I think this should be our internal ID to better
+      // identify and debug webhooks.
       id: public_id.to_string(),
       application,
       subscription,
       endpoint: id,
       entries: entries.into_iter().map(Into::into).collect(),
+      metadata,
     };
 
     let sent_at = now();
