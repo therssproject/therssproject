@@ -155,6 +155,7 @@ pub struct PublicSubscription {
   pub feed: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub endpoint: ObjectId,
+  pub metadata: Option<Json>,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub created_at: Date,
 }
@@ -167,6 +168,7 @@ impl From<Subscription> for PublicSubscription {
       url: subscription.url.clone(),
       feed: subscription.feed,
       endpoint: subscription.endpoint,
+      metadata: subscription.metadata,
       created_at: subscription.created_at,
     }
   }
