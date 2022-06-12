@@ -13,7 +13,7 @@ use crate::lib::database_model::ModelExt;
 use crate::models::feed::Feed;
 
 lazy_static! {
-  static ref SCHEDULER_INTERVAL: Duration = Duration::minutes(1);
+  static ref SCHEDULER_INTERVAL: Duration = Duration::minutes(2);
 }
 
 pub fn start() {

@@ -31,6 +31,17 @@ async fn create_subscription(
 ) -> Result<Json<PublicSubscription>, Error> {
   let application_id = params.get("application_id").unwrap().to_owned();
   let application_id = to_object_id(application_id).unwrap();
+  let endpoint_id = to_object_id(payload.endpoint)?;
+
+  let endpoint = Endpoint::find_one(
+    doc! { "application": &application_id, "_id": endpoint_id },
+    None,
+  )
+  .await?;
+
+  if endpoint.is_none() {
+    return Err(Error::NotFound(NotFound::new("endpoint")));
+  }
 
   // Feeds are global, not attached to any user
   let feed = Feed::find_one(doc! { "url": &payload.url }, None).await?;
@@ -43,31 +54,7 @@ async fn create_subscription(
     }
   };
 
-  let endpoint = match payload.endpoint {
-    SubscriptionEndpoint::Url { url, title } => {
-      let endpoint = Endpoint::new(application_id, url, title);
-      Endpoint::create(endpoint).await?
-    }
-
-    SubscriptionEndpoint::Endpoint { id } => {
-      let endpoint_id = to_object_id(id)?;
-      let endpoint = Endpoint::find_one(
-        doc! { "application": &application_id, "_id": endpoint_id },
-        None,
-      )
-      .await?;
-
-      match endpoint {
-        Some(endpoint) => endpoint,
-        None => {
-          return Err(Error::NotFound(NotFound::new("endpoint")));
-        }
-      }
-    }
-  };
-
   let feed_id = feed.id.unwrap();
-  let endpoint_id = endpoint.id.unwrap();
   let metadata = payload.metadata;
   let subscription = Subscription::new(application_id, feed_id, endpoint_id, payload.url, metadata);
   let subscription = Subscription::create(subscription).await?;
@@ -142,15 +129,8 @@ async fn remove_subscription_by_id(
 }
 
 #[derive(Deserialize)]
-#[serde(untagged)]
-enum SubscriptionEndpoint {
-  Url { url: String, title: String },
-  Endpoint { id: String },
-}
-
-#[derive(Deserialize)]
 struct CreateSubscription {
   url: String,
-  endpoint: SubscriptionEndpoint,
+  endpoint: String,
   metadata: Option<JsonValue>,
 }

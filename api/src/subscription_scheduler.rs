@@ -14,7 +14,7 @@ use crate::messenger::get_messenger;
 use crate::models::subscription::Subscription;
 
 lazy_static! {
-  static ref SCHEDULER_INTERVAL: Duration = Duration::seconds(10);
+  static ref SCHEDULER_INTERVAL: Duration = Duration::seconds(30);
 }
 
 pub fn start() {
