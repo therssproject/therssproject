@@ -157,7 +157,10 @@ async fn insert_updated_entries(feed: &ObjectId, entries: Entries) -> Result<(),
 
   info!("Inserting {} new entries to feed {}", entries.len(), feed);
   stream::iter(entries)
-    // This is done sequential because we depend on the insertion order.
+    // This is done sequential because we depend on the insertion order. We do
+    // not use the insert_many function because it does not allow to insert docs
+    // in order and skip duplicates. This can be improved in the future using a
+    // bulk insert.
     .for_each(|entry| async move {
       let public_id = entry.public_id.clone();
       let res = <Entry as ModelExt>::create(entry).await;
