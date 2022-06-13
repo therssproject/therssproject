@@ -2,8 +2,8 @@ use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use feed_rs;
 use serde::{Deserialize, Serialize};
-use tracing::debug;
 use tracing::error;
+use tracing::info;
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
@@ -12,7 +12,7 @@ use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
-use crate::lib::fetch_rss::fetch_rss;
+use crate::lib::fetch_rss::get_feed;
 use crate::models::entry::Entry;
 use crate::models::subscription::Subscription;
 
@@ -40,7 +40,8 @@ pub struct Feed {
 
 impl Feed {
   pub async fn from_url(url: String) -> Self {
-    let raw_feed = fetch_rss(url.clone()).await;
+    // TODO: Remove this unwrap. This is important.
+    let raw_feed = get_feed(url.clone()).await.unwrap();
 
     let title = raw_feed.title.clone().map(|title| title.content);
     let description = raw_feed
@@ -65,7 +66,7 @@ impl Feed {
   /// Fetch the last RSS Feed version and store it's entries in the database.
   /// If the feed has new entries, update the related subscriptions.
   pub async fn sync(id: ObjectId) -> Result<(), Error> {
-    debug!("Syncing feed");
+    info!("Syncing feed {}", &id);
 
     let feed = Self::find_by_id(&id).await?;
     let feed = match feed {
@@ -77,37 +78,38 @@ impl Feed {
     };
 
     let url = feed.url;
-    let raw_feed = fetch_rss(url.clone()).await;
+    let raw_feed = get_feed(url.clone()).await;
+    let raw_feed = match raw_feed {
+      Ok(raw_feed) => raw_feed,
+      Err(err) => {
+        error!("Failed to get Feed {}. Error: {}", &id, err);
+        // TODO: Return a proper error type. This is not a not found error.
+        return Err(Error::NotFound(NotFound::new("feed")));
+      }
+    };
+
     let entries = raw_feed
       .entries
       .into_iter()
+      // Feed entries are sorted from most recent to least recent. We handle
+      // entries sorted chronologically (From oldest to newest).
+      .rev()
       .map(|raw_entry| Entry::from_raw_entry(id, raw_entry))
       .collect::<Vec<Entry>>();
 
-    let inserted_count = Entry::try_insert_many(entries).await?;
-    let should_update_subscriptions = inserted_count > 0;
+    let was_inserted = Entry::insert(&id, entries).await?;
+    let synced_at = now();
+    let mut update = doc! { "synced_at": &synced_at };
 
-    Self::update_one(
-      doc! { "_id": &id },
-      doc! { "$set": { "synced_at": now() } },
-      None,
-    )
-    .await?;
+    Self::update_one(doc! { "_id": &id }, doc! { "$set": &update }, None).await?;
 
-    // TODO: Set synced_at and scheduled_at conditionally.
-    if should_update_subscriptions {
-      let now = now();
-      Subscription::update_many(
-        doc! { "feed": &id },
-        doc! { "$set": {
-            "synced_at": now,
-            "scheduled_at": now
-          }
-        },
-        None,
-      )
-      .await?;
+    // Update subscriptions. If the feed has new entries, set the scheduled_at
+    // attribute so the subscription scheduler picks up this subscription to
+    // notify the user with the new entries.
+    if was_inserted {
+      update.insert("scheduled_at", synced_at);
     }
+    Subscription::update_many(doc! { "feed": &id }, doc! { "$set": update}, None).await?;
 
     Ok(())
   }

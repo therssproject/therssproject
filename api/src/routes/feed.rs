@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use tracing::debug;
 
 use crate::errors::Error;
-use crate::lib::fetch_rss::fetch_rss;
+use crate::lib::fetch_rss::get_feed;
 use crate::lib::to_url::to_url;
 use crate::models::entry::PublicEntry;
 use crate::models::feed::FeedType;
@@ -17,7 +17,8 @@ pub fn create_router() -> Router {
 async fn get_feed_by_url(query: Query<GetFeedQuery>) -> Result<Json<FeedResponse>, Error> {
   let url = query.url.clone();
   let url = to_url(url)?;
-  let raw_feed = fetch_rss(url.to_string()).await;
+  // TODO: Remove this unwrap. This is important.
+  let raw_feed = get_feed(url.to_string()).await.unwrap();
   let feed = FeedResponse::from_raw_feed(raw_feed);
 
   debug!("Returning feed");

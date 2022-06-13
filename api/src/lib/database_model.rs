@@ -160,7 +160,7 @@ pub trait ModelExt {
 
   async fn insert_many(
     documents: Vec<Self::T>,
-    options: InsertManyOptions,
+    options: Option<InsertManyOptions>,
   ) -> Result<InsertManyResult, Error> {
     let connection = database::get_connection();
     Self::T::collection(connection)

@@ -1,8 +1,11 @@
 use feed_rs::model::Entry as RawEntry;
+use futures::{stream, StreamExt};
+use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
+use tracing::{debug, error, info};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
-use wither::mongodb::options::InsertManyOptions;
+use wither::mongodb::options::FindOneOptions;
 use wither::Model as WitherModel;
 
 use crate::errors::Error;
@@ -10,6 +13,12 @@ use crate::lib::database_model::ModelExt;
 use crate::lib::date::now;
 use crate::lib::date::Date;
 use crate::lib::serde::bson_datetime_option_as_rfc3339_string;
+
+type Entries = Vec<Entry>;
+
+lazy_static! {
+  static ref SORT_DESC: FindOneOptions = FindOneOptions::builder().sort(doc! { "_id": -1 }).build();
+}
 
 impl ModelExt for Entry {
   type T = Entry;
@@ -55,13 +64,32 @@ impl Entry {
   }
 
   /// This function tries to insert as many entries as possible. When a write
-  /// fails, continue with the remaining writes, if any.
-  pub async fn try_insert_many(entries: Vec<Entry>) -> Result<i32, Error> {
-    let insert_options = InsertManyOptions::builder().ordered(false).build();
-    let _result = Self::insert_many(entries, insert_options).await;
+  /// fails, continue with the remaining writes, if any. Order is extremely
+  /// important, entries should be sorted chronologically (From oldest to
+  /// newest). The biggest MongoDB ID will end up being the most recent feed
+  /// entry.
+  pub async fn insert(feed: &ObjectId, entries: Vec<Entry>) -> Result<bool, Error> {
+    if entries.is_empty() {
+      return Ok(false);
+    }
 
-    // TODO: Return the actual count of inserted entries.
-    Ok(1)
+    // If the most recent item from the feed is already in the database, the
+    // feed is already synced.
+    let most_recent_entry = entries[entries.len() - 1].clone();
+    let is_synced = Self::exists(doc! {
+      "feed": feed,
+      "public_id": most_recent_entry.public_id
+    })
+    .await?;
+    if is_synced {
+      debug!("Feed {} is already in sync", &feed);
+      return Ok(false);
+    }
+
+    insert_updated_entries(feed, entries.clone()).await?;
+    remove_outdated_entries(feed, entries.clone()).await?;
+
+    Ok(true)
   }
 }
 
@@ -101,4 +129,70 @@ impl From<RawEntry> for PublicEntry {
       published_at,
     }
   }
+}
+
+async fn insert_updated_entries(feed: &ObjectId, entries: Entries) -> Result<(), Error> {
+  let most_recent =
+    <Entry as ModelExt>::find_one(doc! { "feed": &feed }, Some(SORT_DESC.clone())).await?;
+
+  let entries = match most_recent {
+    None => entries,
+    Some(most_recent) => {
+      // Find the most recent entry from the database in the feed entries.
+      let index = entries
+        .iter()
+        .position(|entry| entry.public_id == most_recent.public_id);
+
+      match index {
+        // If the most recent entry from the database is not on the feed entries
+        // insert all entries. This can happen if the feed has updated all its
+        // entries since our last sync.
+        None => entries,
+        // If the most recent entry from the database is on the feed entries
+        // filter and get only the entries that are newer than this entry.
+        Some(index) => entries.into_iter().skip(index + 1).collect(),
+      }
+    }
+  };
+
+  info!("Inserting {} new entries to feed {}", entries.len(), feed);
+  stream::iter(entries)
+    // This is done sequential because we depend on the insertion order.
+    .for_each(|entry| async move {
+      let public_id = entry.public_id.clone();
+      let res = <Entry as ModelExt>::create(entry).await;
+      if let Err(err) = res {
+        // This usually happens when the feed updates its entries order and
+        // promotes an old entry to the top (Maybe because the entry was
+        // updated). We then try to insert it, but it is already created on our
+        // database. We skip this entry but ideally we should notify the user
+        // somehow that his happened
+        error!(
+          "Error inserting entry with public ID {} to feed {}. Error: {}",
+          public_id, &feed, err
+        );
+      }
+    })
+    .await;
+
+  Ok(())
+}
+
+/// Cleanup outdated entries that are not present in the feed anymore. Ideally
+/// the database state should be the same as the feed's.
+async fn remove_outdated_entries(feed: &ObjectId, entries: Entries) -> Result<(), Error> {
+  let oldest = entries[0].clone();
+
+  let entry =
+    <Entry as ModelExt>::find_one(doc! { "feed": feed, "public_id": oldest.public_id }, None)
+      .await?
+      .expect("Oldest entry not found when removing outdated entries");
+
+  let res =
+    <Entry as ModelExt>::delete_many(doc! { "feed": feed, "_id": { "$lt": entry.id.unwrap() } })
+      .await?;
+  let count = res.deleted_count;
+  info!("Removed {} entries from feed {}", count, feed);
+
+  Ok(())
 }
