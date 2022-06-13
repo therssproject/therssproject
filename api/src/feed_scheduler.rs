@@ -57,12 +57,9 @@ async fn find_feeds() -> Result<Cursor<Feed>, Error> {
 
 async fn sync_feed(feed: Feed) {
   let id = feed.id.unwrap();
-  let url = feed.url;
-
-  info!("Syncing feed with ID {} and URL {}", &id, url);
   let result = Feed::sync(id).await;
   if let Err(err) = result {
-    error!("Failed to sync Feed with ID {:?}. Error: {}", id, err);
+    error!("Failed to sync Feed {:?}. Error: {}", id, err);
   }
 }
 
