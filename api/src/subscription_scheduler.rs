@@ -76,4 +76,16 @@ async fn queue_send_webhook_job(subscription: Subscription) {
     .publish("send_webhook", id.bytes().as_ref())
     .await
     .unwrap();
+
+  Subscription::update_one(
+    doc! { "_id": id },
+    doc! {
+      "$unset": {
+        "scheduled_at": 1_i32
+      }
+    },
+    None,
+  )
+  .await
+  .unwrap();
 }
