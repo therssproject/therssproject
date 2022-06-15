@@ -45,7 +45,7 @@ async fn run_job() {
     );
 
     // We currently have a small amount of feeds. Once we have a decent amount
-    // of feeds we can running this job continuously.
+    // of feeds we can start running this job continuously.
     sleep(Duration::seconds(60).to_std().unwrap()).await;
   }
 }
