@@ -1,7 +1,7 @@
 use bson::doc;
 use chrono::Duration;
 use futures::StreamExt;
-use lazy_static::lazy_static;
+use std::time::Instant;
 use tokio::time::sleep;
 use tracing::error;
 use tracing::info;
@@ -13,10 +13,6 @@ use crate::lib::database_model::ModelExt;
 use crate::messenger::get_messenger;
 use crate::models::subscription::Subscription;
 
-lazy_static! {
-  static ref SCHEDULER_INTERVAL: Duration = Duration::minutes(1);
-}
-
 pub fn start() {
   tokio::spawn(run_job());
 }
@@ -25,6 +21,7 @@ async fn run_job() {
   loop {
     info!("Running subscription scheduler");
 
+    let start = Instant::now();
     let concurrency = 50;
     let subscriptions = match find_subscriptions().await {
       Ok(subscriptions) => subscriptions,
@@ -41,7 +38,15 @@ async fn run_job() {
       .for_each_concurrent(concurrency, queue_send_webhook_job)
       .await;
 
-    sleep(SCHEDULER_INTERVAL.to_std().unwrap()).await;
+    let duration = start.elapsed();
+    println!(
+      "Finished running subscription scheduler elapsed={:.0?}",
+      duration
+    );
+
+    // We currently have a small amount of feeds. Once we have a decent amount
+    // of feeds we can running this job continuously.
+    sleep(Duration::seconds(60).to_std().unwrap()).await;
   }
 }
 
@@ -72,12 +77,13 @@ async fn queue_send_webhook_job(subscription: Subscription) {
   let messenger = get_messenger();
   let id = subscription.id.unwrap();
 
-  messenger
-    .publish("send_webhook", id.bytes().as_ref())
-    .await
-    .unwrap();
+  let confirmation = messenger.publish("send_webhook", id.bytes().as_ref()).await;
+  if let Err(error) = confirmation {
+    error!("Failed to queue send webhook job. Error: {}", error);
+    return;
+  }
 
-  Subscription::update_one(
+  let result = Subscription::update_one(
     doc! { "_id": id },
     doc! {
       "$unset": {
@@ -86,6 +92,8 @@ async fn queue_send_webhook_job(subscription: Subscription) {
     },
     None,
   )
-  .await
-  .unwrap();
+  .await;
+  if let Err(error) = result {
+    error!("Failed to update subscription. Error: {}", error);
+  }
 }
