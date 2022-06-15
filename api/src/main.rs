@@ -10,14 +10,13 @@ use tracing::info;
 
 mod database;
 mod errors;
-mod feed_scheduler;
 mod lib;
 mod logger;
 mod messenger;
 mod models;
 mod routes;
+mod schedulers;
 mod settings;
-mod subscription_scheduler;
 
 #[cfg(test)]
 mod tests;
@@ -32,8 +31,8 @@ async fn main() {
   let app = create_app().await;
 
   info!("Starting schedulers");
-  feed_scheduler::start();
-  subscription_scheduler::start();
+  schedulers::feed::start();
+  schedulers::subscription::start();
 
   info!("listening on {}", &address);
   axum::Server::bind(&address)
