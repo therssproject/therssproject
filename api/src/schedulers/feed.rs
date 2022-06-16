@@ -2,6 +2,7 @@ use bson::doc;
 use chrono::{Duration, Utc};
 use futures::StreamExt;
 use lazy_static::lazy_static;
+use std::time::Instant;
 use tokio::time::sleep;
 use tracing::error;
 use tracing::info;
@@ -24,6 +25,7 @@ async fn run_job() {
   loop {
     info!("Running feed scheduler");
 
+    let start = Instant::now();
     let concurrency = 50;
     let feeds = match find_feeds().await {
       Ok(feeds) => feeds,
@@ -39,6 +41,9 @@ async fn run_job() {
       .filter_map(parse)
       .for_each_concurrent(concurrency, sync_feed)
       .await;
+
+    let duration = start.elapsed();
+    println!("Finished running feed scheduler elapsed={:.0?}", duration);
 
     sleep(SCHEDULER_INTERVAL.to_std().unwrap()).await;
   }
