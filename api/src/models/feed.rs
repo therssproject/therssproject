@@ -2,6 +2,7 @@ use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use feed_rs;
 use serde::{Deserialize, Serialize};
+use std::time::Instant;
 use tracing::error;
 use tracing::info;
 use validator::Validate;
@@ -67,6 +68,7 @@ impl Feed {
   /// If the feed has new entries, update the related subscriptions.
   pub async fn sync(id: ObjectId) -> Result<(), Error> {
     info!("Syncing feed {}", &id);
+    let start = Instant::now();
 
     let feed = Self::find_by_id(&id).await?;
     let feed = match feed {
@@ -97,7 +99,7 @@ impl Feed {
       .map(|raw_entry| Entry::from_raw_entry(id, raw_entry))
       .collect::<Vec<Entry>>();
 
-    let was_inserted = Entry::insert(&id, entries).await?;
+    let was_inserted = Entry::sync(&id, entries).await?;
     let synced_at = now();
     let mut update = doc! { "synced_at": &synced_at };
 
@@ -110,6 +112,9 @@ impl Feed {
       update.insert("scheduled_at", synced_at);
     }
     Subscription::update_many(doc! { "feed": &id }, doc! { "$set": update}, None).await?;
+
+    let duration = start.elapsed();
+    println!("Finished syncing feed {} elapsed={:.0?}", &id, duration);
 
     Ok(())
   }
