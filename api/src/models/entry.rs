@@ -113,8 +113,7 @@ impl Entry {
       Some(entry) => {
         let query = doc! { "feed": feed, "_id": { "$lte": entry.id.unwrap() } };
         let res = <Entry as ModelExt>::delete_many(query).await?;
-        let count = res.deleted_count;
-        count
+        res.deleted_count
       }
     };
 
