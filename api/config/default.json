@@ -14,10 +14,6 @@
     "name": "rss"
   },
 
-  "rabbitmq": {
-    "uri": "amqp://localhost:5672"
-  },
-
   "auth": {
     "secret": "secret"
   }

@@ -12,7 +12,6 @@ mod database;
 mod errors;
 mod lib;
 mod logger;
-mod messenger;
 mod models;
 mod routes;
 mod schedulers;
@@ -51,12 +50,6 @@ pub async fn create_app() -> Router {
   models::sync_indexes()
     .await
     .expect("Failed to sync database indexes");
-
-  messenger::setup().await.expect("Failed to setup messenger");
-
-  models::subscription_job::setup()
-    .await
-    .expect("Failed to setup subscription job");
 
   routes::create_router()
     // TODO change to production CORS before going live

@@ -3,7 +3,6 @@ pub mod endpoint;
 pub mod entry;
 pub mod feed;
 pub mod subscription;
-pub mod subscription_job;
 pub mod user;
 pub mod webhook;
 

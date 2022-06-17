@@ -2,13 +2,13 @@ use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
-use tracing::{debug, error};
+use tracing::debug;
 use validator::Validate;
-use wither::bson::{doc, oid::ObjectId, Bson};
+use wither::bson::{doc, oid::ObjectId};
 use wither::mongodb::options::FindOptions;
 use wither::Model as WitherModel;
 
-use crate::errors::{Error, NotFound};
+use crate::errors::Error;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::models::endpoint::Endpoint;
@@ -75,40 +75,28 @@ impl Subscription {
     }
   }
 
-  pub async fn notify(id: ObjectId) -> Result<(), Error> {
-    debug!("Notifying subscription!");
+  /// Send new entries to the subscription endpoint. This function should not be
+  /// called more than once at  the same time per subscription to avoid sending
+  /// duplicate entries.
+  pub async fn notify(&self) -> Result<(), Error> {
+    let id = self.id.unwrap();
 
-    let subscription = Self::find_by_id(&id).await?;
-    let subscription = match subscription {
-      Some(subscription) => subscription,
-      None => {
-        error!("Failed to notify, Subscription with ID {} not found", &id);
-        return Err(Error::NotFound(NotFound::new("subscription")));
-      }
-    };
+    debug!("Notifying subscription {} !", &id);
 
-    let (entries, has_more_entries) = find_entries(&subscription).await?;
+    let (entries, has_more_entries) = find_entries(self).await?;
     if entries.is_empty() {
       debug!("No new entries found for subscription {}", &id);
       return Ok(());
     }
 
     let webhook = Endpoint::send_webhook(
-      subscription.endpoint,
-      subscription.application,
+      self.endpoint,
+      self.application,
       id,
       entries.clone(),
-      subscription.metadata,
+      self.metadata.clone(),
     )
-    .await;
-
-    let webhook = match webhook {
-      Ok(webhook) => webhook,
-      Err(err) => {
-        debug!("Failed to send webhook to subscription {}", &id);
-        return Err(err);
-      }
-    };
+    .await?;
 
     let last_entry = entries.last().unwrap();
     let last_entry_id = last_entry.id.unwrap();
@@ -124,21 +112,7 @@ impl Subscription {
       update.insert("$unset", doc! { "scheduled_at": 1_i32 });
     }
 
-    Self::update_one(
-      doc! {
-        "_id": &id,
-        // We might have concurrent jobs processing the same subscription.
-        // Make sure the update is applied only if the last notified entry is
-        // newer than the last entry on the database.
-        "$or": [
-            { "last_notified_entry": Bson::Null },
-            { "last_notified_entry": { "$lt": last_entry_id } }
-        ]
-      },
-      update,
-      None,
-    )
-    .await?;
+    Self::update_one(doc! {"_id": &id,}, update, None).await?;
 
     Ok(())
   }
@@ -175,10 +149,14 @@ impl From<Subscription> for PublicSubscription {
 }
 
 async fn find_entries(subscription: &Subscription) -> Result<(Vec<Entry>, bool), Error> {
-  let limit = 5;
+  // Arbitrary limit of 20 entries. We probably allow the user to configure this
+  // limit.
+  let limit = 10;
 
   let options = FindOptions::builder()
     .sort(doc! { "_id": 1_i32 })
+    // We query limit + 1 to find out if there are more entries than what we are
+    // querying.
     .limit(limit + 1)
     .build();
 
