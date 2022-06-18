@@ -5,12 +5,12 @@ use std::time::Instant;
 use tokio::time::sleep;
 use tracing::error;
 use tracing::info;
+use wither::mongodb::options::FindOptions;
 use wither::ModelCursor as Cursor;
 use wither::WitherError;
 
 use crate::errors::Error;
 use crate::lib::database_model::ModelExt;
-use crate::messenger::get_messenger;
 use crate::models::subscription::Subscription;
 
 pub fn start() {
@@ -22,7 +22,6 @@ async fn run_job() {
     info!("Running subscription scheduler");
 
     let start = Instant::now();
-    let concurrency = 50;
     let subscriptions = match find_subscriptions().await {
       Ok(subscriptions) => subscriptions,
       Err(error) => {
@@ -33,9 +32,10 @@ async fn run_job() {
       }
     };
 
+    let concurrency = 100;
     subscriptions
       .filter_map(parse)
-      .for_each_concurrent(concurrency, queue_send_webhook_job)
+      .for_each_concurrent(concurrency, notify)
       .await;
 
     let duration = start.elapsed();
@@ -51,13 +51,18 @@ async fn run_job() {
 }
 
 async fn find_subscriptions() -> Result<Cursor<Subscription>, Error> {
+  let options = FindOptions::builder()
+    .sort(doc! { "scheduled_at": 1_i32 })
+    .limit(5_000)
+    .build();
+
   let query = doc! {
     "scheduled_at": {
       "$exists": true
     }
   };
 
-  Subscription::cursor(query, None).await
+  Subscription::cursor(query, Some(options)).await
 }
 
 async fn parse(subscription: Result<Subscription, WitherError>) -> Option<Subscription> {
@@ -73,27 +78,10 @@ async fn parse(subscription: Result<Subscription, WitherError>) -> Option<Subscr
   }
 }
 
-async fn queue_send_webhook_job(subscription: Subscription) {
-  let messenger = get_messenger();
+async fn notify(subscription: Subscription) {
   let id = subscription.id.unwrap();
-
-  let confirmation = messenger.publish("send_webhook", id.bytes().as_ref()).await;
-  if let Err(error) = confirmation {
-    error!("Failed to queue send webhook job. Error: {}", error);
-    return;
-  }
-
-  let result = Subscription::update_one(
-    doc! { "_id": id },
-    doc! {
-      "$unset": {
-        "scheduled_at": 1_i32
-      }
-    },
-    None,
-  )
-  .await;
+  let result = subscription.notify().await;
   if let Err(error) = result {
-    error!("Failed to update subscription. Error: {}", error);
+    error!("Failed to notify subscription {}. Error: {}", id, error);
   }
 }
