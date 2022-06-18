@@ -39,14 +39,14 @@ async fn run_job() {
       .await;
 
     let duration = start.elapsed();
-    println!(
+    info!(
       "Finished running subscription scheduler elapsed={:.0?}",
       duration
     );
 
     // We currently have a small amount of feeds. Once we have a decent amount
     // of feeds we can start running this job continuously.
-    sleep(Duration::seconds(60).to_std().unwrap()).await;
+    sleep(Duration::seconds(10).to_std().unwrap()).await;
   }
 }
 

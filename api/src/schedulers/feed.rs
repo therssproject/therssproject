@@ -1,21 +1,17 @@
 use bson::doc;
-use chrono::{Duration, Utc};
+use chrono::Duration;
 use futures::StreamExt;
-use lazy_static::lazy_static;
 use std::time::Instant;
 use tokio::time::sleep;
 use tracing::error;
 use tracing::info;
+use wither::mongodb::options::FindOptions;
 use wither::ModelCursor as Cursor;
 use wither::WitherError;
 
 use crate::errors::Error;
 use crate::lib::database_model::ModelExt;
 use crate::models::feed::Feed;
-
-lazy_static! {
-  static ref SCHEDULER_INTERVAL: Duration = Duration::minutes(5);
-}
 
 pub fn start() {
   tokio::spawn(run_job());
@@ -26,7 +22,7 @@ async fn run_job() {
     info!("Running feed scheduler");
 
     let start = Instant::now();
-    let concurrency = 50;
+    let concurrency = 1_000;
     let feeds = match find_feeds().await {
       Ok(feeds) => feeds,
       Err(error) => {
@@ -43,21 +39,21 @@ async fn run_job() {
       .await;
 
     let duration = start.elapsed();
-    println!("Finished running feed scheduler elapsed={:.0?}", duration);
+    info!("Finished running feed scheduler elapsed={:.0?}", duration);
 
-    sleep(SCHEDULER_INTERVAL.to_std().unwrap()).await;
+    // We currently have a small amount of feeds. Once we have a decent amount
+    // of feeds we can start running this job continuously.
+    sleep(Duration::seconds(10).to_std().unwrap()).await;
   }
 }
 
 async fn find_feeds() -> Result<Cursor<Feed>, Error> {
-  let lower_than = Utc::now() - *SCHEDULER_INTERVAL;
-  let query = doc! {
-    "synced_at": {
-      "$lt": lower_than
-    }
-  };
+  let options = FindOptions::builder()
+    .sort(doc! { "synced_at": 1_i32 })
+    .limit(5_000)
+    .build();
 
-  Feed::cursor(query, None).await
+  Feed::cursor(doc! {}, Some(options)).await
 }
 
 async fn sync_feed(feed: Feed) {

@@ -114,7 +114,7 @@ impl Feed {
     Subscription::update_many(doc! { "feed": &id }, doc! { "$set": update}, None).await?;
 
     let duration = start.elapsed();
-    println!("Finished syncing feed {} elapsed={:.0?}", &id, duration);
+    info!("Finished syncing feed {} elapsed={:.0?}", &id, duration);
 
     Ok(())
   }
