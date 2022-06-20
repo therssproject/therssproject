@@ -1,11 +1,9 @@
 import {Dialog, Transition} from '@headlessui/react';
 import {
   CalendarIcon,
-  ChartBarIcon,
   DocumentTextIcon,
   FolderIcon,
   HomeIcon,
-  InboxIcon,
   InformationCircleIcon,
   LogoutIcon,
   UsersIcon,
@@ -33,11 +31,14 @@ type NavLink = {
 
 const navigation: NavLink[] = [
   {name: 'Dashboard', icon: HomeIcon, href: Route.dashboard, current: true},
-  {name: 'Team', icon: UsersIcon, href: Route.notFound, current: false},
-  {name: 'Projects', icon: FolderIcon, href: Route.notFound, current: false},
-  {name: 'Calendar', icon: CalendarIcon, href: Route.notFound, current: false},
-  {name: 'Documents', icon: InboxIcon, href: Route.notFound, current: false},
-  {name: 'Reports', icon: ChartBarIcon, href: Route.notFound, current: false},
+  {name: 'Endpoints', icon: UsersIcon, href: Route.dashboard, current: false},
+  {
+    name: 'Subscriptions',
+    icon: FolderIcon,
+    href: Route.dashboard,
+    current: false,
+  },
+  {name: 'Logs', icon: CalendarIcon, href: Route.dashboard, current: false},
 ];
 
 type SecondaryNavItem =
@@ -163,7 +164,7 @@ export const Sidebar: FC<Props> = ({
       {/* Static sidebar for desktop */}
       <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
         {/* Sidebar component, swap this element with another sidebar if you like */}
-        <div className="flex flex-grow flex-col overflow-y-auto border-r border-gray-200 bg-white pt-5">
+        <div className="flex flex-grow flex-col overflow-y-auto border-x border-gray-200 bg-white pt-5">
           <Logo />
           <div className="mx-2 mt-5">
             <Select {...appSelector} />

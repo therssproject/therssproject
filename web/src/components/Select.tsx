@@ -30,7 +30,7 @@ export const Select = <O extends Option>({
 }: Props<O>) => {
   return (
     <Listbox value={selectedO} onChange={onSelect} disabled={disabled}>
-      <div className="relative mt-1">
+      <div className="relative mt-1 w-full">
         <Listbox.Button
           className={clsxm(
             'flex items-center justify-between',

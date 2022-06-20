@@ -16,19 +16,21 @@ import {format, match, parse, parseO, Route, RouteTag} from './routes';
 const noOp = () => {};
 
 // Navigates to login route on logged IN only pages
-const loggedOutGuard = (push: (path: string) => void) => (route: Route) =>
+const loggedOutGuard = (push: (path: string) => void) => (route: Route) => {
+  const onPrivate = (route: Route) =>
+    pipe(
+      // Don't include home in the url since it's the default page to return
+      route.tag === 'Dashboard' ? undefined : route,
+      Route.login,
+      format,
+      push,
+    );
+
   pipe(
     route,
     match({
       // Private
-      Dashboard: (route) =>
-        pipe(
-          // Don't include home in the url since it's the default page to return
-          route.tag === 'Dashboard' ? undefined : route,
-          Route.login,
-          format,
-          push,
-        ),
+      Dashboard: onPrivate,
       // Public
       Index: noOp,
       Login: noOp,
@@ -40,9 +42,10 @@ const loggedOutGuard = (push: (path: string) => void) => (route: Route) =>
       NotFound: noOp,
     }),
   );
+};
 
 // Navigates to home (or the `returnTo`) route on logged OUT only pages
-const loggedInGuard = (push: (path: string) => void) => (route: Route) =>
+const loggedInGuard = (push: (path: string) => void) => (route: Route) => {
   pipe(
     route,
     match({
@@ -58,6 +61,7 @@ const loggedInGuard = (push: (path: string) => void) => (route: Route) =>
       ResetPasswordConfirm: () => pipe(Route.dashboard, format, push),
     }),
   );
+};
 
 const eqSession = pipe(
   eqString,
@@ -73,11 +77,13 @@ export const useSessionGuard = () => {
     () => {
       const route = parse(router.asPath);
 
-      if (O.isSome(session)) {
-        loggedInGuard(router.push)(route);
-      } else {
-        loggedOutGuard(router.push)(route);
-      }
+      pipe(
+        session,
+        O.match(
+          () => loggedOutGuard(router.push)(route),
+          () => loggedInGuard(router.push)(route),
+        ),
+      );
     },
     [session],
     tuple(eqSession),
