@@ -13,6 +13,7 @@ use crate::models::application::Application;
 use crate::models::endpoint::Endpoint;
 use crate::models::entry::Entry;
 use crate::models::feed::Feed;
+use crate::models::key::Key;
 use crate::models::subscription::Subscription;
 use crate::models::user::User;
 use crate::models::webhook::Webhook;
@@ -83,6 +84,7 @@ async fn cleanup_database() {
   Endpoint::delete_many(doc! {}).await.unwrap();
   Entry::delete_many(doc! {}).await.unwrap();
   Feed::delete_many(doc! {}).await.unwrap();
+  Key::delete_many(doc! {}).await.unwrap();
   Subscription::delete_many(doc! {}).await.unwrap();
   User::delete_many(doc! {}).await.unwrap();
   Webhook::delete_many(doc! {}).await.unwrap();

@@ -36,13 +36,17 @@ pub struct Endpoint {
 }
 
 impl Endpoint {
-  pub fn new(application: ObjectId, url: String, title: String) -> Self {
+  pub fn new<A, B>(application: ObjectId, url: A, title: B) -> Self
+  where
+    A: Into<String>,
+    B: Into<String>,
+  {
     let now = now();
     Self {
       id: None,
       application,
-      url,
-      title,
+      url: url.into(),
+      title: title.into(),
       updated_at: now,
       created_at: now,
     }

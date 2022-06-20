@@ -82,9 +82,14 @@ pub async fn hash_password<P>(password: P) -> Result<String, Error>
 where
   P: AsRef<str> + Send + 'static,
 {
+  #[cfg(not(test))]
+  let cost = bcrypt::DEFAULT_COST;
+  #[cfg(test)]
+  let cost = 4;
+
   // TODO: Hash password with salt.
   // https://docs.rs/bcrypt/latest/bcrypt/fn.hash_with_salt.html
-  task::spawn_blocking(move || bcrypt::hash(password.as_ref(), bcrypt::DEFAULT_COST))
+  task::spawn_blocking(move || bcrypt::hash(password.as_ref(), cost))
     .await
     .map_err(Error::RunSyncTask)?
     .map_err(Error::HashPassword)

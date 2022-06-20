@@ -1,5 +1,5 @@
 use axum::{
-  extract::Path,
+  extract::{Extension, Path},
   routing::{delete, get, post},
   Json, Router,
 };
@@ -13,6 +13,7 @@ use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::to_object_id::to_object_id;
+use crate::models::application::Application;
 use crate::models::endpoint::Endpoint;
 use crate::models::feed::Feed;
 use crate::models::subscription::{PublicSubscription, Subscription};
@@ -27,11 +28,10 @@ pub fn create_router() -> Router {
 
 async fn create_subscription(
   Json(payload): Json<CreateSubscription>,
-  Path(params): Path<HashMap<String, String>>,
+  Extension(application): Extension<Application>,
 ) -> Result<Json<PublicSubscription>, Error> {
-  let application_id = params.get("application_id").unwrap().to_owned();
-  let application_id = to_object_id(application_id).unwrap();
   let endpoint_id = to_object_id(payload.endpoint)?;
+  let application_id = application.id.unwrap();
 
   let endpoint = Endpoint::find_one(
     doc! { "application": &application_id, "_id": endpoint_id },

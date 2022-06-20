@@ -26,13 +26,17 @@ pub struct Application {
 }
 
 impl Application {
-  pub fn new(user: ObjectId, name: String, description: Option<String>) -> Self {
+  pub fn new<A, B>(user: ObjectId, name: A, description: Option<B>) -> Self
+  where
+    A: Into<String>,
+    B: Into<String>,
+  {
     let now = now();
     Self {
       id: None,
       user,
-      name,
-      description,
+      name: name.into(),
+      description: description.map(Into::into),
       updated_at: now,
       created_at: now,
     }
