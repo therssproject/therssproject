@@ -26,7 +26,7 @@ async fn get_feed_by_url(query: Query<GetFeedQuery>) -> Result<Json<FeedResponse
 }
 
 #[derive(Serialize, Deserialize)]
-struct FeedResponse {
+pub struct FeedResponse {
   pub feed_type: FeedType,
   pub title: Option<String>,
   pub description: Option<String>,
@@ -50,6 +50,4 @@ impl FeedResponse {
 #[derive(Deserialize)]
 struct GetFeedQuery {
   url: String,
-  // TODO: Implement limit for returned entries
-  // limit: Option<usize>,
 }
