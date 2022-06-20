@@ -4,6 +4,9 @@ use lazy_static::lazy_static;
 use reqwest;
 use std::time::Duration;
 
+#[cfg(test)]
+use mockito;
+
 lazy_static! {
   static ref CLIENT: reqwest::Client = reqwest::Client::builder()
     .timeout(Duration::from_secs(5))
@@ -13,6 +16,7 @@ lazy_static! {
 
 // TODO: Return a proper error type.
 pub async fn get_feed(url: String) -> Result<Feed, String> {
+  let url = get_url(url);
   let content = CLIENT
     .get(&url)
     .send()
@@ -26,4 +30,11 @@ pub async fn get_feed(url: String) -> Result<Feed, String> {
     .map_err(|err| format!("Failed to parse feed from URL {}. Error: {}", &url, err))?;
 
   Ok(feed)
+}
+
+fn get_url(url: String) -> String {
+  #[cfg(test)]
+  let url = mockito::server_url();
+
+  url
 }

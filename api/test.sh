@@ -4,7 +4,7 @@
 # By default the Rust test harness hides output from test execution to keep
 # results readable. The nocapture flag disables that behavior.
 
-cargo test -- \
+RUST_BACKTRACE=1 cargo test -- \
   --test-threads=1 \
   --nocapture \
   --color=always

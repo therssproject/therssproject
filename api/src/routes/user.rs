@@ -25,7 +25,7 @@ async fn create_user(Json(body): Json<CreateBody>) -> Result<Json<PublicUser>, E
   let user = User::create(user).await?;
   let user_id = user.id.unwrap();
 
-  let application = Application::new(user_id, body.name, None);
+  let application = Application::new::<_, String>(user_id, body.name, None);
   Application::create(application).await?;
 
   let res = PublicUser::from(user);

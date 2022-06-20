@@ -8,6 +8,7 @@ use tower_http::{
 };
 use tracing::info;
 
+mod authentication;
 mod database;
 mod errors;
 mod lib;
