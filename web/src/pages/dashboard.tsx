@@ -19,20 +19,38 @@ const Dashboard = () => {
         description: 'Pre-built components with awesome default',
       }}
     >
-      <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
-        <div className="p-4">
-          {pipe(
-            session,
-            O.map((u) => ({...u, access_token: u.access_token.slice(0, 10)})),
-            O.match(
-              () => <div>Logged out ...</div>,
-              (user) => (
-                <div>
-                  <pre>{JSON.stringify(user, null, 2)}</pre>
-                </div>
+      <div className="space-y-4">
+        <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
+          <div className="p-4">
+            {pipe(
+              session,
+              O.map((u) => ({...u, access_token: u.access_token.slice(0, 10)})),
+              O.match(
+                () => <div>Logged out ...</div>,
+                (user) => (
+                  <div>
+                    <pre>{JSON.stringify(user, null, 2)}</pre>
+                  </div>
+                ),
               ),
-            ),
-          )}
+            )}
+          </div>
+        </div>
+        <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
+          <div className="p-4">
+            {pipe(
+              session,
+              O.map((u) => ({...u, access_token: u.access_token.slice(0, 10)})),
+              O.match(
+                () => <div>Logged out ...</div>,
+                (user) => (
+                  <div>
+                    <pre>{JSON.stringify(user, null, 2)}</pre>
+                  </div>
+                ),
+              ),
+            )}
+          </div>
         </div>
       </div>
     </Layout>

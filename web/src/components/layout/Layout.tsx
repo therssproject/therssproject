@@ -34,7 +34,7 @@ export const Layout = (props: Props) => {
     .with({variant: 'clean'}, (props) => (
       <>
         <Seo {...props.seo} />
-        <main>{props.children}</main>
+        <main className="h-full">{props.children}</main>
       </>
     ))
     .exhaustive();
