@@ -32,7 +32,6 @@ export const SOON: AppOption = {
   disabled: true,
 };
 
-// TODO: HERE moving selected app state to an atom
 export const appToOption = (app: Application): AppOption => ({
   ...app,
   type: 'app',

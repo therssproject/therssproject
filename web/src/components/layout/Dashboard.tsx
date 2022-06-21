@@ -4,11 +4,14 @@ import * as E from 'fp-ts/Either';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
+import {useRouter} from 'next/router';
 import {ReactNode, useState} from 'react';
 import * as RD from 'remote-data-ts';
+import {match} from 'ts-pattern';
 
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
+import {format as formatRoute, Route} from '@/lib/routes';
 import {useAsyncEffect} from '@/lib/useAsyncEffect';
 
 import {Select} from '@/components/Select';
@@ -30,8 +33,12 @@ type Props = {
   seo?: SeoProps;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noOp = () => {};
+
 export const Dashboard = ({title, children, seo}: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
 
   const [session, setSession] = useAtom(SessionAtom);
   const [apps, setApps] = useAtom(AppsAtom);
@@ -61,6 +68,16 @@ export const Dashboard = ({title, children, seo}: Props) => {
     );
   }, []);
 
+  const onSelect = (opt?: AppOption) => {
+    setOption(opt);
+
+    match(opt)
+      .with({type: 'app'}, (app) => {
+        router.push(formatRoute(Route.appDashboard(app.id)));
+      })
+      .otherwise(noOp);
+  };
+
   const appSelector = {
     // TODO: use derived atom?
     options: pipe(
@@ -71,7 +88,7 @@ export const Dashboard = ({title, children, seo}: Props) => {
       O.getOrElse((): AppOption[] => []),
     ),
     selected: option,
-    onSelect: setOption,
+    onSelect,
     disabled: !RD.isSuccess(apps),
   };
 
