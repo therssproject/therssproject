@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import clsxm from '@/lib/clsxm';
+import {clsxm} from '@/lib/clsxm';
 
 type Props = React.ComponentPropsWithoutRef<'div'>;
 

@@ -1,4 +1,3 @@
-import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -14,7 +13,8 @@ import {Button} from '@/components/buttons/Button';
 import {GitHub} from '@/components/icons/GitHub';
 import {Google} from '@/components/icons/Google';
 import {Rss} from '@/components/icons/Rss';
-import {Field} from '@/components/inputs/Field';
+import {PasswordField} from '@/components/inputs/PasswordField';
+import {TextField} from '@/components/inputs/TextField';
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
 
@@ -33,7 +33,6 @@ const Inputs = yup.object({
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPass] = useState(false);
   const {
     register,
     handleSubmit,
@@ -111,11 +110,12 @@ const Login = () => {
 
               <div className="mt-6">
                 <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                  <Field
+                  <TextField
                     label="Email"
                     input={{
                       id: 'email',
                       type: 'email',
+                      placeholder: 'doe.john@ymail.com',
                       autoComplete: 'email',
                       variant: errors.email ? 'error' : 'default',
                       ...register('email', {required: true}),
@@ -123,22 +123,16 @@ const Login = () => {
                     message={errors.email?.message}
                   />
 
-                  <Field
+                  <PasswordField
                     label="Password"
                     input={{
                       id: 'password',
-                      type: showPassword ? 'text' : 'password',
+                      placeholder: '****************',
                       autoComplete: 'password',
                       variant: errors.password ? 'error' : 'default',
                       ...register('password', {required: true}),
                     }}
                     message={errors.password?.message}
-                    icon={{
-                      After: showPassword ? EyeIcon : EyeOffIcon,
-                      onClick: showPassword
-                        ? () => setShowPass(false)
-                        : () => setShowPass(true),
-                    }}
                   />
 
                   <div className="flex items-center justify-end">

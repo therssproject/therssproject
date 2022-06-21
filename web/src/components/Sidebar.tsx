@@ -11,7 +11,7 @@ import {
 } from '@heroicons/react/outline';
 import {ComponentType, FC, Fragment} from 'react';
 
-import clsxm from '@/lib/clsxm';
+import {clsxm} from '@/lib/clsxm';
 import {Route} from '@/lib/routes';
 
 import {Rss} from '@/components/icons/Rss';
