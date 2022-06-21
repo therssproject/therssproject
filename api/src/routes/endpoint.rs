@@ -1,4 +1,4 @@
-use axum::extract::Path;
+use axum::extract::{Extension, Path};
 use axum::routing::{delete, get, post, put};
 use axum::Json;
 use axum::Router;
@@ -12,6 +12,7 @@ use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::lib::to_object_id::to_object_id;
+use crate::models::application::Application;
 use crate::models::endpoint::{Endpoint, PublicEndpoint};
 
 pub fn create_router() -> Router {
@@ -25,10 +26,10 @@ pub fn create_router() -> Router {
 
 async fn create_endpoint(
   Json(payload): Json<CreateEndpoint>,
-  Path(params): Path<HashMap<String, String>>,
+  Extension(application): Extension<Application>,
 ) -> Result<Json<PublicEndpoint>, Error> {
-  let application_id = params.get("application_id").unwrap().to_owned();
-  let application_id = to_object_id(application_id).unwrap();
+  let application_id = application.id.unwrap();
+
   let endpoint = Endpoint::new(application_id, payload.url, payload.title);
   let endpoint = Endpoint::create(endpoint).await?;
   let res = PublicEndpoint::from(endpoint);
@@ -37,10 +38,9 @@ async fn create_endpoint(
 }
 
 async fn query_endpoint(
-  Path(params): Path<HashMap<String, String>>,
+  Extension(application): Extension<Application>,
 ) -> Result<Json<Vec<PublicEndpoint>>, Error> {
-  let application_id = params.get("application_id").unwrap().to_owned();
-  let application_id = to_object_id(application_id).unwrap();
+  let application_id = application.id.unwrap();
 
   let endpoints = Endpoint::find(doc! { "application": application_id }, None)
     .await?
@@ -54,9 +54,9 @@ async fn query_endpoint(
 
 async fn get_endpoint_by_id(
   Path(params): Path<HashMap<String, String>>,
+  Extension(application): Extension<Application>,
 ) -> Result<Json<PublicEndpoint>, Error> {
-  let application_id = params.get("application_id").unwrap().to_owned();
-  let application_id = to_object_id(application_id).unwrap();
+  let application_id = application.id.unwrap();
 
   let endpoint_id = params.get("id").unwrap().to_owned();
   let endpoint_id = to_object_id(endpoint_id)?;
@@ -82,9 +82,9 @@ async fn get_endpoint_by_id(
 async fn update_endpoint_by_id(
   Path(params): Path<HashMap<String, String>>,
   Json(payload): Json<CreateEndpoint>,
+  Extension(application): Extension<Application>,
 ) -> Result<(), Error> {
-  let application_id = params.get("application_id").unwrap().to_owned();
-  let application_id = to_object_id(application_id).unwrap();
+  let application_id = application.id.unwrap();
 
   let endpoint_id = params.get("id").unwrap().to_owned();
   let endpoint_id = to_object_id(endpoint_id)?;
@@ -107,9 +107,11 @@ async fn update_endpoint_by_id(
   Ok(())
 }
 
-async fn remove_endpoint_by_id(Path(params): Path<HashMap<String, String>>) -> Result<(), Error> {
-  let application_id = params.get("application_id").unwrap().to_owned();
-  let application_id = to_object_id(application_id).unwrap();
+async fn remove_endpoint_by_id(
+  Path(params): Path<HashMap<String, String>>,
+  Extension(application): Extension<Application>,
+) -> Result<(), Error> {
+  let application_id = application.id.unwrap();
 
   let endpoint_id = params.get("id").unwrap().to_owned();
   let endpoint_id = to_object_id(endpoint_id)?;
