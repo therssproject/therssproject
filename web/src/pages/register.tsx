@@ -1,6 +1,5 @@
 import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
 import {yupResolver} from '@hookform/resolvers/yup';
-import * as E from 'fp-ts/Either';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
@@ -49,28 +48,24 @@ const Register = () => {
 
   const [_session, setSession] = useAtom(SessionAtom);
 
-  const onSubmit: SubmitHandler<Inputs> = async ({name, email, password}) => {
+  const onSubmit: SubmitHandler<Inputs> = ({name, email, password}) => {
     setLoading(true);
 
     pipe(
-      // TODO: handle resgiter errors as well
-      await pipe(
-        register({name, email, password}),
-        TE.chain(() => authenticate({email, password})),
-      )(),
-      E.match(
+      register({name, email, password}),
+      TE.chain(() => authenticate({email, password})),
+      TE.match(
         (error) => {
           // TODO: show a toast or inline error
           // eslint-disable-next-line no-console
-          console.log('Failed to login', error);
+          console.log('Failed to register', error);
+          setLoading(false);
         },
         (user) => {
           setSession(O.some(user));
         },
       ),
-    );
-
-    setLoading(false);
+    )();
   };
 
   return (
