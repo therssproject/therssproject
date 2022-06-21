@@ -64,10 +64,9 @@ async fn create_subscription(
 }
 
 async fn query_subscription(
-  Path(params): Path<HashMap<String, String>>,
+  Extension(application): Extension<Application>,
 ) -> Result<Json<Vec<PublicSubscription>>, Error> {
-  let application_id = params.get("application_id").unwrap().to_owned();
-  let application_id = to_object_id(application_id).unwrap();
+  let application_id = application.id.unwrap();
 
   let subscriptions = Subscription::find(doc! { "application": &application_id }, None)
     .await?
@@ -80,10 +79,10 @@ async fn query_subscription(
 }
 
 async fn get_subscription_by_id(
+  Extension(application): Extension<Application>,
   Path(params): Path<HashMap<String, String>>,
 ) -> Result<Json<PublicSubscription>, Error> {
-  let application_id = params.get("application_id").unwrap().to_owned();
-  let application_id = to_object_id(application_id).unwrap();
+  let application_id = application.id.unwrap();
 
   let subscription_id = params.get("id").unwrap().to_owned();
   let subscription_id = to_object_id(subscription_id)?;
@@ -108,10 +107,10 @@ async fn get_subscription_by_id(
 }
 
 async fn remove_subscription_by_id(
+  Extension(application): Extension<Application>,
   Path(params): Path<HashMap<String, String>>,
 ) -> Result<(), Error> {
-  let application_id = params.get("application_id").unwrap().to_owned();
-  let application_id = to_object_id(application_id).unwrap();
+  let application_id = application.id.unwrap();
 
   let subscription_id = params.get("id").unwrap().to_owned();
   let subscription_id = to_object_id(subscription_id)?;
