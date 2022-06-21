@@ -4,54 +4,80 @@ import * as Routing from 'fp-ts-routing';
 import * as t from 'io-ts';
 
 type NotFound = {tag: 'NotFound'};
-type Dashboard = {tag: 'Dashboard'};
+// Public
 type Documentation = {tag: 'Documentation'};
 type Index = {tag: 'Index'};
+
+// Public (logged-out only)
 type Login = {tag: 'Login'; returnTo?: Route};
 type Register = {tag: 'Register'; returnTo?: Route};
 type Components = {tag: 'Components'};
 type ResetPasswordRequest = {tag: 'ResetPasswordRequest'};
 type ResetPasswordConfirm = {tag: 'ResetPasswordConfirm'; token: string};
 
+// Private (logged-in only)
+type Dashboard = {tag: 'Dashboard'};
+type AppDashboard = {tag: 'AppDashboard'; app: string};
+type AppEndpoints = {tag: 'AppEndpoints'; app: string};
+type AppSubs = {tag: 'AppSubs'; app: string};
+type AppLogs = {tag: 'AppLogs'; app: string};
+
 export type Route =
+  | NotFound
   // Public
   | Index
   | Components
   | Documentation
-  // Logged-in only
-  | Dashboard
-  // Logged-out only
+  // Public (logged-out only)
   | Login
   | Register
   | ResetPasswordRequest
   | ResetPasswordConfirm
-  // Misc
-  | NotFound;
+  // Private (logged-in only)
+  | Dashboard
+  | AppDashboard
+  | AppEndpoints
+  | AppSubs
+  | AppLogs;
 
 export type RouteTag = Route['tag'];
 
 export const match =
   <R>(matcher: {
+    NotFound: (r: NotFound) => R;
+
+    // Public
     Index: (r: Index) => R;
     Documentation: (r: Documentation) => R;
     Components: (r: Components) => R;
-    Dashboard: (r: Dashboard) => R;
+
+    // Public (logged-out only)
     Login: (r: Login) => R;
     Register: (r: Register) => R;
     ResetPasswordRequest: (r: ResetPasswordRequest) => R;
     ResetPasswordConfirm: (r: ResetPasswordConfirm) => R;
-    NotFound: (r: NotFound) => R;
+
+    // Private
+    Dashboard: (r: Dashboard) => R;
+    AppDashboard: (r: AppDashboard) => R;
+    AppEndpoints: (r: AppEndpoints) => R;
+    AppSubs: (r: AppSubs) => R;
+    AppLogs: (r: AppLogs) => R;
   }) =>
   (route: Route): R => {
     switch (route.tag) {
-      case 'Dashboard':
-        return matcher.Dashboard(route);
+      case 'NotFound':
+        return matcher.NotFound(route);
+
+      // Public
       case 'Documentation':
         return matcher.Documentation(route);
       case 'Index':
         return matcher.Index(route);
       case 'Components':
         return matcher.Components(route);
+
+      // Public (logged-out only)
       case 'Login':
         return matcher.Login(route);
       case 'Register':
@@ -60,14 +86,29 @@ export const match =
         return matcher.ResetPasswordRequest(route);
       case 'ResetPasswordConfirm':
         return matcher.ResetPasswordConfirm(route);
-      case 'NotFound':
-        return matcher.NotFound(route);
+
+      // Private
+      case 'Dashboard':
+        return matcher.Dashboard(route);
+      case 'AppDashboard':
+        return matcher.AppDashboard(route);
+      case 'AppEndpoints':
+        return matcher.AppEndpoints(route);
+      case 'AppSubs':
+        return matcher.AppSubs(route);
+      case 'AppLogs':
+        return matcher.AppLogs(route);
     }
   };
 
+const notFound: Route = {tag: 'NotFound'};
+
+// Public
 const index: Route = {tag: 'Index'};
-const dashboard: Route = {tag: 'Dashboard'};
 const documentation: Route = {tag: 'Documentation'};
+const components: Route = {tag: 'Components'};
+
+// Public (logged-out only)
 const login = (returnTo?: Route): Route => ({tag: 'Login', returnTo});
 const register = (returnTo?: Route): Route => ({tag: 'Register', returnTo});
 const resetPasswordRequest: Route = {tag: 'ResetPasswordRequest'};
@@ -75,59 +116,97 @@ const resetPasswordConfirm = (token: string): Route => ({
   tag: 'ResetPasswordConfirm',
   token,
 });
-const components: Route = {tag: 'Components'};
-const notFound: Route = {tag: 'NotFound'};
+
+// Private
+const dashboard: Route = {tag: 'Dashboard'};
+const appDashboard = (app: string): Route => ({tag: 'AppDashboard', app});
+const appEndpoints = (app: string): Route => ({tag: 'AppEndpoints', app});
+const appSubs = (app: string): Route => ({tag: 'AppSubs', app});
+const appLogs = (app: string): Route => ({tag: 'AppLogs', app});
 
 export const Route = {
+  notFound,
+
+  // Public
   index,
-  dashboard,
   documentation,
+  components,
+
+  // Public (logged-out only)
   login,
   register,
-  components,
   resetPasswordRequest,
   resetPasswordConfirm,
-  notFound,
+
+  // Private
+  dashboard,
+  appDashboard,
+  appEndpoints,
+  appSubs,
+  appLogs,
 };
-
-const indexMatch = Routing.end;
-
-const dashboardMatch = Routing.lit('dashboard').then(Routing.end);
-
-const documentationMatch = Routing.lit('documentation').then(Routing.end);
 
 // Optional query properties
 // @reference: https://github.com/gcanti/fp-ts-routing/issues/59#issuecomment-800801913
 const returnToQuery = Routing.query(t.exact(t.partial({returnTo: t.string})));
 
-const loginMatch = Routing.lit('login').then(returnToQuery).then(Routing.end);
+const _404Match = Routing.lit('404').then(Routing.end);
 
+// Public
+const indexMatch = Routing.end;
+const componentsMatch = Routing.lit('components').then(Routing.end);
+const documentationMatch = Routing.lit('documentation').then(Routing.end);
+
+// Public (logged-out only)
+const loginMatch = Routing.lit('login').then(returnToQuery).then(Routing.end);
 const registerMatch = Routing.lit('register')
   .then(returnToQuery)
   .then(Routing.end);
-
-const componentsMatch = Routing.lit('components').then(Routing.end);
-
 const resetPasswordRequestMatch = Routing.lit('reset-password').then(
   Routing.end,
 );
-
 const resetPasswordConfirmMatch = Routing.lit('reset-password')
   .then(Routing.str('token'))
   .then(Routing.end);
 
-const _404Match = Routing.lit('404').then(Routing.end);
+// Private
+const dashboardMatch = Routing.lit('dashboard').then(Routing.end);
+const appDashboardMatch = Routing.lit('app')
+  .then(Routing.str('app'))
+  .then(Routing.lit('dashboard'))
+  .then(Routing.end);
+const appEndpointsMatch = Routing.lit('app')
+  .then(Routing.str('app'))
+  .then(Routing.lit('endpoints'))
+  .then(Routing.end);
+const appSubsMatch = Routing.lit('app')
+  .then(Routing.str('app'))
+  .then(Routing.lit('subscriptions'))
+  .then(Routing.end);
+const appLogsMatch = Routing.lit('app')
+  .then(Routing.str('app'))
+  .then(Routing.lit('logs'))
+  .then(Routing.end);
 
 export const Match = {
+  _404: _404Match,
+  // Public
   index: indexMatch,
-  dashboard: dashboardMatch,
   documentation: documentationMatch,
+  components: componentsMatch,
+
+  // Public (logged-out only)
   login: loginMatch,
   register: registerMatch,
-  components: componentsMatch,
   resetPasswordRequest: resetPasswordRequestMatch,
   resetPasswordConfirm: resetPasswordConfirmMatch,
-  _404: _404Match,
+
+  // Private
+  dashboard: dashboardMatch,
+  appDashboard: appDashboardMatch,
+  appEndpoints: appEndpointsMatch,
+  appSubs: appSubsMatch,
+  appLogs: appLogsMatch,
 };
 
 const parseBackTo =
@@ -148,9 +227,12 @@ const parseBackTo =
   };
 
 const router = Routing.zero<Route>()
+  // Public
   .alt(Match.index.parser.map(() => Route.index))
-  .alt(Match.dashboard.parser.map(() => Route.dashboard))
   .alt(Match.documentation.parser.map(() => Route.documentation))
+  .alt(Match.components.parser.map(() => Route.components))
+
+  // Public (logged-out only)
   .alt(Match.login.parser.map(parseBackTo(Route.login)))
   .alt(Match.register.parser.map(parseBackTo(Route.register)))
   .alt(Match.resetPasswordRequest.parser.map(() => Route.resetPasswordRequest))
@@ -159,7 +241,15 @@ const router = Routing.zero<Route>()
       Route.resetPasswordConfirm(token),
     ),
   )
-  .alt(Match.components.parser.map(() => Route.components))
+
+  // Private
+  .alt(Match.dashboard.parser.map(() => Route.dashboard))
+  .alt(Match.appDashboard.parser.map(({app}) => Route.appDashboard(app)))
+  .alt(Match.appEndpoints.parser.map(({app}) => Route.appEndpoints(app)))
+  .alt(Match.appSubs.parser.map(({app}) => Route.appSubs(app)))
+  .alt(Match.appLogs.parser.map(({app}) => Route.appLogs(app)))
+
+  // Misc
   .alt(Match._404.parser.map(() => Route.notFound));
 
 export const parse = (path: string): Route =>
@@ -172,9 +262,14 @@ export const format = (route: Route): string =>
   pipe(
     route,
     match<string>({
+      NotFound: () => Routing.format(Match._404.formatter, {}),
+
+      // Public
       Index: () => Routing.format(Match.index.formatter, {}),
-      Dashboard: () => Routing.format(Match.dashboard.formatter, {}),
       Documentation: () => Routing.format(Match.documentation.formatter, {}),
+      Components: () => Routing.format(Match.components.formatter, {}),
+
+      // Public (logged-out only)
       Login: ({returnTo}) =>
         Routing.format(
           Match.login.formatter,
@@ -189,7 +284,14 @@ export const format = (route: Route): string =>
         Routing.format(Match.resetPasswordRequest.formatter, {}),
       ResetPasswordConfirm: ({token}) =>
         Routing.format(Match.resetPasswordConfirm.formatter, {token}),
-      Components: () => Routing.format(Match.components.formatter, {}),
-      NotFound: () => Routing.format(Match._404.formatter, {}),
+
+      // Private
+      Dashboard: () => Routing.format(Match.dashboard.formatter, {}),
+      AppDashboard: ({app}) =>
+        Routing.format(Match.appDashboard.formatter, {app}),
+      AppEndpoints: ({app}) =>
+        Routing.format(Match.appEndpoints.formatter, {app}),
+      AppSubs: ({app}) => Routing.format(Match.appSubs.formatter, {app}),
+      AppLogs: ({app}) => Routing.format(Match.appLogs.formatter, {app}),
     }),
   );
