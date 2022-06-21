@@ -1,8 +1,8 @@
 import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
 import {yupResolver} from '@hookform/resolvers/yup';
-import * as E from 'fp-ts/Either';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
+import * as TE from 'fp-ts/TaskEither';
 import {useAtom} from 'jotai';
 import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
@@ -42,24 +42,24 @@ const Login = () => {
 
   const [_session, setSession] = useAtom(SessionAtom);
 
-  const onSubmit: SubmitHandler<Inputs> = async ({email, password}) => {
+  const onSubmit: SubmitHandler<Inputs> = ({email, password}) => {
     setLoading(true);
 
     pipe(
-      await authenticate({email, password})(),
-      E.match(
+      authenticate({email, password}),
+      TE.match(
         (error) => {
           // TODO: show a toast or inline error
           // eslint-disable-next-line no-console
           console.log('Failed to login', error);
+
+          setLoading(false);
         },
         (user) => {
           setSession(O.some(user));
         },
       ),
-    );
-
-    setLoading(false);
+    )();
   };
 
   return (
