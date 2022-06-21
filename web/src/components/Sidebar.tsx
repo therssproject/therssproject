@@ -29,16 +29,26 @@ type NavLink = {
   current: boolean;
 };
 
-const navigation: NavLink[] = [
-  {name: 'Dashboard', icon: HomeIcon, href: Route.dashboard, current: true},
-  {name: 'Endpoints', icon: UsersIcon, href: Route.dashboard, current: false},
+const navigation = (app: string): NavLink[] => [
+  {
+    name: 'Dashboard',
+    icon: HomeIcon,
+    href: Route.appDashboard(app),
+    current: true,
+  },
+  {
+    name: 'Endpoints',
+    icon: UsersIcon,
+    href: Route.appEndpoints(app),
+    current: false,
+  },
   {
     name: 'Subscriptions',
     icon: FolderIcon,
-    href: Route.dashboard,
+    href: Route.appSubs(app),
     current: false,
   },
-  {name: 'Logs', icon: CalendarIcon, href: Route.dashboard, current: false},
+  {name: 'Logs', icon: CalendarIcon, href: Route.appLogs(app), current: false},
 ];
 
 type SecondaryNavItem =
@@ -147,8 +157,9 @@ export const Sidebar: FC<Props> = ({
               {/* ... */}
               <div className="h-0 flex-1 overflow-y-auto pt-5 pb-4">
                 <Logo />
-                <nav className="mt-5 space-y-1 px-2">
-                  <MainNav />
+                <nav className="mt-5 space-y-2 px-2">
+                  {/* TODO: `getAppId` getter that ignores the `type: 'soon'` ???  */}
+                  <MainNav app={appSelector.selected?.id} />
                 </nav>
               </div>
               <SecondaryNav onLogout={onLogout} />
@@ -174,8 +185,9 @@ export const Sidebar: FC<Props> = ({
               className="flex-1 space-y-8 bg-white px-2"
               aria-label="Sidebar"
             >
-              <div className="space-y-1">
-                <MainNav />
+              <div className="space-y-2">
+                {/* TODO: `getAppId` getter that ignores the `type: 'soon'` ???  */}
+                <MainNav app={appSelector.selected?.id} />
               </div>
             </nav>
           </div>
@@ -196,31 +208,40 @@ const Logo = () => (
   </UnstyledLink>
 );
 
-const MainNav = () => (
+const MainNav = ({app}: {app?: string}) => (
   <>
-    {navigation.map((item) => (
-      <UnstyledLink
-        key={item.name}
-        href={item.href}
-        className={clsxm(
-          item.current
-            ? 'bg-gray-100 text-gray-900'
-            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-          'group flex items-center rounded-md px-2 py-2 text-base font-medium',
-        )}
-      >
-        <item.icon
+    {app ? (
+      navigation(app).map((item) => (
+        <UnstyledLink
+          key={item.name}
+          href={item.href}
           className={clsxm(
             item.current
-              ? 'text-gray-500'
-              : 'text-gray-400 group-hover:text-gray-500',
-            'mr-4 h-6 w-6 flex-shrink-0',
+              ? 'bg-gray-100 text-gray-900'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+            'group flex items-center rounded-md px-2 py-2 text-base font-medium',
           )}
-          aria-hidden="true"
-        />
-        {item.name}
-      </UnstyledLink>
-    ))}
+        >
+          <item.icon
+            className={clsxm(
+              item.current
+                ? 'text-gray-500'
+                : 'text-gray-400 group-hover:text-gray-500',
+              'mr-4 h-6 w-6 flex-shrink-0',
+            )}
+            aria-hidden="true"
+          />
+          {item.name}
+        </UnstyledLink>
+      ))
+    ) : (
+      <>
+        <div className="flex h-10 items-center rounded-md bg-gray-100 px-2 py-2 text-base font-medium" />
+        <div className="flex h-10 items-center rounded-md bg-gray-100 px-2 py-2 text-base font-medium" />
+        <div className="flex h-10 items-center rounded-md bg-gray-100 px-2 py-2 text-base font-medium" />
+        <div className="flex h-10 items-center rounded-md bg-gray-100 px-2 py-2 text-base font-medium" />
+      </>
+    )}
   </>
 );
 
