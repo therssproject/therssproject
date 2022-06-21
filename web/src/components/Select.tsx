@@ -2,7 +2,7 @@ import {Listbox} from '@headlessui/react';
 import {CheckIcon, SelectorIcon} from '@heroicons/react/solid';
 import ColorHash from 'color-hash';
 
-import clsxm from '@/lib/clsxm';
+import {clsxm} from '@/lib/clsxm';
 
 const colorHash = new ColorHash({lightness: 0.9});
 

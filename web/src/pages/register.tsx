@@ -1,4 +1,3 @@
-import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -14,7 +13,8 @@ import {Button} from '@/components/buttons/Button';
 import {GitHub} from '@/components/icons/GitHub';
 import {Google} from '@/components/icons/Google';
 import {Rss} from '@/components/icons/Rss';
-import {Field} from '@/components/inputs/Field';
+import {PasswordField} from '@/components/inputs/PasswordField';
+import {TextField} from '@/components/inputs/TextField';
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
 
@@ -39,7 +39,6 @@ const Inputs = yup.object({
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPass] = useState(false);
   const {
     register: registerField,
     handleSubmit,
@@ -117,11 +116,12 @@ const Register = () => {
 
               <div className="mt-6">
                 <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                  <Field
+                  <TextField
                     label="Name"
                     input={{
                       id: 'name',
                       type: 'name',
+                      placeholder: 'John Doe',
                       autoComplete: 'name',
                       variant: errors.name ? 'error' : 'default',
                       ...registerField('name', {required: true}),
@@ -129,11 +129,12 @@ const Register = () => {
                     message={errors.name?.message}
                   />
 
-                  <Field
+                  <TextField
                     label="Email"
                     input={{
                       id: 'email',
                       type: 'email',
+                      placeholder: 'doe.john@ymail.com',
                       autoComplete: 'email',
                       variant: errors.email ? 'error' : 'default',
                       ...registerField('email', {required: true}),
@@ -141,40 +142,28 @@ const Register = () => {
                     message={errors.email?.message}
                   />
 
-                  <Field
+                  <PasswordField
                     label="Password"
                     input={{
                       id: 'password',
-                      type: showPassword ? 'text' : 'password',
+                      placeholder: '****************',
                       autoComplete: 'password',
                       variant: errors.password ? 'error' : 'default',
                       ...registerField('password', {required: true}),
                     }}
                     message={errors.password?.message}
-                    icon={{
-                      After: showPassword ? EyeIcon : EyeOffIcon,
-                      onClick: showPassword
-                        ? () => setShowPass(false)
-                        : () => setShowPass(true),
-                    }}
                   />
 
-                  <Field
+                  <PasswordField
                     label="Cofirm password"
                     input={{
                       id: 'passwordCheck',
-                      type: showPassword ? 'text' : 'password',
+                      placeholder: '****************',
                       autoComplete: 'passwordCheck',
                       variant: errors.passwordCheck ? 'error' : 'default',
                       ...registerField('passwordCheck', {required: true}),
                     }}
                     message={errors.passwordCheck?.message}
-                    icon={{
-                      After: showPassword ? EyeIcon : EyeOffIcon,
-                      onClick: showPassword
-                        ? () => setShowPass(false)
-                        : () => setShowPass(true),
-                    }}
                   />
 
                   <Button
