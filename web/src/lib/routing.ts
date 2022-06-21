@@ -29,17 +29,25 @@ const loggedOutGuard = (push: (path: string) => void) => (route: Route) => {
   pipe(
     route,
     match({
-      // Private
-      Dashboard: onPrivate,
+      NotFound: noOp,
+
       // Public
       Index: noOp,
+      Documentation: noOp,
+      Components: noOp,
+
+      // Public (logged-out only)
       Login: noOp,
       Register: noOp,
       ResetPasswordRequest: noOp,
       ResetPasswordConfirm: noOp,
-      Documentation: noOp,
-      Components: noOp,
-      NotFound: noOp,
+
+      // Private
+      Dashboard: onPrivate,
+      AppDashboard: onPrivate,
+      AppEndpoints: onPrivate,
+      AppSubs: onPrivate,
+      AppLogs: onPrivate,
     }),
   );
 };
@@ -49,16 +57,25 @@ const loggedInGuard = (push: (path: string) => void) => (route: Route) => {
   pipe(
     route,
     match({
+      NotFound: noOp,
+
+      // Public
       Index: noOp,
-      Dashboard: noOp,
       Components: noOp,
       Documentation: noOp,
-      NotFound: noOp,
-      // Logged OUT only routes
+
+      // Public (logged-out only)
       Login: ({returnTo}) => pipe(returnTo ?? Route.dashboard, format, push),
       Register: ({returnTo}) => pipe(returnTo ?? Route.dashboard, format, push),
       ResetPasswordRequest: () => pipe(Route.dashboard, format, push),
       ResetPasswordConfirm: () => pipe(Route.dashboard, format, push),
+
+      // Private
+      Dashboard: noOp,
+      AppDashboard: noOp,
+      AppEndpoints: noOp,
+      AppSubs: noOp,
+      AppLogs: noOp,
     }),
   );
 };
@@ -90,7 +107,9 @@ export const useSessionGuard = () => {
   );
 };
 
-export const useCurrentRoute = <T extends RouteTag, R extends Route & {tag: T}>(
+export const useCurrentRoute = (): Route => pipe(useRouter().asPath, parse);
+
+export const useRouteOfType = <T extends RouteTag, R extends Route & {tag: T}>(
   expected: T,
 ): O.Option<Extract<Route, R>> => {
   const router = useRouter();
