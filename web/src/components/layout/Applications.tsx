@@ -1,8 +1,7 @@
 import {MenuIcon} from '@heroicons/react/outline';
-import {sequenceS} from 'fp-ts/Apply';
+import {HomeIcon} from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
-import {fold} from 'fp-ts/Monoid';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
 import * as t from 'io-ts';
@@ -13,9 +12,14 @@ import {match} from 'ts-pattern';
 
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
-import {format as formatRoute, Route} from '@/lib/routes';
-import {useRouteOfType} from '@/lib/routing';
+import {
+  format as formatRoute,
+  matchP as matchRouteP,
+  Route,
+} from '@/lib/routes';
+import {useCurrentRoute} from '@/lib/routing';
 
+import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Select} from '@/components/Select';
 import {Props as SeoProps, Seo} from '@/components/Seo';
 import {Sidebar} from '@/components/Sidebar';
@@ -26,6 +30,7 @@ import {
   AppsAtom,
   appToOption,
   SOON,
+  useCurrentApp,
 } from '@/models/application';
 import {useSession} from '@/models/user';
 
@@ -38,42 +43,25 @@ type Props = {
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
 
-const useAppIdFromPath = () =>
-  pipe(
-    [
-      useRouteOfType('AppDashboard'),
-      useRouteOfType('AppEndpoints'),
-      useRouteOfType('AppSubs'),
-      useRouteOfType('AppLogs'),
-    ],
-    fold(O.getFirstMonoid()),
-    O.map(({app}) => app),
-  );
+const isApplicationsRoute = (route: Route) =>
+  route.tag === 'AppDashboard' ||
+  route.tag === 'AppEndpoints' ||
+  route.tag === 'AppSubs' ||
+  route.tag === 'AppLogs';
 
 export const Applications = ({title, children, seo}: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
+  const isInAppsRoute = isApplicationsRoute(useCurrentRoute());
 
   const {session, logOut} = useSession();
   const [apps, setApps] = useAtom(AppsAtom);
 
-  const appId = useAppIdFromPath();
-
-  const selected = pipe(
-    sequenceS(O.Apply)({apps: RD.toOption(apps), id: appId}),
-    O.chain(({apps, id}) =>
-      pipe(
-        apps,
-        A.findFirst((app) => app.id === id),
-      ),
-    ),
-    O.map(appToOption),
-    O.toUndefined,
-  );
+  const selected = pipe(useCurrentApp(), O.map(appToOption), O.toUndefined);
 
   const onSelect = (opt?: AppOption) => {
-    match(opt)
-      .with({type: 'app'}, (app) => {
+    match([opt, isInAppsRoute])
+      .with([{type: 'app'}, false], ([app]: [AppOption, boolean]) => {
         router.push(formatRoute(Route.appDashboard(app.id)));
       })
       .otherwise(noOp);
@@ -164,8 +152,10 @@ export const Applications = ({title, children, seo}: Props) => {
             <main className="flex-1">
               <div className="space-y-8 py-8">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                  <h1 className="text-4xl font-semibold text-gray-700">
-                    {title}
+                  <Breadcrumbs />
+
+                  <h1 className="mt-4 text-3xl font-semibold text-gray-700">
+                    {selected?.label} {title}
                   </h1>
                 </div>
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
@@ -177,5 +167,106 @@ export const Applications = ({title, children, seo}: Props) => {
         </div>
       ),
     ),
+  );
+};
+
+type Breadcrumb = {
+  name: string;
+  href: Route;
+};
+
+const getPages = (app: Application, current: Route): Breadcrumb[] =>
+  A.cons({name: app.name, href: Route.appDashboard(app.id)})(
+    pipe(
+      current,
+      matchRouteP({
+        __: () => [],
+
+        AppEndpoints: () => [
+          {name: 'Endpoints', href: Route.appEndpoints(app.id)},
+        ],
+        AppSubs: () => [{name: 'Subscriptions', href: Route.appSubs(app.id)}],
+        AppLogs: () => [{name: 'Logs', href: Route.appLogs(app.id)}],
+      }),
+    ),
+  );
+
+const Breadcrumbs = () => {
+  const route = useCurrentRoute();
+
+  const pages = pipe(
+    useCurrentApp(),
+    O.map((app) => getPages(app, route)),
+    O.getOrElse((): Breadcrumb[] => []),
+  );
+
+  return (
+    <nav className="flex" aria-label="Breadcrumb">
+      <ol role="list" className="flex items-center space-x-4">
+        <li>
+          <div>
+            <UnstyledLink
+              href={Route.dashboard}
+              className="text-gray-400 hover:text-gray-500"
+            >
+              <HomeIcon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+              <span className="sr-only">Home</span>
+            </UnstyledLink>
+          </div>
+        </li>
+        {pipe(
+          A.init(pages),
+          O.getOrElse((): Breadcrumb[] => []),
+          (init) =>
+            init.map((page) => (
+              <li key={page.name}>
+                <div className="flex items-center">
+                  <svg
+                    className="h-5 w-5 flex-shrink-0 text-gray-300"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
+                    <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
+                  </svg>
+                  <UnstyledLink
+                    href={page.href}
+                    className="ml-4 text-xs font-medium text-gray-500 hover:text-gray-700"
+                  >
+                    {page.name}
+                  </UnstyledLink>
+                </div>
+              </li>
+            )),
+        )}
+
+        {pipe(
+          pages,
+          A.last,
+          O.match(
+            () => null,
+            ({name}) => (
+              <li key={name}>
+                <div className="flex items-center">
+                  <svg
+                    className="h-5 w-5 flex-shrink-0 text-gray-300"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
+                    <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
+                  </svg>
+                  <div className="ml-4 text-xs font-medium text-gray-700">
+                    {name}
+                  </div>
+                </div>
+              </li>
+            ),
+          ),
+        )}
+      </ol>
+    </nav>
   );
 };

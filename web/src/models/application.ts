@@ -1,7 +1,15 @@
+import {sequenceS} from 'fp-ts/Apply';
+import * as A from 'fp-ts/Array';
+import {pipe} from 'fp-ts/function';
+import {fold} from 'fp-ts/Monoid';
+import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import * as te from 'io-ts-extra';
 import {atom} from 'jotai';
 import * as RD from 'remote-data-ts';
+
+import {useAtom} from '@/lib/jotai';
+import {useRouteOfType} from '@/lib/routing';
 
 export const Application = te.sparseType({
   id: t.string,
@@ -41,3 +49,30 @@ export const appToOption = (app: Application): AppOption => ({
 type AppsState = RD.RemoteData<string, Application[]>;
 
 export const AppsAtom = atom<AppsState>(RD.notAsked);
+
+export const useAppIdFromPath = () =>
+  pipe(
+    [
+      useRouteOfType('AppDashboard'),
+      useRouteOfType('AppEndpoints'),
+      useRouteOfType('AppSubs'),
+      useRouteOfType('AppLogs'),
+    ],
+    fold(O.getFirstMonoid()),
+    O.map(({app}) => app),
+  );
+
+export const useCurrentApp = () => {
+  const appId = useAppIdFromPath();
+  const [apps, _setApps] = useAtom(AppsAtom);
+
+  return pipe(
+    sequenceS(O.Apply)({apps: RD.toOption(apps), id: appId}),
+    O.chain(({apps, id}) =>
+      pipe(
+        apps,
+        A.findFirst((app) => app.id === id),
+      ),
+    ),
+  );
+};
