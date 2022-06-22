@@ -42,28 +42,30 @@ export type Route =
 
 export type RouteTag = Route['tag'];
 
+type RouteMatcher<R> = {
+  NotFound: (r: NotFound) => R;
+
+  // Public
+  Index: (r: Index) => R;
+  Documentation: (r: Documentation) => R;
+  Components: (r: Components) => R;
+
+  // Public (logged-out only)
+  Login: (r: Login) => R;
+  Register: (r: Register) => R;
+  ResetPasswordRequest: (r: ResetPasswordRequest) => R;
+  ResetPasswordConfirm: (r: ResetPasswordConfirm) => R;
+
+  // Private
+  Dashboard: (r: Dashboard) => R;
+  AppDashboard: (r: AppDashboard) => R;
+  AppEndpoints: (r: AppEndpoints) => R;
+  AppSubs: (r: AppSubs) => R;
+  AppLogs: (r: AppLogs) => R;
+};
+
 export const match =
-  <R>(matcher: {
-    NotFound: (r: NotFound) => R;
-
-    // Public
-    Index: (r: Index) => R;
-    Documentation: (r: Documentation) => R;
-    Components: (r: Components) => R;
-
-    // Public (logged-out only)
-    Login: (r: Login) => R;
-    Register: (r: Register) => R;
-    ResetPasswordRequest: (r: ResetPasswordRequest) => R;
-    ResetPasswordConfirm: (r: ResetPasswordConfirm) => R;
-
-    // Private
-    Dashboard: (r: Dashboard) => R;
-    AppDashboard: (r: AppDashboard) => R;
-    AppEndpoints: (r: AppEndpoints) => R;
-    AppSubs: (r: AppSubs) => R;
-    AppLogs: (r: AppLogs) => R;
-  }) =>
+  <R>(matcher: RouteMatcher<R>) =>
   (route: Route): R => {
     switch (route.tag) {
       case 'NotFound':
@@ -98,6 +100,45 @@ export const match =
         return matcher.AppSubs(route);
       case 'AppLogs':
         return matcher.AppLogs(route);
+    }
+  };
+
+export const matchP =
+  <R>(matcher: Partial<RouteMatcher<R>> & {__: (route: Route) => R}) =>
+  (route: Route): R => {
+    switch (route.tag) {
+      case 'NotFound':
+        return (matcher.NotFound ?? matcher.__)(route);
+
+      // Public
+      case 'Documentation':
+        return (matcher.Documentation ?? matcher.__)(route);
+      case 'Index':
+        return (matcher.Index ?? matcher.__)(route);
+      case 'Components':
+        return (matcher.Components ?? matcher.__)(route);
+
+      // Public (logged-out only)
+      case 'Login':
+        return (matcher.Login ?? matcher.__)(route);
+      case 'Register':
+        return (matcher.Register ?? matcher.__)(route);
+      case 'ResetPasswordRequest':
+        return (matcher.ResetPasswordRequest ?? matcher.__)(route);
+      case 'ResetPasswordConfirm':
+        return (matcher.ResetPasswordConfirm ?? matcher.__)(route);
+
+      // Private
+      case 'Dashboard':
+        return (matcher.Dashboard ?? matcher.__)(route);
+      case 'AppDashboard':
+        return (matcher.AppDashboard ?? matcher.__)(route);
+      case 'AppEndpoints':
+        return (matcher.AppEndpoints ?? matcher.__)(route);
+      case 'AppSubs':
+        return (matcher.AppSubs ?? matcher.__)(route);
+      case 'AppLogs':
+        return (matcher.AppLogs ?? matcher.__)(route);
     }
   };
 

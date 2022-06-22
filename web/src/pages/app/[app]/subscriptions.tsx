@@ -1,36 +1,32 @@
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 
-import {useRouteOfType} from '@/lib/routing';
-
 import {Layout} from '@/components/layout/Layout';
+import {Skeleton} from '@/components/Skeleton';
 
+import {useCurrentApp} from '@/models/application';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppSubs: NextPageWithLayout = () => {
-  const route = useRouteOfType('AppSubs');
-
-  return (
-    <div className="space-y-4">
-      <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
-        <div className="p-4">
-          {pipe(
-            route,
-            O.match(
-              () => <div>What? No app?</div>,
-              ({app}) => <div>App {app}</div>,
-            ),
-          )}
+  return pipe(
+    useCurrentApp(),
+    O.match(
+      () => null,
+      (_app) => (
+        <div className="space-y-4">
+          <Skeleton className="h-48 w-full rounded-lg" />
+          <Skeleton className="h-96 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
         </div>
-      </div>
-    </div>
+      ),
+    ),
   );
 };
 
 AppSubs.getLayout = (page) => (
   <Layout
     variant="applications"
-    title="Components"
+    title="Subscriptions"
     seo={{
       templateTitle: 'Components',
       description: 'Pre-built components with awesome default',
