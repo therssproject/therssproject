@@ -2,8 +2,12 @@ import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import * as tt from 'io-ts-types';
 import {atomWithStorage} from 'jotai/utils';
+import * as RD from 'remote-data-ts';
 
 import * as http from '@/lib/fetch';
+import {useAtom} from '@/lib/jotai';
+
+import {AppsAtom} from './application';
 
 export const PublicUser = t.interface({
   id: t.string,
@@ -38,3 +42,15 @@ export const register = (payload: {
   email: string;
   password: string;
 }) => http.post<PublicUser>('/users', payload, PublicUser);
+
+export const useSession = () => {
+  const [session, setSession] = useAtom(SessionAtom);
+  const [_apps, setApps] = useAtom(AppsAtom);
+
+  const logOut = () => {
+    setSession(O.none);
+    setApps(RD.notAsked);
+  };
+
+  return {session, setSession, logOut};
+};

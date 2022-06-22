@@ -1,6 +1,8 @@
 import {MenuIcon} from '@heroicons/react/outline';
+import {sequenceS} from 'fp-ts/Apply';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
+import {fold} from 'fp-ts/Monoid';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
 import * as t from 'io-ts';
@@ -12,6 +14,7 @@ import {match} from 'ts-pattern';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 import {format as formatRoute, Route} from '@/lib/routes';
+import {useRouteOfType} from '@/lib/routing';
 
 import {Select} from '@/components/Select';
 import {Props as SeoProps, Seo} from '@/components/Seo';
@@ -29,19 +32,44 @@ import {useSession} from '@/models/user';
 type Props = {
   title: string;
   children: ReactNode;
-  goToAppOnLoad: boolean;
   seo?: SeoProps;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
 
-export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
+const useAppIdFromPath = () =>
+  pipe(
+    [
+      useRouteOfType('AppDashboard'),
+      useRouteOfType('AppEndpoints'),
+      useRouteOfType('AppSubs'),
+      useRouteOfType('AppLogs'),
+    ],
+    fold(O.getFirstMonoid()),
+    O.map(({app}) => app),
+  );
+
+export const Applications = ({title, children, seo}: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
   const {session, logOut} = useSession();
   const [apps, setApps] = useAtom(AppsAtom);
+
+  const appId = useAppIdFromPath();
+
+  const selected = pipe(
+    sequenceS(O.Apply)({apps: RD.toOption(apps), id: appId}),
+    O.chain(({apps, id}) =>
+      pipe(
+        apps,
+        A.findFirst((app) => app.id === id),
+      ),
+    ),
+    O.map(appToOption),
+    O.toUndefined,
+  );
 
   const onSelect = (opt?: AppOption) => {
     match(opt)
@@ -71,8 +99,8 @@ export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
             pipe(
               res,
               A.head,
+              O.filter(() => Boolean(!selected)),
               O.map(appToOption),
-              O.filter(() => goToAppOnLoad),
               O.match(noOp, onSelect),
             );
           },
@@ -92,7 +120,7 @@ export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
       RD.toOption,
       O.getOrElse((): AppOption[] => []),
     ),
-    selected: undefined,
+    selected,
     onSelect,
     disabled: !RD.isSuccess(apps),
   };

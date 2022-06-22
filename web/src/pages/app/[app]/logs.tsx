@@ -5,33 +5,39 @@ import {useRouteOfType} from '@/lib/routing';
 
 import {Layout} from '@/components/layout/Layout';
 
-const Dashboard = () => {
+import {NextPageWithLayout} from '@/pages/_app';
+
+const AppLogs: NextPageWithLayout = () => {
   const route = useRouteOfType('AppLogs');
 
   return (
-    <Layout
-      variant="dashboard"
-      title="Components"
-      seo={{
-        templateTitle: 'Components',
-        description: 'Pre-built components with awesome default',
-      }}
-    >
-      <div className="space-y-4">
-        <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
-          <div className="p-4">
-            {pipe(
-              route,
-              O.match(
-                () => <div>What? No app?</div>,
-                ({app}) => <div>App {app}</div>,
-              ),
-            )}
-          </div>
+    <div className="space-y-4">
+      <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
+        <div className="p-4">
+          {pipe(
+            route,
+            O.match(
+              () => <div>What? No app?</div>,
+              ({app}) => <div>App {app}</div>,
+            ),
+          )}
         </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 
-export default Dashboard;
+AppLogs.getLayout = (page) => (
+  <Layout
+    variant="applications"
+    title="Components"
+    seo={{
+      templateTitle: 'Components',
+      description: 'Pre-built components with awesome default',
+    }}
+  >
+    {page}
+  </Layout>
+);
+
+export default AppLogs;

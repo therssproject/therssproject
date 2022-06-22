@@ -13,9 +13,11 @@ import {ComponentType, FC, Fragment} from 'react';
 
 import {clsxm} from '@/lib/clsxm';
 import {Route} from '@/lib/routes';
+import {useCurrentRoute} from '@/lib/routing';
 
 import {Rss} from '@/components/icons/Rss';
 import {Select} from '@/components/Select';
+import {Skeleton} from '@/components/Skeleton';
 
 import {AppOption} from '@/models/application';
 import {PublicUser} from '@/models/user';
@@ -26,7 +28,6 @@ type NavLink = {
   name: string;
   href: Route;
   icon: ComponentType<{className: string}>;
-  current: boolean;
 };
 
 const navigation = (app: string): NavLink[] => [
@@ -34,21 +35,18 @@ const navigation = (app: string): NavLink[] => [
     name: 'Dashboard',
     icon: HomeIcon,
     href: Route.appDashboard(app),
-    current: true,
   },
   {
     name: 'Endpoints',
     icon: UsersIcon,
     href: Route.appEndpoints(app),
-    current: false,
   },
   {
     name: 'Subscriptions',
     icon: FolderIcon,
     href: Route.appSubs(app),
-    current: false,
   },
-  {name: 'Logs', icon: CalendarIcon, href: Route.appLogs(app), current: false},
+  {name: 'Logs', icon: CalendarIcon, href: Route.appLogs(app)},
 ];
 
 type SecondaryNavItem =
@@ -66,14 +64,12 @@ const secondaryNavigation = (onLogout: () => void): SecondaryNavItem[] => [
     name: 'Documentation',
     icon: DocumentTextIcon,
     href: Route.documentation,
-    current: false,
   },
   {
     type: 'link',
     name: 'Share feedback',
     icon: InformationCircleIcon,
     href: Route.notFound,
-    current: false,
   },
   {
     type: 'action',
@@ -208,94 +204,102 @@ const Logo = () => (
   </UnstyledLink>
 );
 
-const MainNav = ({app}: {app?: string}) => (
-  <>
-    {app ? (
-      navigation(app).map((item) => (
-        <UnstyledLink
-          key={item.name}
-          href={item.href}
-          className={clsxm(
-            item.current
-              ? 'bg-gray-100 text-gray-900'
-              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-            'group flex items-center rounded-md px-2 py-2 text-base font-medium',
-          )}
-        >
-          <item.icon
-            className={clsxm(
-              item.current
-                ? 'text-gray-500'
-                : 'text-gray-400 group-hover:text-gray-500',
-              'mr-4 h-6 w-6 flex-shrink-0',
-            )}
-            aria-hidden="true"
-          />
-          {item.name}
-        </UnstyledLink>
-      ))
-    ) : (
-      <>
-        <div className="flex h-10 items-center rounded-md bg-gray-100 px-2 py-2 text-base font-medium" />
-        <div className="flex h-10 items-center rounded-md bg-gray-100 px-2 py-2 text-base font-medium" />
-        <div className="flex h-10 items-center rounded-md bg-gray-100 px-2 py-2 text-base font-medium" />
-        <div className="flex h-10 items-center rounded-md bg-gray-100 px-2 py-2 text-base font-medium" />
-      </>
-    )}
-  </>
-);
+const MainNav = ({app}: {app?: string}) => {
+  const route = useCurrentRoute();
 
-const SecondaryNav = ({onLogout}: {onLogout: () => void}) => (
-  <div
-    className="space-y-1 px-2"
-    role="group"
-    aria-labelledby="projects-headline"
-  >
-    {secondaryNavigation(onLogout).map((item) =>
-      item.type === 'link' ? (
-        <UnstyledLink
-          key={item.name}
-          href={item.href}
-          className={clsxm(
-            item.current
-              ? 'bg-gray-100 text-gray-700'
-              : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700',
-            'group flex items-center rounded-md px-2 py-2 text-base font-medium',
-          )}
-        >
-          <item.icon
+  return (
+    <>
+      {app ? (
+        navigation(app).map((item) => (
+          <UnstyledLink
+            key={item.name}
+            href={item.href}
             className={clsxm(
-              item.current
-                ? 'text-gray-600'
-                : 'text-gray-400 group-hover:text-gray-600',
-              'mr-4 h-5 w-5 flex-shrink-0',
+              item.href.tag === route.tag
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+              'group flex items-center rounded-md px-2 py-2 text-base font-medium',
             )}
-            aria-hidden="true"
-          />
-          {item.name}
-        </UnstyledLink>
+          >
+            <item.icon
+              className={clsxm(
+                item.href.tag === route.tag
+                  ? 'text-gray-500'
+                  : 'text-gray-400 group-hover:text-gray-500',
+                'mr-4 h-6 w-6 flex-shrink-0',
+              )}
+              aria-hidden="true"
+            />
+            {item.name}
+          </UnstyledLink>
+        ))
       ) : (
-        <button
-          key={item.name}
-          onClick={item.action}
-          className={clsxm(
-            'text-gray-400 hover:bg-gray-50 hover:text-gray-700',
-            'group flex w-full items-center rounded-md px-2 py-2 text-base font-medium',
-          )}
-        >
-          <item.icon
+        <>
+          <Skeleton className="h-10 w-full rounded-md p-2" />
+          <Skeleton className="h-10 w-full rounded-md p-2" />
+          <Skeleton className="h-10 w-full rounded-md p-2" />
+          <Skeleton className="h-10 w-full rounded-md p-2" />
+        </>
+      )}
+    </>
+  );
+};
+
+const SecondaryNav = ({onLogout}: {onLogout: () => void}) => {
+  const route = useCurrentRoute();
+
+  return (
+    <div
+      className="space-y-1 px-2"
+      role="group"
+      aria-labelledby="projects-headline"
+    >
+      {secondaryNavigation(onLogout).map((item) =>
+        item.type === 'link' ? (
+          <UnstyledLink
+            key={item.name}
+            href={item.href}
             className={clsxm(
-              'text-gray-400 group-hover:text-gray-600',
-              'mr-4 h-5 w-5 flex-shrink-0',
+              item.href.tag === route.tag
+                ? 'bg-gray-100 text-gray-700'
+                : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700',
+              'group flex items-center rounded-md px-2 py-2 text-base font-medium',
             )}
-            aria-hidden="true"
-          />
-          {item.name}
-        </button>
-      ),
-    )}
-  </div>
-);
+          >
+            <item.icon
+              className={clsxm(
+                item.href.tag === route.tag
+                  ? 'text-gray-600'
+                  : 'text-gray-400 group-hover:text-gray-600',
+                'mr-4 h-5 w-5 flex-shrink-0',
+              )}
+              aria-hidden="true"
+            />
+            {item.name}
+          </UnstyledLink>
+        ) : (
+          <button
+            key={item.name}
+            onClick={item.action}
+            className={clsxm(
+              'text-gray-400 hover:bg-gray-50 hover:text-gray-700',
+              'group flex w-full items-center rounded-md px-2 py-2 text-base font-medium',
+            )}
+          >
+            <item.icon
+              className={clsxm(
+                'text-gray-400 group-hover:text-gray-600',
+                'mr-4 h-5 w-5 flex-shrink-0',
+              )}
+              aria-hidden="true"
+            />
+            {item.name}
+          </button>
+        ),
+      )}
+    </div>
+  );
+};
 
 const Profile = ({username, avatar}: {username: string; avatar?: string}) => (
   <div className="mt-4 flex flex-shrink-0 border-t border-gray-200 p-4">

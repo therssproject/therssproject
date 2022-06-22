@@ -5,6 +5,7 @@ import {useSessionGuard} from '@/lib/routing';
 
 import {Props as SeoProps, Seo} from '@/components/Seo';
 
+import {Applications} from './Applications';
 import {Dashboard} from './Dashboard';
 
 type Props =
@@ -17,6 +18,13 @@ type Props =
       variant: 'dashboard';
       title: string;
       children: ReactNode;
+      goToAppOnLoad: boolean;
+      seo?: SeoProps;
+    }
+  | {
+      variant: 'applications';
+      title: string;
+      children: ReactNode;
       seo?: SeoProps;
     };
 
@@ -24,13 +32,8 @@ export const Layout = (props: Props) => {
   useSessionGuard();
 
   return match(props)
-    .with({variant: 'dashboard'}, (props) => (
-      <Dashboard
-        title={props.title}
-        seo={props.seo}
-        children={props.children}
-      />
-    ))
+    .with({variant: 'dashboard'}, (props) => <Dashboard {...props} />)
+    .with({variant: 'applications'}, (props) => <Applications {...props} />)
     .with({variant: 'clean'}, (props) => (
       <>
         <Seo {...props.seo} />
