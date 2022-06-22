@@ -1,6 +1,7 @@
 pub mod application;
 pub mod endpoint;
 pub mod feed;
+pub mod key;
 pub mod subscription;
 pub mod user;
 
@@ -36,7 +37,8 @@ pub fn create_router() -> Router {
                 "/:application_id",
                 Router::new()
                   .merge(subscription::create_router())
-                  .merge(endpoint::create_router()),
+                  .merge(endpoint::create_router())
+                  .merge(key::create_router()),
               )
               // Authorize the user before allowing access to the application
               // routes.
