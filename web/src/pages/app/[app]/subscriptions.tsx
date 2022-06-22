@@ -8,7 +8,7 @@ import {Layout} from '@/components/layout/Layout';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppSubs: NextPageWithLayout = () => {
-  const route = useRouteOfType('AppLogs');
+  const route = useRouteOfType('AppSubs');
 
   return (
     <div className="space-y-4">
