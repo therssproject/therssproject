@@ -1,3 +1,4 @@
+import {identity} from 'fp-ts/lib/function';
 import {NextPage} from 'next';
 import {AppProps} from 'next/app';
 import {ReactElement, ReactNode} from 'react';
@@ -15,7 +16,11 @@ type AppPropsWithLayout = AppProps & {
 };
 
 function MyApp({Component, pageProps}: AppPropsWithLayout) {
-  return Component.getLayout(<Component {...pageProps} />);
+  // Although all pages should have `getLayout`, Next also renders other pages
+  // (like the 500 one) which do not have it.
+  const getLayout = Component.getLayout ?? identity;
+
+  return getLayout(<Component {...pageProps} />);
 }
 
 export default MyApp;
