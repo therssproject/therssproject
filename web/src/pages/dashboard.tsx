@@ -1,60 +1,24 @@
-import {pipe} from 'fp-ts/function';
-import * as O from 'fp-ts/Option';
-
-import {useAtom} from '@/lib/jotai';
-
 import {Layout} from '@/components/layout/Layout';
+import {Skeleton} from '@/components/Skeleton';
 
-import {SessionAtom} from '@/models/user';
+import {NextPageWithLayout} from './_app';
 
-const Dashboard = () => {
-  const [session] = useAtom(SessionAtom);
+const Dashboard: NextPageWithLayout = () => (
+  <Skeleton className="h-96 w-full rounded-lg" />
+);
 
-  return (
-    <Layout
-      variant="dashboard"
-      title="Components"
-      seo={{
-        templateTitle: 'Components',
-        description: 'Pre-built components with awesome default',
-      }}
-    >
-      <div className="space-y-4">
-        <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
-          <div className="p-4">
-            {pipe(
-              session,
-              O.map((u) => ({...u, access_token: u.access_token.slice(0, 10)})),
-              O.match(
-                () => <div>Logged out ...</div>,
-                (user) => (
-                  <div>
-                    <pre>{JSON.stringify(user, null, 2)}</pre>
-                  </div>
-                ),
-              ),
-            )}
-          </div>
-        </div>
-        <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
-          <div className="p-4">
-            {pipe(
-              session,
-              O.map((u) => ({...u, access_token: u.access_token.slice(0, 10)})),
-              O.match(
-                () => <div>Logged out ...</div>,
-                (user) => (
-                  <div>
-                    <pre>{JSON.stringify(user, null, 2)}</pre>
-                  </div>
-                ),
-              ),
-            )}
-          </div>
-        </div>
-      </div>
-    </Layout>
-  );
-};
+Dashboard.getLayout = (page) => (
+  <Layout
+    variant="dashboard"
+    title="RSS"
+    goToAppOnLoad
+    seo={{
+      templateTitle: 'RSS',
+      description: 'Pre-built components with awesome default',
+    }}
+  >
+    {page}
+  </Layout>
+);
 
 export default Dashboard;
