@@ -16,7 +16,7 @@ use crate::tests::utils::create_user_token;
 use crate::tests::utils::setup_application;
 
 lazy_static! {
-  static ref FIXTURE: &'static str = include_str!("../fixture/reddit_atom.xml");
+  static ref FIXTURE: &'static str = include_str!("../../fixture/reddit_atom.xml");
 }
 
 #[test]

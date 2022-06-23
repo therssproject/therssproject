@@ -21,7 +21,7 @@ use crate::models::subscription::{PublicSubscription, Subscription};
 pub fn create_router() -> Router {
   Router::new()
     .route("/subscriptions", post(create_subscription))
-    .route("/subscriptions", get(query_subscription))
+    .route("/subscriptions", get(query_subscriptions))
     .route("/subscriptions/:id", get(get_subscription_by_id))
     .route("/subscriptions/:id", delete(remove_subscription_by_id))
 }
@@ -63,7 +63,7 @@ async fn create_subscription(
   Ok(Json(res))
 }
 
-async fn query_subscription(
+async fn query_subscriptions(
   Extension(application): Extension<Application>,
 ) -> Result<Json<Vec<PublicSubscription>>, Error> {
   let application_id = application.id.unwrap();
