@@ -2,9 +2,11 @@ use wither::bson::oid::ObjectId;
 
 use crate::errors::Error;
 use crate::lib::database_model::ModelExt;
+use crate::lib::date;
 use crate::lib::token;
 use crate::models::application::Application;
 use crate::models::endpoint::Endpoint;
+use crate::models::feed::{Feed, FeedType};
 use crate::models::key::Key;
 use crate::models::user::hash_password;
 use crate::models::user::User;
@@ -52,4 +54,22 @@ pub async fn setup_application(user: &ObjectId) -> Result<(Application, Key, End
   let key = Key::create(key).await?;
 
   Ok((application, key, endpoint))
+}
+
+pub async fn create_feed() -> Result<Feed, Error> {
+  let now = date::now();
+  let feed = Feed {
+    id: None,
+    public_id: "PUBLIC_ID_FOO".to_string(),
+    feed_type: FeedType::RSS2,
+    url: "https://www.reddit.com/r/rust/.rss".to_string(),
+    title: Some("The Rust Programming Language".to_string()),
+    description: Some("The official subreddit for the Rust programming language".to_string()),
+    synced_at: now,
+    updated_at: now,
+    created_at: now,
+  };
+
+  let feed = Feed::create(feed).await?;
+  Ok(feed)
 }
