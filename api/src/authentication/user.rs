@@ -1,4 +1,3 @@
-// TODO: Move this logic and token logic to a separate authentication file.
 use axum::{
   async_trait,
   extract::{FromRequest, RequestParts, TypedHeader},
