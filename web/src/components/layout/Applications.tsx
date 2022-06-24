@@ -155,7 +155,7 @@ export const Applications = ({title, children, seo}: Props) => {
                   <Breadcrumbs />
 
                   <h1 className="mt-4 text-3xl font-semibold text-gray-700">
-                    {selected?.label} {title}
+                    {title}
                   </h1>
                 </div>
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
