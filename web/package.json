@@ -20,6 +20,10 @@
     "postbuild": "next-sitemap",
     "prepare": "cd ../ && husky install ./rss-web/.husky"
   },
+  "engines": {
+    "node": "16",
+    "yarn": "1.22"
+  },
   "dependencies": {
     "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.6",
