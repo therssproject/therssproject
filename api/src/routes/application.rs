@@ -1,5 +1,5 @@
 use axum::{
-  extract::Path,
+  extract::{Extension, Path},
   routing::{delete, get, post},
   Json, Router,
 };
@@ -23,7 +23,7 @@ pub fn create_router() -> Router {
 }
 
 async fn create_application(
-  user: UserFromToken,
+  Extension(user): Extension<UserFromToken>,
   Json(payload): Json<CreateApplication>,
 ) -> Result<Json<PublicApplication>, Error> {
   let application = Application::new(user.id, payload.name, payload.description);
@@ -33,7 +33,9 @@ async fn create_application(
   Ok(Json(res))
 }
 
-async fn query_application(user: UserFromToken) -> Result<Json<Vec<PublicApplication>>, Error> {
+async fn query_application(
+  Extension(user): Extension<UserFromToken>,
+) -> Result<Json<Vec<PublicApplication>>, Error> {
   let applications = Application::find(doc! { "user": &user.id }, None)
     .await?
     .into_iter()
@@ -45,7 +47,7 @@ async fn query_application(user: UserFromToken) -> Result<Json<Vec<PublicApplica
 }
 
 async fn get_application_by_id(
-  user: UserFromToken,
+  Extension(user): Extension<UserFromToken>,
   Path(id): Path<String>,
 ) -> Result<Json<PublicApplication>, Error> {
   let application_id = to_object_id(id)?;
@@ -66,7 +68,7 @@ async fn get_application_by_id(
 }
 
 async fn remove_application_by_id(
-  user: UserFromToken,
+  Extension(user): Extension<UserFromToken>,
   Path(id): Path<String>,
 ) -> Result<(), Error> {
   let application_id = to_object_id(id)?;

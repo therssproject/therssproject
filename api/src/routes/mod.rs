@@ -10,7 +10,7 @@ use axum::Router;
 
 use crate::authentication::application::AuthenticateApplication;
 use crate::authentication::key::AuthenticateKey;
-use crate::lib::token::UserFromToken;
+use crate::authentication::user::AuthenticateUser;
 
 pub fn create_router() -> Router {
   Router::new()
@@ -50,6 +50,6 @@ pub fn create_router() -> Router {
         )
         // Authenticate the user before allowing access to the application
         // routes.
-        .route_layer(from_extractor::<UserFromToken>()),
+        .route_layer(from_extractor::<AuthenticateUser>()),
     )
 }
