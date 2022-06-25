@@ -21,7 +21,8 @@ impl ModelExt for Webhook {
 
 // TODO: Add response status to the webhook model.
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
-#[model(index(keys = r#"doc!{ "application": 1, "subscription": 1 }"#))]
+#[model(index(keys = r#"doc!{ "application": 1, "created_at": 1 }"#))]
+#[model(index(keys = r#"doc!{ "application": 1, "subscription": 1, "created_at": 1 }"#))]
 pub struct Webhook {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
