@@ -8,6 +8,7 @@ use serde::Deserialize;
 use serde_json::Value as JsonValue;
 use std::collections::HashMap;
 use tracing::debug;
+use wither::mongodb::options::FindOptions;
 
 use crate::errors::Error;
 use crate::errors::NotFound;
@@ -68,7 +69,12 @@ async fn query_subscriptions(
 ) -> Result<Json<Vec<PublicSubscription>>, Error> {
   let application_id = application.id.unwrap();
 
-  let subscriptions = Subscription::find(doc! { "application": &application_id }, None)
+  let options = FindOptions::builder()
+    .sort(doc! { "created_at": -1 })
+    .limit(1_000)
+    .build();
+
+  let subscriptions = Subscription::find(doc! { "application": &application_id }, Some(options))
     .await?
     .into_iter()
     .map(Into::into)

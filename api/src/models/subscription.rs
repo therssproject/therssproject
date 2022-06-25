@@ -19,7 +19,7 @@ impl ModelExt for Subscription {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
-#[model(index(keys = r#"doc!{ "application": 1 }"#))]
+#[model(index(keys = r#"doc!{ "application": 1, "created_at": 1 }"#))]
 #[model(index(keys = r#"doc!{ "feed": 1 }"#))]
 #[model(index(
   keys = r#"doc!{ "scheduled_at": 1 }"#,
