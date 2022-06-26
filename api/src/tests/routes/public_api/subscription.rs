@@ -33,7 +33,7 @@ fn post_subscriptions_with_no_authentication_header() {
 
     let client = reqwest::Client::new();
     let res = client
-      .post("http://localhost:8088/subscriptions")
+      .post("http://localhost:8088/v1/subscriptions")
       .json(&body)
       .send()
       .await
@@ -64,7 +64,7 @@ fn post_subscriptions_with_invalid_authentication_header() {
 
     let client = reqwest::Client::new();
     let res = client
-      .post("http://localhost:8088/subscriptions")
+      .post("http://localhost:8088/v1/subscriptions")
       .header("Authorization", invalid_authentication_header)
       .json(&body)
       .send()
@@ -101,7 +101,7 @@ fn post_subscriptions_with_valid_authentication_header() {
 
     let client = reqwest::Client::new();
     let res = client
-      .post("http://localhost:8088/subscriptions")
+      .post("http://localhost:8088/v1/subscriptions")
       .header("Authorization", key.key)
       .json(&body)
       .send()

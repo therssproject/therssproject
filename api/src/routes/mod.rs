@@ -17,15 +17,18 @@ pub fn create_router() -> Router {
   Router::new()
     // User routes, no authentication required.
     .merge(user::create_router())
-    // Public API routes using API Keys to authenticate the User and
-    // Application.
+    // Public API routes using API Keys to authenticate the user and
+    // application.
     .merge(
-      Router::new()
-        .merge(feed::create_router())
-        .merge(subscription::create_router())
-        .route_layer(from_extractor::<AuthenticateKey>()),
+      Router::new().nest(
+        "/v1",
+        Router::new()
+          .merge(feed::create_router())
+          .merge(subscription::create_router())
+          .route_layer(from_extractor::<AuthenticateKey>()),
+      ),
     )
-    // Private API routes using JWT tokens to authenticate the User. These
+    // Private API routes using JWT tokens to authenticate the user. These
     // routes are used from the dashboard. All these routes are scoped by an
     // application ID.
     .merge(
