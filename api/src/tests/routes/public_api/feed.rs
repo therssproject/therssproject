@@ -20,7 +20,7 @@ fn get_feeds_with_no_authentication_header() {
   with_app(async move {
     let client = reqwest::Client::new();
     let res = client
-      .get("http://localhost:8088/feeds")
+      .get("http://localhost:8088/v1/feeds")
       .query(&[("url", feed_url)])
       .send()
       .await
@@ -43,7 +43,7 @@ fn get_feeds_with_invalid_authentication_header() {
 
     let client = reqwest::Client::new();
     let res = client
-      .get("http://localhost:8088/feeds")
+      .get("http://localhost:8088/v1/feeds")
       .header("Authorization", invalid_authentication_header)
       .query(&[("url", feed_url)])
       .send()
@@ -74,7 +74,7 @@ fn get_feeds_with_valid_authentication_header() {
 
     let client = reqwest::Client::new();
     let res = client
-      .get("http://localhost:8088/feeds")
+      .get("http://localhost:8088/v1/feeds")
       .header("Authorization", key.key)
       .query(&[("url", feed_url)])
       .send()
