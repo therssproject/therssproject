@@ -93,6 +93,7 @@ impl Subscription {
       self.endpoint,
       self.application,
       id,
+      self.feed,
       entries.clone(),
       self.metadata.clone(),
     )

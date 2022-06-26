@@ -7,7 +7,7 @@ use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
 use crate::lib::database_model::ModelExt;
-use crate::lib::date::{now, Date};
+use crate::lib::date::Date;
 use crate::models::entry::PublicEntry;
 
 // This model represents a request sent to the user's endpoint and its response
@@ -21,39 +21,31 @@ impl ModelExt for Webhook {
 
 // TODO: Add response status to the webhook model.
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
-#[model(index(keys = r#"doc!{ "application": 1, "created_at": 1 }"#))]
-#[model(index(keys = r#"doc!{ "application": 1, "subscription": 1, "created_at": 1 }"#))]
+#[model(index(keys = r#"doc!{ "application": 1, "sent_at": 1 }"#))]
+#[model(index(keys = r#"doc!{ "application": 1, "subscription": 1, "sent_at": 1 }"#))]
 pub struct Webhook {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
   pub application: ObjectId,
   pub subscription: ObjectId,
-  pub webhook: ObjectId,
-  // The webhook might change its URL, we want to keep a record of the original
-  // URL where this webhook was sent.
-  pub url: String,
+  pub feed: ObjectId,
+  pub endpoint: ObjectId,
+  pub status: Status,
+  // These are denormalized values. We want to keep a record of the original
+  // endpoint and feed URL, as well as the feed title. This is also useful for
+  // performance reasons.
+  pub endpoint_url: String,
+  pub feed_url: String,
+  pub feed_title: Option<String>,
   pub sent_at: Date,
   pub created_at: Date,
 }
 
-impl Webhook {
-  pub fn new(
-    application: ObjectId,
-    subscription: ObjectId,
-    webhook: ObjectId,
-    url: String,
-    sent_at: Date,
-  ) -> Self {
-    Self {
-      id: None,
-      application,
-      subscription,
-      webhook,
-      url,
-      sent_at,
-      created_at: now(),
-    }
-  }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Status {
+  Sent,
+  Failed,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -63,10 +55,18 @@ pub struct PublicWebhook {
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub application: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
-  pub webhook: ObjectId,
-  pub url: String,
+  pub subscription: ObjectId,
+  #[serde(serialize_with = "serialize_object_id_as_hex_string")]
+  pub feed: ObjectId,
+  #[serde(serialize_with = "serialize_object_id_as_hex_string")]
+  pub endpoint: ObjectId,
+  pub endpoint_url: String,
+  pub feed_url: String,
+  pub feed_title: Option<String>,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub created_at: Date,
+  #[serde(with = "bson_datetime_as_rfc3339_string")]
+  pub sent_at: Date,
 }
 
 impl From<Webhook> for PublicWebhook {
@@ -74,14 +74,19 @@ impl From<Webhook> for PublicWebhook {
     Self {
       id: webhook.id.unwrap(),
       application: webhook.application,
-      webhook: webhook.webhook,
-      url: webhook.url,
+      subscription: webhook.subscription,
+      feed: webhook.feed,
+      endpoint: webhook.endpoint,
+      endpoint_url: webhook.endpoint_url,
+      feed_url: webhook.feed_url,
+      feed_title: webhook.feed_title,
       created_at: webhook.created_at,
+      sent_at: webhook.sent_at,
     }
   }
 }
 
-// This is the actual data sent to the user's endpoint.
+// Webhook payload sent to the user's endpoint.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WebhookSendPayload {
   pub id: String,

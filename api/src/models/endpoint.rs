@@ -1,7 +1,9 @@
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
+use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
+use std::time::Duration;
 use tracing::{debug, error};
 use uuid::Uuid;
 use validator::Validate;
@@ -11,10 +13,20 @@ use wither::Model as WitherModel;
 use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
+use crate::lib::date;
 use crate::lib::date::{now, Date};
 use crate::models::entry::Entry;
+use crate::models::feed::Feed;
+use crate::models::webhook::Status;
 use crate::models::webhook::Webhook;
 use crate::models::webhook::WebhookSendPayload;
+
+lazy_static! {
+  static ref CLIENT: reqwest::Client = reqwest::Client::builder()
+    .timeout(Duration::from_secs(5))
+    .build()
+    .expect("Failed to create a reqwest client");
+}
 
 impl ModelExt for Endpoint {
   type T = Endpoint;
@@ -56,43 +68,75 @@ impl Endpoint {
   // as an argument in this function. The responsability of this function is
   // just to send the webhook.
   pub async fn send_webhook(
-    id: ObjectId,
+    endpoint: ObjectId,
     application: ObjectId,
     subscription: ObjectId,
+    feed: ObjectId,
     entries: Vec<Entry>,
     metadata: Option<Json>,
   ) -> Result<Webhook, Error> {
     debug!("Notifying endpoint");
 
-    let endpoint = Self::find_by_id(&id).await?;
+    let endpoint_id = endpoint;
+    let endpoint = Self::find_by_id(&endpoint_id).await?;
     let endpoint = match endpoint {
       Some(endpoint) => endpoint,
       None => {
-        error!("Failed to notify. Endpoint with ID {} not found", &id);
+        error!(
+          "Failed to notify. Endpoint with ID {} not found",
+          &endpoint_id
+        );
         return Err(Error::NotFound(NotFound::new("endpoint")));
       }
     };
 
-    let client = reqwest::Client::new();
-    let url = endpoint.url;
+    let feed_id = feed;
+    let feed = Feed::find_by_id(&feed_id).await?;
+    let feed = match feed {
+      Some(feed) => feed,
+      None => {
+        error!("Failed to notify. Feed with ID {} not found", &feed_id);
+        return Err(Error::NotFound(NotFound::new("feed")));
+      }
+    };
+
+    let endpoint_url = endpoint.url;
     let public_id = Uuid::new_v4();
 
     let payload = WebhookSendPayload {
-      // TODO: Update this ID. I think this should be our internal ID to better
-      // identify and debug webhooks.
       id: public_id.to_string(),
       application,
       subscription,
-      endpoint: id,
+      endpoint: endpoint_id,
       entries: entries.into_iter().map(Into::into).collect(),
       metadata,
     };
 
     let sent_at = now();
-    // TODO: Store the request response status.
-    let _res = client.post(&url).json(&payload).send().await.unwrap();
+    let res = CLIENT.post(&endpoint_url).json(&payload).send().await;
 
-    let webhook = Webhook::new(endpoint.application, subscription, id, url.clone(), sent_at);
+    let status = match res {
+      Err(_) => Status::Failed,
+      Ok(res) => match res.error_for_status() {
+        Ok(_) => Status::Sent,
+        Err(_) => Status::Failed,
+      },
+    };
+
+    let webhook = Webhook {
+      id: None,
+      status,
+      application,
+      subscription,
+      feed: feed_id,
+      endpoint: endpoint_id,
+      endpoint_url,
+      feed_url: feed.url,
+      feed_title: feed.title,
+      sent_at,
+      created_at: date::now(),
+    };
+
     let webhook = Webhook::create(webhook).await?;
 
     Ok(webhook)
