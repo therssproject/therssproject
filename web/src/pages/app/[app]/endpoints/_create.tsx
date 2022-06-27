@@ -54,7 +54,7 @@ export const Create = ({app, open, onClose}: Props) => {
 
     await run();
 
-    setLoading(true);
+    setLoading(false);
   };
 
   return (
