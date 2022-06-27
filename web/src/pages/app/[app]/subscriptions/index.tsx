@@ -1,6 +1,7 @@
 import {
   CalendarIcon,
   LocationMarkerIcon,
+  PlusIcon,
   UsersIcon,
 } from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
@@ -9,16 +10,19 @@ import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
 import {useStableEffect} from 'fp-ts-react-stable-hooks';
+import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
+import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Skeleton} from '@/components/Skeleton';
 
 import {eqApplication, useCurrentApp} from '@/models/application';
+import {AppEndpointsAtom} from '@/models/endpoint';
 import {
   AppSubscriptionsAtom,
   fetchSubscriptions,
@@ -26,9 +30,15 @@ import {
 } from '@/models/subscription';
 import {NextPageWithLayout} from '@/pages/_app';
 
+import {Create} from './_create';
+
 const AppSubs: NextPageWithLayout = () => {
   const currentApp = useCurrentApp();
+  const [appEndpoints] = useAtom(AppEndpointsAtom);
   const [appSubscriptions, setSubscriptions] = useAtom(AppSubscriptionsAtom);
+  const [showForm, setShowForm] = useState(false);
+
+  const onOpen = () => setShowForm(true);
 
   useStableEffect(
     () => {
@@ -66,40 +76,57 @@ const AppSubs: NextPageWithLayout = () => {
     currentApp,
     O.match(
       () => null,
-      (_app) =>
-        pipe(
-          appSubscriptions,
-          RD.match({
-            notAsked: () => <Skeleton className="h-48 w-full rounded-lg" />,
-            loading: () => <Skeleton className="h-48 w-full rounded-lg" />,
-            success: (endpoints) =>
-              pipe(
-                endpoints,
-                A.match(
-                  () => (
-                    <div className="rounded-lg bg-yellow-50 p-4 text-gray-700">
-                      No endpoints created yet ...
-                    </div>
-                  ),
-                  (endpoints) => (
-                    <div className="overflow-hidden bg-white shadow sm:rounded-md">
-                      <ul role="list" className="divide-y divide-gray-200">
-                        {endpoints.map((endpoint) => (
-                          <SubscriptionItem
-                            key={endpoint.id}
-                            endpoint={endpoint}
-                          />
-                        ))}
-                      </ul>
-                    </div>
+      (app) => (
+        <div className="space-y-8">
+          <Create
+            app={app.id}
+            endpoints={pipe(appEndpoints, RD.toOption, O.toUndefined) ?? []}
+            open={showForm}
+            onClose={() => setShowForm(false)}
+          />
+
+          <div className="flex w-full justify-end">
+            {/* TODO: only show if there are endpoints */}
+            <Button onClick={onOpen}>
+              <PlusIcon className="h-4 w-4" /> Add subscription
+            </Button>
+          </div>
+
+          {pipe(
+            appSubscriptions,
+            RD.match({
+              notAsked: () => <Skeleton className="h-48 w-full rounded-lg" />,
+              loading: () => <Skeleton className="h-48 w-full rounded-lg" />,
+              success: (endpoints) =>
+                pipe(
+                  endpoints,
+                  A.match(
+                    () => (
+                      <div className="rounded-lg bg-yellow-50 p-4 text-gray-700">
+                        No subscriptions created yet ...
+                      </div>
+                    ),
+                    (endpoints) => (
+                      <div className="overflow-hidden bg-white shadow sm:rounded-md">
+                        <ul role="list" className="divide-y divide-gray-200">
+                          {endpoints.map((endpoint) => (
+                            <SubscriptionItem
+                              key={endpoint.id}
+                              endpoint={endpoint}
+                            />
+                          ))}
+                        </ul>
+                      </div>
+                    ),
                   ),
                 ),
+              failure: (msg) => (
+                <div className="rounded-lg bg-red-50 p-4">{msg}</div>
               ),
-            failure: (msg) => (
-              <div className="rounded-lg bg-red-50 p-4">{msg}</div>
-            ),
-          }),
-        ),
+            }),
+          )}
+        </div>
+      ),
     ),
   );
 };

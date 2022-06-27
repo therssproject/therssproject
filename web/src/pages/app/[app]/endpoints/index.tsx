@@ -25,7 +25,7 @@ import {eqApplication, useCurrentApp} from '@/models/application';
 import {AppEndpointsAtom, Endpoint, fetchEndpoints} from '@/models/endpoint';
 import {NextPageWithLayout} from '@/pages/_app';
 
-import {CreateEndpoint} from './_createEndpoint';
+import {Create} from './_create';
 
 const AppEndpoints: NextPageWithLayout = () => {
   const currentApp = useCurrentApp();
@@ -72,7 +72,7 @@ const AppEndpoints: NextPageWithLayout = () => {
       () => null,
       (app) => (
         <div className="space-y-8">
-          <CreateEndpoint
+          <Create
             app={app.id}
             open={showForm}
             onClose={() => setShowForm(false)}
