@@ -71,7 +71,7 @@ async fn query_subscriptions(
 
   let options = FindOptions::builder()
     .sort(doc! { "created_at": -1 })
-    .limit(100)
+    .limit(50)
     .build();
 
   let subscriptions = Subscription::find(doc! { "application": &application_id }, Some(options))

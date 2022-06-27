@@ -19,7 +19,7 @@ async fn query_webhooks(
 
   let options = FindOptions::builder()
     .sort(doc! { "created_at": -1 })
-    .limit(100)
+    .limit(50)
     .build();
 
   let webhooks = Webhook::find(doc! { "application": &application_id }, Some(options))
