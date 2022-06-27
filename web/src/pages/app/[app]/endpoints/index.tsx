@@ -21,11 +21,10 @@ import {Layout} from '@/components/layout/Layout';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Skeleton} from '@/components/Skeleton';
 
+import {Create} from '@/features/CreateEndpoint';
 import {eqApplication, useCurrentApp} from '@/models/application';
 import {AppEndpointsAtom, Endpoint, fetchEndpoints} from '@/models/endpoint';
 import {NextPageWithLayout} from '@/pages/_app';
-
-import {Create} from './_create';
 
 const AppEndpoints: NextPageWithLayout = () => {
   const currentApp = useCurrentApp();

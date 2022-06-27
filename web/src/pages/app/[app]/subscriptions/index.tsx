@@ -21,6 +21,7 @@ import {Layout} from '@/components/layout/Layout';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Skeleton} from '@/components/Skeleton';
 
+import {Create} from '@/features/CreateSub';
 import {eqApplication, useCurrentApp} from '@/models/application';
 import {AppEndpointsAtom} from '@/models/endpoint';
 import {
@@ -29,8 +30,6 @@ import {
   Subscription,
 } from '@/models/subscription';
 import {NextPageWithLayout} from '@/pages/_app';
-
-import {Create} from './_create';
 
 const AppSubs: NextPageWithLayout = () => {
   const currentApp = useCurrentApp();
