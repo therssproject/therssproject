@@ -1,8 +1,10 @@
 import {sequenceS} from 'fp-ts/Apply';
 import * as A from 'fp-ts/Array';
+import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
 import {fold} from 'fp-ts/Monoid';
 import * as O from 'fp-ts/Option';
+import {Eq as eqString} from 'fp-ts/string';
 import * as t from 'io-ts';
 import * as te from 'io-ts-extra';
 import {atom} from 'jotai';
@@ -21,6 +23,11 @@ export const Application = te.sparseType({
 });
 
 export interface Application extends t.TypeOf<typeof Application> {}
+
+export const eqApplication = pipe(
+  eqString,
+  Eq.contramap(({id}: Application) => id),
+);
 
 export type AppOption =
   | {
