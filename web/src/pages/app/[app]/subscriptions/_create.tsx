@@ -72,7 +72,7 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
 
     await run();
 
-    setLoading(true);
+    setLoading(false);
   };
 
   const endpointValue = watch('endpoint');
@@ -98,7 +98,7 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
           />
 
           <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
-            {/* Title */}
+            {/* Feed URL */}
             <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
               <div>
                 <label
@@ -112,7 +112,7 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
                 <input
                   type="text"
                   id="url"
-                  placeholder="My subscription"
+                  placeholder="https://rss.art19.com/apology-line"
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   {...register('url')}
                 />
@@ -139,6 +139,7 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
                   )}
                   options={endpoints.map(endpointToOption)}
                   onSelect={(endpoint) => setValue('endpoint', endpoint.value)}
+                  // TODO: what about this?
                   {...register('endpoint')}
                 />
               </div>
