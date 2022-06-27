@@ -2,11 +2,11 @@ import {yupResolver} from '@hookform/resolvers/yup';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
-import {useAtom} from 'jotai';
 import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
+import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
