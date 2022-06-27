@@ -22,6 +22,7 @@ import {
   AppOption,
   AppsAtom,
   appToOption,
+  SelectedAppAtom,
   SOON,
 } from '@/models/application';
 import {useSession} from '@/models/user';
@@ -42,11 +43,13 @@ export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
 
   const {session, logOut} = useSession();
   const [apps, setApps] = useAtom(AppsAtom);
+  const [_currentApp, setCurrentApp] = useAtom(SelectedAppAtom);
 
   const onSelect = (opt?: AppOption) => {
     match(opt)
       .with({type: 'app'}, (app) => {
         router.push(formatRoute(Route.appDashboard(app.id)));
+        setCurrentApp(O.some(app as Application));
       })
       .otherwise(noOp);
   };
@@ -84,7 +87,7 @@ export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
   );
 
   const appSelector = {
-    // TODO: use derived atom?
+    // TODO: use SelectedAppAtom instead
     options: pipe(
       apps,
       RD.map(A.map(appToOption)),

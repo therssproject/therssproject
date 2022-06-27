@@ -8,6 +8,8 @@ import * as RD from 'remote-data-ts';
 
 import * as http from '@/lib/fetch';
 
+import {SelectedAppAtom} from './application';
+
 export const Log = te.sparseType({
   id: t.string,
   application: t.string,
@@ -33,17 +35,21 @@ export const LogsAtom = atom<LogsState>({});
 export const fetchLogs = (app: string) =>
   http.get(`/applications/${app}/webhooks`, t.array(Log));
 
-// TODO: app id
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noOp = () => {};
+
 export const AppLogsAtom = atom(
   (get) =>
     pipe(
-      get(LogsAtom),
-      R.lookup('62b03b9d0995bd5115d1321c'),
+      get(SelectedAppAtom),
+      O.chain((app) => R.lookup(app.id)(get(LogsAtom))),
       O.getOrElse((): LoadingLogs => RD.notAsked),
     ),
   (get, set, newLogs: LoadingLogs) =>
-    set(
-      LogsAtom,
-      pipe(get(LogsAtom), R.insertAt('62b03b9d0995bd5115d1321c', newLogs)),
+    pipe(
+      get(SelectedAppAtom),
+      O.match(noOp, (app) =>
+        set(LogsAtom, pipe(get(LogsAtom), R.insertAt(app.id, newLogs))),
+      ),
     ),
 );

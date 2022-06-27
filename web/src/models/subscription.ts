@@ -8,6 +8,8 @@ import * as RD from 'remote-data-ts';
 
 import * as http from '@/lib/fetch';
 
+import {SelectedAppAtom} from './application';
+
 export const Subscription = te.sparseType({
   id: t.string,
   application: t.string,
@@ -30,19 +32,24 @@ export const SubscriptionsAtom = atom<SubscriptionsState>({});
 export const fetchSubscriptions = (app: string) =>
   http.get(`/applications/${app}/subscriptions`, t.array(Subscription));
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noOp = () => {};
+
 export const AppSubscriptionsAtom = atom(
   (get) =>
     pipe(
-      get(SubscriptionsAtom),
-      R.lookup('62b03b9d0995bd5115d1321c'),
+      get(SelectedAppAtom),
+      O.chain((app) => R.lookup(app.id)(get(SubscriptionsAtom))),
       O.getOrElse((): LoadingSubscriptions => RD.notAsked),
     ),
   (get, set, newSubscriptions: LoadingSubscriptions) =>
-    set(
-      SubscriptionsAtom,
-      pipe(
-        get(SubscriptionsAtom),
-        R.insertAt('62b03b9d0995bd5115d1321c', newSubscriptions),
+    pipe(
+      get(SelectedAppAtom),
+      O.match(noOp, (app) =>
+        set(
+          SubscriptionsAtom,
+          pipe(get(SubscriptionsAtom), R.insertAt(app.id, newSubscriptions)),
+        ),
       ),
     ),
 );

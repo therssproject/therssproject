@@ -69,7 +69,8 @@ export const useAppIdFromPath = () =>
     O.map(({app}) => app),
   );
 
-export const useCurrentApp = () => {
+// TODO: should I use this one or the one bellow?
+export const useCurrentApp_ = () => {
   const appId = useAppIdFromPath();
   const [apps, _setApps] = useAtom(AppsAtom);
 
@@ -82,4 +83,12 @@ export const useCurrentApp = () => {
       ),
     ),
   );
+};
+
+export const SelectedAppAtom = atom<O.Option<Application>>(O.none);
+
+export const useCurrentApp = () => {
+  const [currentApp, _setApp] = useAtom(SelectedAppAtom);
+
+  return currentApp;
 };
