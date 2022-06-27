@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "eslint src --fix && yarn format",
-    "lint:strict": "eslint --max-warnings=0 src",
+    "lint:strict": "eslint --max-warnings=2 src",
     "ts:check": "tsc --noEmit",
     "ts:watch": "tsc --noEmit --watch",
     "test:watch": "jest --watch",
