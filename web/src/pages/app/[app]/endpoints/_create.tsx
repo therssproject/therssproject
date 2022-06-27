@@ -24,7 +24,7 @@ type Props = {
   onClose: () => void;
 };
 
-export const CreateEndpoint = ({app, open, onClose}: Props) => {
+export const Create = ({app, open, onClose}: Props) => {
   const [loading, setLoading] = useState(false);
   const {
     register,

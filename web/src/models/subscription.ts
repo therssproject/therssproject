@@ -1,9 +1,12 @@
+import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as R from 'fp-ts/Record';
 import * as t from 'io-ts';
 import * as te from 'io-ts-extra';
 import {atom} from 'jotai';
+import {useAtomCallback} from 'jotai/utils';
+import {useCallback} from 'react';
 import * as RD from 'remote-data-ts';
 
 import * as http from '@/lib/fetch';
@@ -32,6 +35,14 @@ export const SubscriptionsAtom = atom<SubscriptionsState>({});
 export const fetchSubscriptions = (app: string) =>
   http.get(`/applications/${app}/subscriptions`, t.array(Subscription));
 
+export type CreateSubscription = {
+  url: string;
+  endpoint: string;
+};
+
+export const createSubscription = (app: string, body: CreateSubscription) =>
+  http.post(`/applications/${app}/subscriptions`, body, Subscription);
+
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
 
@@ -53,3 +64,24 @@ export const AppSubscriptionsAtom = atom(
       ),
     ),
 );
+
+export const useSetNewSubscription = () =>
+  useAtomCallback(
+    useCallback(
+      (get, set, newSub: Subscription) =>
+        pipe(
+          get(SelectedAppAtom),
+          O.match(noOp, (app) =>
+            set(
+              SubscriptionsAtom,
+              pipe(
+                get(SubscriptionsAtom),
+                R.modifyAt(app.id, RD.map(A.append(newSub))),
+                O.getOrElse(() => get(SubscriptionsAtom)),
+              ),
+            ),
+          ),
+        ),
+      [],
+    ),
+  );
