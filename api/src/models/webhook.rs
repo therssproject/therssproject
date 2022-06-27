@@ -60,6 +60,7 @@ pub struct PublicWebhook {
   pub feed: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub endpoint: ObjectId,
+  pub status: Status,
   pub endpoint_url: String,
   pub feed_url: String,
   pub feed_title: Option<String>,
@@ -77,6 +78,7 @@ impl From<Webhook> for PublicWebhook {
       subscription: webhook.subscription,
       feed: webhook.feed,
       endpoint: webhook.endpoint,
+      status: webhook.status,
       endpoint_url: webhook.endpoint_url,
       feed_url: webhook.feed_url,
       feed_title: webhook.feed_title,
