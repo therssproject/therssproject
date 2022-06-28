@@ -7,6 +7,7 @@ import {
 import * as A from 'fp-ts/Array';
 import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
+import * as NEA from 'fp-ts/NonEmptyArray';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
 import {useStableEffect} from 'fp-ts-react-stable-hooks';
@@ -18,6 +19,7 @@ import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
+import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Skeleton} from '@/components/Skeleton';
 
@@ -51,7 +53,7 @@ const AppSubs: NextPageWithLayout = () => {
         setSubscriptions(RD.loading);
       }
 
-      pipe(
+      const run = pipe(
         fetchSubscriptions(app.id),
         TE.match(
           (err) => {
@@ -64,8 +66,9 @@ const AppSubs: NextPageWithLayout = () => {
             setSubscriptions(RD.success(endpoints));
           },
         ),
-        (run) => run(),
       );
+
+      run();
     },
     [currentApp],
     Eq.tuple(O.getEq(eqApplication)),
@@ -77,19 +80,40 @@ const AppSubs: NextPageWithLayout = () => {
       () => null,
       (app) => (
         <div className="space-y-8">
-          <Create
-            app={app.id}
-            endpoints={pipe(appEndpoints, RD.toOption, O.toUndefined) ?? []}
-            open={showForm}
-            onClose={() => setShowForm(false)}
-          />
+          {pipe(
+            appEndpoints,
+            RD.toOption,
+            O.chain(NEA.fromArray),
+            O.match(
+              () => (
+                <div className="flex w-full justify-end">
+                  <div className="pb-4 text-gray-600">
+                    No endpoints created yet, please{' '}
+                    <PrimaryLink href={Route.appEndpoints(app.id, true)}>
+                      add an endpoint
+                    </PrimaryLink>{' '}
+                    first.
+                  </div>
+                </div>
+              ),
+              (endpoints) => (
+                <>
+                  <Create
+                    app={app.id}
+                    endpoints={endpoints}
+                    open={showForm}
+                    onClose={() => setShowForm(false)}
+                  />
 
-          <div className="flex w-full justify-end">
-            {/* TODO: only show if there are endpoints */}
-            <Button onClick={onOpen}>
-              <PlusIcon className="h-4 w-4" /> Add subscription
-            </Button>
-          </div>
+                  <div className="flex w-full justify-end">
+                    <Button onClick={onOpen}>
+                      <PlusIcon className="h-4 w-4" /> Add subscription
+                    </Button>
+                  </div>
+                </>
+              ),
+            ),
+          )}
 
           {pipe(
             appSubscriptions,

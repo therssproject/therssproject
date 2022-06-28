@@ -10,11 +10,13 @@ import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
 import {useStableEffect} from 'fp-ts-react-stable-hooks';
-import {useState} from 'react';
+import {useRouter} from 'next/router';
+import {useEffect, useState} from 'react';
 import * as RD from 'remote-data-ts';
 
 import {useAtom} from '@/lib/jotai';
-import {Route} from '@/lib/routes';
+import {format as formatRoute, Route} from '@/lib/routes';
+import {useRouteOfType} from '@/lib/routing';
 
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
@@ -26,10 +28,32 @@ import {eqApplication, useCurrentApp} from '@/models/application';
 import {AppEndpointsAtom, Endpoint, fetchEndpoints} from '@/models/endpoint';
 import {NextPageWithLayout} from '@/pages/_app';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noOp = () => {};
+
 const AppEndpoints: NextPageWithLayout = () => {
+  const route = useRouteOfType('AppEndpoints');
+  const router = useRouter();
   const currentApp = useCurrentApp();
   const [appEndpoints, setEndpoints] = useAtom(AppEndpointsAtom);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(() =>
+    Boolean(O.toUndefined(route)?.create),
+  );
+
+  // Clear the `?create=true` from the URL
+  useEffect(
+    () => {
+      pipe(
+        route,
+        O.filter((r) => r.create),
+        O.match(noOp, (route) => {
+          router.replace(formatRoute(Route.appEndpoints(route.app, false)));
+        }),
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const onOpen = () => setShowForm(true);
 
@@ -127,7 +151,7 @@ const EndpointItem = ({endpoint}: {endpoint: Endpoint}) => {
   return (
     <li>
       <UnstyledLink
-        href={Route.appEndpoints(endpoint.application)}
+        href={Route.appEndpoints(endpoint.application, false)}
         className="block hover:bg-gray-50"
       >
         <div className="px-4 py-4 sm:px-6">
