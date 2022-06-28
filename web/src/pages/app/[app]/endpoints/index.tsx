@@ -5,11 +5,8 @@ import {
   UsersIcon,
 } from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
-import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
-import * as TE from 'fp-ts/TaskEither';
-import {useStableEffect} from 'fp-ts-react-stable-hooks';
 import {useRouter} from 'next/router';
 import {useEffect, useState} from 'react';
 import * as RD from 'remote-data-ts';
@@ -24,8 +21,8 @@ import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Skeleton} from '@/components/Skeleton';
 
 import {Create} from '@/features/CreateEndpoint';
-import {eqApplication, useCurrentApp} from '@/models/application';
-import {AppEndpointsAtom, Endpoint, fetchEndpoints} from '@/models/endpoint';
+import {useCurrentApp} from '@/models/application';
+import {AppEndpointsAtom, Endpoint} from '@/models/endpoint';
 import {NextPageWithLayout} from '@/pages/_app';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -35,10 +32,12 @@ const AppEndpoints: NextPageWithLayout = () => {
   const route = useRouteOfType('AppEndpoints');
   const router = useRouter();
   const currentApp = useCurrentApp();
-  const [appEndpoints, setEndpoints] = useAtom(AppEndpointsAtom);
+  const [appEndpoints, _setEndpoints] = useAtom(AppEndpointsAtom);
   const [showForm, setShowForm] = useState(() =>
     Boolean(O.toUndefined(route)?.create),
   );
+
+  const onOpen = () => setShowForm(true);
 
   // Clear the `?create=true` from the URL
   useEffect(
@@ -53,40 +52,6 @@ const AppEndpoints: NextPageWithLayout = () => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
-  );
-
-  const onOpen = () => setShowForm(true);
-
-  useStableEffect(
-    () => {
-      const app = O.toUndefined(currentApp);
-
-      if (!app) {
-        return;
-      }
-
-      if (RD.isNotAsked(appEndpoints) || RD.isFailure(appEndpoints)) {
-        setEndpoints(RD.loading);
-      }
-
-      pipe(
-        fetchEndpoints(app.id),
-        TE.match(
-          (err) => {
-            // eslint-disable-next-line no-console
-            console.log(err);
-
-            setEndpoints(RD.failure('Failed to fetch endpoints'));
-          },
-          (endpoints) => {
-            setEndpoints(RD.success(endpoints));
-          },
-        ),
-        (run) => run(),
-      );
-    },
-    [currentApp],
-    Eq.tuple(O.getEq(eqApplication)),
   );
 
   return pipe(

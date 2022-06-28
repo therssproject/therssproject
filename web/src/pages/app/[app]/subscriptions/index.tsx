@@ -5,12 +5,9 @@ import {
   UsersIcon,
 } from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
-import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
 import * as NEA from 'fp-ts/NonEmptyArray';
 import * as O from 'fp-ts/Option';
-import * as TE from 'fp-ts/TaskEither';
-import {useStableEffect} from 'fp-ts-react-stable-hooks';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
@@ -24,55 +21,18 @@ import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Skeleton} from '@/components/Skeleton';
 
 import {Create} from '@/features/CreateSub';
-import {eqApplication, useCurrentApp} from '@/models/application';
+import {useCurrentApp} from '@/models/application';
 import {AppEndpointsAtom} from '@/models/endpoint';
-import {
-  AppSubscriptionsAtom,
-  fetchSubscriptions,
-  Subscription,
-} from '@/models/subscription';
+import {AppSubscriptionsAtom, Subscription} from '@/models/subscription';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppSubs: NextPageWithLayout = () => {
   const currentApp = useCurrentApp();
   const [appEndpoints] = useAtom(AppEndpointsAtom);
-  const [appSubscriptions, setSubscriptions] = useAtom(AppSubscriptionsAtom);
+  const [appSubscriptions, _setSubscriptions] = useAtom(AppSubscriptionsAtom);
   const [showForm, setShowForm] = useState(false);
 
   const onOpen = () => setShowForm(true);
-
-  useStableEffect(
-    () => {
-      const app = O.toUndefined(currentApp);
-
-      if (!app) {
-        return;
-      }
-
-      if (RD.isNotAsked(appSubscriptions) || RD.isFailure(appSubscriptions)) {
-        setSubscriptions(RD.loading);
-      }
-
-      const run = pipe(
-        fetchSubscriptions(app.id),
-        TE.match(
-          (err) => {
-            // eslint-disable-next-line no-console
-            console.log(err);
-
-            setSubscriptions(RD.failure('Failed to fetch endpoints'));
-          },
-          (endpoints) => {
-            setSubscriptions(RD.success(endpoints));
-          },
-        ),
-      );
-
-      run();
-    },
-    [currentApp],
-    Eq.tuple(O.getEq(eqApplication)),
-  );
 
   return pipe(
     currentApp,

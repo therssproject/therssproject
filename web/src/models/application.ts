@@ -9,9 +9,17 @@ import * as t from 'io-ts';
 import * as te from 'io-ts-extra';
 import {atom} from 'jotai';
 import * as RD from 'remote-data-ts';
+import * as TE from 'fp-ts/TaskEither';
+
+import {useStableEffect} from 'fp-ts-react-stable-hooks';
 
 import {useAtom} from '@/lib/jotai';
 import {useRouteOfType} from '@/lib/routing';
+
+import {AppSubscriptionsAtom, fetchSubscriptions} from './subscription';
+import {AppEndpointsAtom, fetchEndpoints} from './endpoint';
+import {AppLogsAtom, fetchLogs} from './log';
+import {FetchError} from '@/lib/fetch';
 
 export const Application = te.sparseType({
   id: t.string,
@@ -91,4 +99,78 @@ export const useCurrentApp = () => {
   const [currentApp, _setApp] = useAtom(SelectedAppAtom);
 
   return currentApp;
+};
+
+const useFetchOnAppChange = <Data>(
+  fetch: (app: Application) => TE.TaskEither<string, Data>,
+  currentApp: O.Option<Application>,
+  currentData: RD.RemoteData<string, Data>,
+  setData: (data: RD.RemoteData<string, Data>) => void,
+) => {
+  useStableEffect(
+    () => {
+      const app = O.toUndefined(currentApp);
+
+      if (!app) {
+        return;
+      }
+
+      if (RD.isNotAsked(currentData) || RD.isFailure(currentData)) {
+        setData(RD.loading);
+      }
+
+      const run = pipe(
+        fetch(app),
+        TE.match(
+          (msg) => setData(RD.failure(msg)),
+          (data) => setData(RD.success(data)),
+        ),
+      );
+
+      run();
+    },
+    [currentApp],
+    Eq.tuple(O.getEq(eqApplication)),
+  );
+};
+
+export const useFetchAppData = () => {
+  const currentApp = useCurrentApp();
+
+  const [subscriptions, setSubscriptions] = useAtom(AppSubscriptionsAtom);
+  const [endpoints, setEndpoints] = useAtom(AppEndpointsAtom);
+  const [logs, setLogs] = useAtom(AppLogsAtom);
+
+  useFetchOnAppChange(
+    (app) =>
+      pipe(
+        fetchSubscriptions(app.id),
+        TE.mapLeft(() => 'Failed to fetch subscriptions'),
+      ),
+    currentApp,
+    subscriptions,
+    setSubscriptions,
+  );
+
+  useFetchOnAppChange(
+    (app) =>
+      pipe(
+        fetchEndpoints(app.id),
+        TE.mapLeft(() => 'Failed to fetch endpoints'),
+      ),
+    currentApp,
+    endpoints,
+    setEndpoints,
+  );
+
+  useFetchOnAppChange(
+    (app) =>
+      pipe(
+        fetchLogs(app.id),
+        TE.mapLeft(() => 'Failed to fetch logs'),
+      ),
+    currentApp,
+    logs,
+    setLogs,
+  );
 };

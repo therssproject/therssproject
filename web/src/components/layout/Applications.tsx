@@ -33,6 +33,7 @@ import {
   SelectedAppAtom,
   SOON,
   useCurrentApp,
+  useFetchAppData,
 } from '@/models/application';
 import {useSession} from '@/models/user';
 
@@ -62,6 +63,9 @@ export const Applications = ({title, children, seo}: Props) => {
 
   const selected = pipe(useCurrentApp(), O.map(appToOption), O.toUndefined);
 
+  useFetchAppData();
+
+  // TODO: clean this up
   const onSelect = (opt?: AppOption) => {
     match([opt, isInAppsRoute])
       .with([{type: 'app'}, false], ([app]: [AppOption, boolean]) => {
@@ -74,6 +78,7 @@ export const Applications = ({title, children, seo}: Props) => {
       .otherwise(noOp);
   };
 
+  // TODO: clean this up
   useEffect(
     () => {
       if (!RD.isSuccess(apps)) {
