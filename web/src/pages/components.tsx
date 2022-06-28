@@ -11,7 +11,6 @@ import {ButtonLink} from '@/components/links/ButtonLink';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {UnderlineLink} from '@/components/links/UnderlineLink';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
-import {NextImage} from '@/components/NextImage';
 import {Skeleton} from '@/components/Skeleton';
 
 import {NextPageWithLayout} from './_app';
@@ -285,6 +284,7 @@ const ComponentsPage: NextPageWithLayout = () => {
               <ButtonLink href={Route.notFound}>Visit the 404 page</ButtonLink>
             </div>
           </li>
+          {/* TODO find the way to enable and use this!
           <li className="space-y-2">
             <h2 className="text-lg md:text-xl">Next Image</h2>
             <p className={clsx('!mt-1 text-sm', textColor)}>
@@ -298,6 +298,7 @@ const ComponentsPage: NextPageWithLayout = () => {
               alt="Icon"
             />
           </li>
+          */}
           <li className="space-y-2">
             <h2 className="text-lg md:text-xl">Skeleton</h2>
             <p className={clsx('!mt-1 text-sm', textColor)}>
