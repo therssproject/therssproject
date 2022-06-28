@@ -5,6 +5,8 @@ import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
+import {Button} from '@/components/buttons/Button';
+import {TextField} from '@/components/inputs/TextField';
 import {SlideOver} from '@/components/SlideOver';
 
 import {
@@ -29,11 +31,18 @@ export const Create = ({app, open, onClose}: Props) => {
   const {
     register,
     handleSubmit,
-    // TODO: show errors when InlineField component is created
-    // formState: {error},
+    reset,
+    formState: {errors},
   } = useForm<CreateEndpointBody>({resolver: yupResolver(CreateEndpoint_)});
 
   const setNewEndpoint = useSetNewEndpoint();
+
+  const doClose = () => {
+    if (!loading) {
+      onClose();
+      reset();
+    }
+  };
 
   const onSubmit: SubmitHandler<CreateEndpointBody> = async (body) => {
     setLoading(true);
@@ -47,7 +56,7 @@ export const Create = ({app, open, onClose}: Props) => {
         },
         (newEndpoint) => {
           setNewEndpoint(newEndpoint);
-          onClose();
+          doClose();
         },
       ),
     );
@@ -58,14 +67,7 @@ export const Create = ({app, open, onClose}: Props) => {
   };
 
   return (
-    <SlideOver
-      open={open}
-      onClose={() => {
-        if (!loading) {
-          onClose();
-        }
-      }}
-    >
+    <SlideOver open={open} onClose={doClose}>
       <form
         className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl"
         onSubmit={handleSubmit(onSubmit)}
@@ -79,45 +81,29 @@ export const Create = ({app, open, onClose}: Props) => {
 
           <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
             {/* Title */}
-            <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
-              <div>
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium text-gray-900 sm:mt-px sm:pt-2"
-                >
-                  Title
-                </label>
-              </div>
-              <div className="sm:col-span-2">
-                <input
-                  type="text"
-                  id="title"
-                  placeholder="My endpoint"
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  {...register('title')}
-                />
-              </div>
+            <div className="p-6">
+              <TextField
+                label="Title"
+                input={{
+                  id: 'title',
+                  placeholder: 'My title',
+                  variant: errors.title ? 'error' : 'default',
+                  ...register('title'),
+                }}
+              />
             </div>
 
             {/* URL */}
-            <div className="space-y-1 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
-              <div>
-                <label
-                  htmlFor="url"
-                  className="block text-sm font-medium text-gray-900 sm:mt-px sm:pt-2"
-                >
-                  Endpoint URL
-                </label>
-              </div>
-              <div className="sm:col-span-2">
-                <input
-                  type="text"
-                  id="url"
-                  placeholder="https://sub.domain.com/webhooks/rss"
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  {...register('url')}
-                />
-              </div>
+            <div className="p-6">
+              <TextField
+                label="Webhook Endpoint URL"
+                input={{
+                  id: 'url',
+                  placeholder: 'https://sub.domain.com/webhooks/rss',
+                  variant: errors.url ? 'error' : 'default',
+                  ...register('url'),
+                }}
+              />
             </div>
           </div>
         </div>
@@ -125,21 +111,17 @@ export const Create = ({app, open, onClose}: Props) => {
         {/* Action buttons */}
         <div className="flex-shrink-0 border-t border-gray-200 px-4 py-5 sm:px-6">
           <div className="flex justify-end space-x-3">
-            <button
+            <Button
               type="button"
-              className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              onClick={onClose}
+              variant="outline"
+              onClick={doClose}
               disabled={loading}
             >
               Cancel
-            </button>
-            <button
-              type="submit"
-              className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              disabled={loading}
-            >
+            </Button>
+            <Button type="submit" disabled={loading}>
               Create
-            </button>
+            </Button>
           </div>
         </div>
       </form>

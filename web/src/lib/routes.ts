@@ -18,7 +18,7 @@ type ResetPasswordConfirm = {tag: 'ResetPasswordConfirm'; token: string};
 // Private (logged-in only)
 type Dashboard = {tag: 'Dashboard'};
 type AppDashboard = {tag: 'AppDashboard'; app: string};
-type AppEndpoints = {tag: 'AppEndpoints'; app: string};
+type AppEndpoints = {tag: 'AppEndpoints'; app: string; create: boolean};
 type AppSubs = {tag: 'AppSubs'; app: string};
 type AppLogs = {tag: 'AppLogs'; app: string};
 
@@ -161,7 +161,11 @@ const resetPasswordConfirm = (token: string): Route => ({
 // Private
 const dashboard: Route = {tag: 'Dashboard'};
 const appDashboard = (app: string): Route => ({tag: 'AppDashboard', app});
-const appEndpoints = (app: string): Route => ({tag: 'AppEndpoints', app});
+const appEndpoints = (app: string, create: boolean): Route => ({
+  tag: 'AppEndpoints',
+  app,
+  create,
+});
 const appSubs = (app: string): Route => ({tag: 'AppSubs', app});
 const appLogs = (app: string): Route => ({tag: 'AppLogs', app});
 
@@ -219,6 +223,7 @@ const appDashboardMatch = Routing.lit('app')
 const appEndpointsMatch = Routing.lit('app')
   .then(Routing.str('app'))
   .then(Routing.lit('endpoints'))
+  .then(Routing.query(t.exact(t.partial({create: t.string}))))
   .then(Routing.end);
 const appSubsMatch = Routing.lit('app')
   .then(Routing.str('app'))
@@ -286,7 +291,11 @@ const router = Routing.zero<Route>()
   // Private
   .alt(Match.dashboard.parser.map(() => Route.dashboard))
   .alt(Match.appDashboard.parser.map(({app}) => Route.appDashboard(app)))
-  .alt(Match.appEndpoints.parser.map(({app}) => Route.appEndpoints(app)))
+  .alt(
+    Match.appEndpoints.parser.map(({app, create}) =>
+      Route.appEndpoints(app, create === '1' || create === 'true'),
+    ),
+  )
   .alt(Match.appSubs.parser.map(({app}) => Route.appSubs(app)))
   .alt(Match.appLogs.parser.map(({app}) => Route.appLogs(app)))
 
@@ -330,8 +339,11 @@ export const format = (route: Route): string =>
       Dashboard: () => Routing.format(Match.dashboard.formatter, {}),
       AppDashboard: ({app}) =>
         Routing.format(Match.appDashboard.formatter, {app}),
-      AppEndpoints: ({app}) =>
-        Routing.format(Match.appEndpoints.formatter, {app}),
+      AppEndpoints: ({app, create}) =>
+        Routing.format(Match.appEndpoints.formatter, {
+          app,
+          create: create ? 'true' : undefined,
+        }),
       AppSubs: ({app}) => Routing.format(Match.appSubs.formatter, {app}),
       AppLogs: ({app}) => Routing.format(Match.appLogs.formatter, {app}),
     }),

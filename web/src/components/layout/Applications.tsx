@@ -5,6 +5,7 @@ import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
 import * as t from 'io-ts';
+import {useSetAtom} from 'jotai';
 import {useRouter} from 'next/router';
 import {ReactNode, useEffect, useState} from 'react';
 import * as RD from 'remote-data-ts';
@@ -57,7 +58,7 @@ export const Applications = ({title, children, seo}: Props) => {
 
   const {session, logOut} = useSession();
   const [apps, setApps] = useAtom(AppsAtom);
-  const [_currentApp, setCurrentApp] = useAtom(SelectedAppAtom);
+  const setCurrentApp = useSetAtom(SelectedAppAtom);
 
   const selected = pipe(useCurrentApp(), O.map(appToOption), O.toUndefined);
 
@@ -79,7 +80,7 @@ export const Applications = ({title, children, seo}: Props) => {
         setApps(RD.loading);
       }
 
-      pipe(
+      const run = pipe(
         http.get('/applications', t.array(Application)),
         TE.match(
           () => {
@@ -99,7 +100,9 @@ export const Applications = ({title, children, seo}: Props) => {
             );
           },
         ),
-      )();
+      );
+
+      run();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -189,7 +192,7 @@ const getPages = (app: Application, current: Route): Breadcrumb[] =>
         __: () => [],
 
         AppEndpoints: () => [
-          {name: 'Endpoints', href: Route.appEndpoints(app.id)},
+          {name: 'Endpoints', href: Route.appEndpoints(app.id, false)},
         ],
         AppSubs: () => [{name: 'Subscriptions', href: Route.appSubs(app.id)}],
         AppLogs: () => [{name: 'Logs', href: Route.appLogs(app.id)}],
