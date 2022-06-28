@@ -1,9 +1,6 @@
 import * as A from 'fp-ts/Array';
-import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
-import * as TE from 'fp-ts/TaskEither';
-import {useStableEffect} from 'fp-ts-react-stable-hooks';
 import React from 'react';
 import * as RD from 'remote-data-ts';
 
@@ -13,45 +10,13 @@ import {useAtom} from '@/lib/jotai';
 import {Layout} from '@/components/layout/Layout';
 import {Skeleton} from '@/components/Skeleton';
 
-import {eqApplication, useCurrentApp} from '@/models/application';
-import {AppLogsAtom, fetchLogs, Log} from '@/models/log';
+import {useCurrentApp} from '@/models/application';
+import {AppLogsAtom, Log} from '@/models/log';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppLogs: NextPageWithLayout = () => {
   const currentApp = useCurrentApp();
-  const [appLogs, setLogs] = useAtom(AppLogsAtom);
-
-  useStableEffect(
-    () => {
-      const app = O.toUndefined(currentApp);
-
-      if (!app) {
-        return;
-      }
-
-      if (RD.isNotAsked(appLogs) || RD.isFailure(appLogs)) {
-        setLogs(RD.loading);
-      }
-
-      pipe(
-        fetchLogs(app.id),
-        TE.match(
-          (err) => {
-            // eslint-disable-next-line no-console
-            console.log(err);
-
-            setLogs(RD.failure('Failed to fetch logs'));
-          },
-          (logs) => {
-            setLogs(RD.success(logs));
-          },
-        ),
-        (run) => run(),
-      );
-    },
-    [currentApp],
-    Eq.tuple(O.getEq(eqApplication)),
-  );
+  const [appLogs, _setLogs] = useAtom(AppLogsAtom);
 
   return pipe(
     currentApp,
