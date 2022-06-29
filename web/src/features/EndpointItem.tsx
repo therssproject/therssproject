@@ -1,17 +1,19 @@
-import * as A from 'fp-ts/Array';
 import {LinkIcon, TrashIcon} from '@heroicons/react/outline';
 import {CalendarIcon} from '@heroicons/react/solid';
 import {CheckIcon} from '@heroicons/react/solid';
 import * as date from 'date-fns';
+import * as A from 'fp-ts/Array';
+import {pipe} from 'fp-ts/function';
+import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
-import {Endpoint} from '@/models/endpoint';
-import {IconButton} from '@/components/buttons/IconButton';
-import {useState} from 'react';
 import {useAtom} from '@/lib/jotai';
-import {AppSubscriptionsAtom} from '@/models/subscription';
-import {pipe} from 'fp-ts/function';
+
+import {IconButton} from '@/components/buttons/IconButton';
 import {useToast} from '@/components/Toast';
+
+import {Endpoint} from '@/models/endpoint';
+import {AppSubscriptionsAtom} from '@/models/subscription';
 
 type Props = {
   endpoint: Endpoint;
@@ -28,7 +30,6 @@ export const EndpointItem = ({endpoint, onDelete}: Props) => {
     RD.toNullable(appSubscriptions) ?? [],
     A.some((sub) => sub.endpoint === endpoint.id),
   );
-
 
   const onDeleteClick = () => {
     if (hasSubs) {

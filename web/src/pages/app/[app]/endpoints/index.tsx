@@ -1,8 +1,8 @@
 import {PlusIcon} from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
-import * as TE from 'fp-ts/TaskEither';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
+import * as TE from 'fp-ts/TaskEither';
 import {useRouter} from 'next/router';
 import {useEffect, useState} from 'react';
 import * as RD from 'remote-data-ts';
@@ -14,13 +14,13 @@ import {useRouteOfType} from '@/lib/routing';
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {Skeleton} from '@/components/Skeleton';
+import {useToast} from '@/components/Toast';
 
 import {Create} from '@/features/CreateEndpoint';
 import {EndpointItem} from '@/features/EndpointItem';
 import {SelectedAppAtom} from '@/models/application';
-import {AppEndpointsAtom, Endpoint, deleteEndpoint} from '@/models/endpoint';
+import {AppEndpointsAtom, deleteEndpoint, Endpoint} from '@/models/endpoint';
 import {NextPageWithLayout} from '@/pages/_app';
-import {useToast} from '@/components/Toast';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};

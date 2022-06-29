@@ -1,20 +1,20 @@
-import {RssIcon, CheckIcon, TrashIcon} from '@heroicons/react/outline';
+import {CheckIcon, RssIcon, TrashIcon} from '@heroicons/react/outline';
 import {CalendarIcon} from '@heroicons/react/solid';
 import * as date from 'date-fns';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
+import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
+import {IconButton} from '@/components/buttons/IconButton';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 import {AppEndpointsAtom} from '@/models/endpoint';
 import {Subscription} from '@/models/subscription';
-import {useState} from 'react';
-import {IconButton} from '@/components/buttons/IconButton';
 
 type Props = {
   subscription: Subscription;

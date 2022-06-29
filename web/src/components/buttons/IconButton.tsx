@@ -1,5 +1,6 @@
+import {ComponentPropsWithRef, forwardRef, ReactNode} from 'react';
 import {match} from 'ts-pattern';
-import {ReactNode, ComponentPropsWithRef, forwardRef} from 'react';
+
 import {clsxm} from '@/lib/clsxm';
 
 type Variant = 'danger' | 'info';
