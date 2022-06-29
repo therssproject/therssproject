@@ -41,6 +41,9 @@ export type CreateEndpoint = {
 export const createEndpoint = (app: string, body: CreateEndpoint) =>
   http.post(`/applications/${app}/endpoints`, body, Endpoint);
 
+export const deleteEndpoint = (app: string, endpoint: string) =>
+  http.del(`/applications/${app}/endpoints/${endpoint}`, t.void);
+
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
 
