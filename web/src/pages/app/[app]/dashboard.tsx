@@ -2,15 +2,19 @@ import {ArrowSmDownIcon, ArrowSmUpIcon} from '@heroicons/react/solid';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 
+import {useAtom} from '@/lib/jotai';
+
 import {Layout} from '@/components/layout/Layout';
 import {Skeleton} from '@/components/Skeleton';
 
-import {useCurrentApp} from '@/models/application';
+import {SelectedAppAtom} from '@/models/application';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppDashboard: NextPageWithLayout = () => {
+  const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
+
   return pipe(
-    useCurrentApp(),
+    currentApp,
     O.match(
       () => null,
       (_app) => (

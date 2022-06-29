@@ -5,7 +5,6 @@ import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
 import * as t from 'io-ts';
-import {useSetAtom} from 'jotai';
 import {useRouter} from 'next/router';
 import {ReactNode, useEffect, useState} from 'react';
 import * as RD from 'remote-data-ts';
@@ -32,7 +31,7 @@ import {
   appToOption,
   SelectedAppAtom,
   SOON,
-  useCurrentApp,
+  useAppIdFromPath,
   useFetchAppData,
 } from '@/models/application';
 import {useSession} from '@/models/user';
@@ -46,22 +45,17 @@ type Props = {
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
 
-const isApplicationsRoute = (route: Route) =>
-  route.tag === 'AppDashboard' ||
-  route.tag === 'AppEndpoints' ||
-  route.tag === 'AppSubs' ||
-  route.tag === 'AppLogs';
-
 export const Applications = ({title, children, seo}: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
-  const isInAppsRoute = isApplicationsRoute(useCurrentRoute());
+  const appId = useAppIdFromPath();
+  const isInAppsRoute = O.isNone(appId);
 
   const {session, logOut} = useSession();
   const [apps, setApps] = useAtom(AppsAtom);
-  const setCurrentApp = useSetAtom(SelectedAppAtom);
+  const [currentApp, setCurrentApp] = useAtom(SelectedAppAtom);
 
-  const selected = pipe(useCurrentApp(), O.map(appToOption), O.toUndefined);
+  const selected = pipe(currentApp, O.map(appToOption), O.toUndefined);
 
   useFetchAppData();
 
@@ -207,9 +201,10 @@ const getPages = (app: Application, current: Route): Breadcrumb[] =>
 
 const Breadcrumbs = () => {
   const route = useCurrentRoute();
+  const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
 
   const pages = pipe(
-    useCurrentApp(),
+    currentApp,
     O.map((app) => getPages(app, route)),
     O.getOrElse((): Breadcrumb[] => []),
   );

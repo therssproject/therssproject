@@ -21,13 +21,13 @@ import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Skeleton} from '@/components/Skeleton';
 
 import {Create} from '@/features/CreateSub';
-import {useCurrentApp} from '@/models/application';
+import {SelectedAppAtom} from '@/models/application';
 import {AppEndpointsAtom} from '@/models/endpoint';
 import {AppSubscriptionsAtom, Subscription} from '@/models/subscription';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppSubs: NextPageWithLayout = () => {
-  const currentApp = useCurrentApp();
+  const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [appEndpoints] = useAtom(AppEndpointsAtom);
   const [appSubscriptions, _setSubscriptions] = useAtom(AppSubscriptionsAtom);
   const [showForm, setShowForm] = useState(false);

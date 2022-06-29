@@ -1,13 +1,17 @@
 import * as O from 'fp-ts/Option';
 import * as t from 'io-ts';
 import * as tt from 'io-ts-types';
+import {useSetAtom} from 'jotai';
 import {atomWithStorage} from 'jotai/utils';
 import * as RD from 'remote-data-ts';
 
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 
-import {AppsAtom} from './application';
+import {AppsAtom, SelectedAppAtom} from './application';
+import {EndpointsAtom} from './endpoint';
+import {LogsAtom} from './log';
+import {SubscriptionsAtom} from './subscription';
 
 export const PublicUser = t.interface({
   id: t.string,
@@ -45,11 +49,19 @@ export const register = (payload: {
 
 export const useSession = () => {
   const [session, setSession] = useAtom(SessionAtom);
-  const [_apps, setApps] = useAtom(AppsAtom);
+  const setApps = useSetAtom(AppsAtom);
+  const setSelectdApp = useSetAtom(SelectedAppAtom);
+  const setSubscriptions = useSetAtom(SubscriptionsAtom);
+  const setLogs = useSetAtom(LogsAtom);
+  const setEndpoints = useSetAtom(EndpointsAtom);
 
   const logOut = () => {
     setSession(O.none);
+    setSelectdApp(O.none);
     setApps(RD.notAsked);
+    setSubscriptions({});
+    setLogs({});
+    setEndpoints({});
   };
 
   return {session, setSession, logOut};

@@ -154,7 +154,6 @@ export const Sidebar: FC<Props> = ({
               <div className="h-0 flex-1 overflow-y-auto pt-5 pb-4">
                 <Logo />
                 <nav className="mt-5 space-y-2 px-2">
-                  {/* TODO: `getAppId` getter that ignores the `type: 'soon'` ???  */}
                   <MainNav app={appSelector.selected?.id} />
                 </nav>
               </div>
