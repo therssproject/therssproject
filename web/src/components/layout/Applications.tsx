@@ -49,7 +49,7 @@ export const Applications = ({title, children, seo}: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
   const appId = useAppIdFromPath();
-  const isInAppsRoute = O.isNone(appId);
+  const isInAppsRoute = O.isSome(appId);
 
   const {session, logOut} = useSession();
   const [apps, setApps] = useAtom(AppsAtom);
