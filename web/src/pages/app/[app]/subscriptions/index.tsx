@@ -1,3 +1,4 @@
+import * as TE from 'fp-ts/TaskEither';
 import {PlusIcon} from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
@@ -18,16 +19,42 @@ import {Create} from '@/features/CreateSub';
 import {SubscriptionItem} from '@/features/SubscriptionItem';
 import {SelectedAppAtom} from '@/models/application';
 import {AppEndpointsAtom} from '@/models/endpoint';
-import {AppSubscriptionsAtom} from '@/models/subscription';
+import {AppSubscriptionsAtom, Subscription, deleteSubscription} from '@/models/subscription';
 import {NextPageWithLayout} from '@/pages/_app';
+import {useToast} from '@/components/Toast';
 
 const AppSubs: NextPageWithLayout = () => {
+  const toast = useToast();
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [appEndpoints] = useAtom(AppEndpointsAtom);
-  const [appSubscriptions, _setSubscriptions] = useAtom(AppSubscriptionsAtom);
+  const [appSubscriptions, setSubscriptions] = useAtom(AppSubscriptionsAtom);
   const [showForm, setShowForm] = useState(false);
 
   const onOpen = () => setShowForm(true);
+
+  const onDeleteSubscription = (toDelete: Subscription) => {
+    pipe(
+      appSubscriptions,
+      RD.map(A.filter((e) => e.id !== toDelete.id)),
+      setSubscriptions,
+    );
+
+    const run = pipe(
+      deleteSubscription(toDelete.application, toDelete.id),
+      TE.match(
+        () => toast.showUnique(toDelete.id, 'Subscription deleted successfully'),
+        () => {
+          pipe(
+            appSubscriptions,
+            RD.map((rest) => A.snoc(rest, toDelete)),
+            setSubscriptions,
+          );
+        },
+      ),
+    );
+
+    run();
+  };
 
   return pipe(
     currentApp,
@@ -91,6 +118,7 @@ const AppSubs: NextPageWithLayout = () => {
                             <SubscriptionItem
                               key={subscription.id}
                               subscription={subscription}
+                              onDelete={onDeleteSubscription}
                             />
                           ))}
                         </ul>

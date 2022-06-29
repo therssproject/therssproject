@@ -43,6 +43,9 @@ export type CreateSubscription = {
 export const createSubscription = (app: string, body: CreateSubscription) =>
   http.post(`/applications/${app}/subscriptions`, body, Subscription);
 
+export const deleteSubscription = (app: string, subscription: string) =>
+  http.del(`/applications/${app}/subscriptions/${subscription}`, t.void);
+
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
 

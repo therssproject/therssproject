@@ -1,4 +1,4 @@
-import {RssIcon} from '@heroicons/react/outline';
+import {RssIcon, CheckIcon, TrashIcon} from '@heroicons/react/outline';
 import {CalendarIcon} from '@heroicons/react/solid';
 import * as date from 'date-fns';
 import * as A from 'fp-ts/Array';
@@ -13,13 +13,25 @@ import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 import {AppEndpointsAtom} from '@/models/endpoint';
 import {Subscription} from '@/models/subscription';
+import {useState} from 'react';
+import {IconButton} from '@/components/buttons/IconButton';
 
-export const SubscriptionItem = ({
-  subscription,
-}: {
+type Props = {
   subscription: Subscription;
-}) => {
+  onDelete: (subscription: Subscription) => void;
+};
+
+export const SubscriptionItem = ({subscription, onDelete}: Props) => {
+  const [confirm, setConfirm] = useState(false);
   const [appEndpoints] = useAtom(AppEndpointsAtom);
+
+  const onDeleteClick = () => {
+    if (confirm) {
+      onDelete(subscription);
+    } else {
+      setConfirm(true);
+    }
+  };
 
   return (
     <li>
@@ -32,22 +44,6 @@ export const SubscriptionItem = ({
             />
             <span className="font-mono">{subscription.url}</span>
           </p>
-
-          <div className="flex items-center text-sm text-gray-500">
-            <CalendarIcon
-              className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-              aria-hidden="true"
-            />
-            <p>
-              Created{' '}
-              <time dateTime={subscription.created_at}>
-                {date.format(
-                  new Date(subscription.created_at),
-                  'yyyy/MM/dd HH:MM',
-                )}
-              </time>
-            </p>
-          </div>
 
           {pipe(
             appEndpoints,
@@ -68,6 +64,36 @@ export const SubscriptionItem = ({
               ),
             ),
           )}
+
+          <div className="flex justify-between">
+            <div className="flex items-center text-sm text-gray-500">
+              <CalendarIcon
+                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                aria-hidden="true"
+              />
+              <p>
+                Created{' '}
+                <time dateTime={subscription.created_at}>
+                  {date.format(
+                    new Date(subscription.created_at),
+                    'yyyy/MM/dd HH:MM',
+                  )}
+                </time>
+              </p>
+            </div>
+
+            <IconButton
+              onClick={onDeleteClick}
+              onBlur={() => setConfirm(false)}
+              variant={confirm ? 'danger' : 'info'}
+            >
+              {confirm ? (
+                <CheckIcon className="h-6 w-6" />
+              ) : (
+                <TrashIcon className="h-6 w-6" />
+              )}
+            </IconButton>
+          </div>
         </div>
       </div>
     </li>

@@ -1,5 +1,6 @@
 import {PlusIcon} from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
+import * as TE from 'fp-ts/TaskEither';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import {useRouter} from 'next/router';
@@ -17,17 +18,19 @@ import {Skeleton} from '@/components/Skeleton';
 import {Create} from '@/features/CreateEndpoint';
 import {EndpointItem} from '@/features/EndpointItem';
 import {SelectedAppAtom} from '@/models/application';
-import {AppEndpointsAtom} from '@/models/endpoint';
+import {AppEndpointsAtom, Endpoint, deleteEndpoint} from '@/models/endpoint';
 import {NextPageWithLayout} from '@/pages/_app';
+import {useToast} from '@/components/Toast';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
 
 const AppEndpoints: NextPageWithLayout = () => {
+  const toast = useToast();
   const route = useRouteOfType('AppEndpoints');
   const router = useRouter();
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
-  const [appEndpoints, _setEndpoints] = useAtom(AppEndpointsAtom);
+  const [appEndpoints, setEndpoints] = useAtom(AppEndpointsAtom);
   const [showForm, setShowForm] = useState(() =>
     Boolean(O.toUndefined(route)?.create),
   );
@@ -48,6 +51,30 @@ const AppEndpoints: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
+  const onDeleteEndpoint = (toDelete: Endpoint) => {
+    pipe(
+      appEndpoints,
+      RD.map(A.filter((e) => e.id !== toDelete.id)),
+      setEndpoints,
+    );
+
+    const run = pipe(
+      deleteEndpoint(toDelete.application, toDelete.id),
+      TE.match(
+        () => toast.showUnique(toDelete.id, 'Endpoint deleted successfully'),
+        () => {
+          pipe(
+            appEndpoints,
+            RD.map((rest) => A.snoc(rest, toDelete)),
+            setEndpoints,
+          );
+        },
+      ),
+    );
+
+    run();
+  };
 
   return pipe(
     currentApp,
@@ -88,6 +115,7 @@ const AppEndpoints: NextPageWithLayout = () => {
                             <EndpointItem
                               key={endpoint.id}
                               endpoint={endpoint}
+                              onDelete={onDeleteEndpoint}
                             />
                           ))}
                         </ul>
