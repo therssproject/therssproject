@@ -1,9 +1,4 @@
-import {
-  CalendarIcon,
-  LocationMarkerIcon,
-  PlusIcon,
-  UsersIcon,
-} from '@heroicons/react/solid';
+import {PlusIcon} from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as NEA from 'fp-ts/NonEmptyArray';
@@ -17,13 +12,13 @@ import {Route} from '@/lib/routes';
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
-import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Skeleton} from '@/components/Skeleton';
 
 import {Create} from '@/features/CreateSub';
+import {SubscriptionItem} from '@/features/SubscriptionItem';
 import {SelectedAppAtom} from '@/models/application';
 import {AppEndpointsAtom} from '@/models/endpoint';
-import {AppSubscriptionsAtom, Subscription} from '@/models/subscription';
+import {AppSubscriptionsAtom} from '@/models/subscription';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppSubs: NextPageWithLayout = () => {
@@ -80,22 +75,22 @@ const AppSubs: NextPageWithLayout = () => {
             RD.match({
               notAsked: () => <Skeleton className="h-48 w-full rounded-lg" />,
               loading: () => <Skeleton className="h-48 w-full rounded-lg" />,
-              success: (endpoints) =>
+              success: (subscription) =>
                 pipe(
-                  endpoints,
+                  subscription,
                   A.match(
                     () => (
                       <div className="rounded-lg bg-yellow-50 p-4 text-gray-700">
                         No subscriptions created yet ...
                       </div>
                     ),
-                    (endpoints) => (
+                    (subscription) => (
                       <div className="overflow-hidden bg-white shadow sm:rounded-md">
                         <ul role="list" className="divide-y divide-gray-200">
-                          {endpoints.map((endpoint) => (
+                          {subscription.map((subscription) => (
                             <SubscriptionItem
-                              key={endpoint.id}
-                              endpoint={endpoint}
+                              key={subscription.id}
+                              subscription={subscription}
                             />
                           ))}
                         </ul>
@@ -111,61 +106,6 @@ const AppSubs: NextPageWithLayout = () => {
         </div>
       ),
     ),
-  );
-};
-
-// TODO: Subscription styles
-const SubscriptionItem = ({endpoint}: {endpoint: Subscription}) => {
-  return (
-    <li>
-      <UnstyledLink
-        href={Route.appSubs(endpoint.application)}
-        className="block hover:bg-gray-50"
-      >
-        <div className="px-4 py-4 sm:px-6">
-          <div className="flex items-center justify-between">
-            <p className="truncate text-sm font-medium text-indigo-600">
-              {endpoint.application}
-            </p>
-            <div className="ml-2 flex flex-shrink-0">
-              <p className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
-                {endpoint.url}
-              </p>
-            </div>
-          </div>
-          <div className="mt-2 sm:flex sm:justify-between">
-            <div className="sm:flex">
-              <p className="flex items-center text-sm text-gray-500">
-                <UsersIcon
-                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                {endpoint.endpoint}
-              </p>
-              <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                <LocationMarkerIcon
-                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                {endpoint.application}
-              </p>
-            </div>
-            <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-              <CalendarIcon
-                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                aria-hidden="true"
-              />
-              <p>
-                Closing on{' '}
-                <time dateTime={endpoint.created_at}>
-                  {new Date(endpoint.created_at).toLocaleString()}
-                </time>
-              </p>
-            </div>
-          </div>
-        </div>
-      </UnstyledLink>
-    </li>
   );
 };
 
