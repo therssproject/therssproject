@@ -10,12 +10,12 @@ import {useAtom} from '@/lib/jotai';
 import {Layout} from '@/components/layout/Layout';
 import {Skeleton} from '@/components/Skeleton';
 
-import {useCurrentApp} from '@/models/application';
+import {SelectedAppAtom} from '@/models/application';
 import {AppLogsAtom, Log} from '@/models/log';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppLogs: NextPageWithLayout = () => {
-  const currentApp = useCurrentApp();
+  const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [appLogs, _setLogs] = useAtom(AppLogsAtom);
 
   return pipe(

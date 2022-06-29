@@ -43,7 +43,7 @@ export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
 
   const {session, logOut} = useSession();
   const [apps, setApps] = useAtom(AppsAtom);
-  const [_currentApp, setCurrentApp] = useAtom(SelectedAppAtom);
+  const [currentApp, setCurrentApp] = useAtom(SelectedAppAtom);
 
   const onSelect = (opt?: AppOption) => {
     match(opt)
@@ -95,7 +95,7 @@ export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
       RD.toOption,
       O.getOrElse((): AppOption[] => []),
     ),
-    selected: undefined,
+    selected: pipe(currentApp, O.map(appToOption), O.toUndefined),
     onSelect,
     disabled: !RD.isSuccess(apps),
   };

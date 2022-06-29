@@ -5,21 +5,19 @@ import {pipe} from 'fp-ts/function';
 import {fold} from 'fp-ts/Monoid';
 import * as O from 'fp-ts/Option';
 import {Eq as eqString} from 'fp-ts/string';
+import * as TE from 'fp-ts/TaskEither';
+import {useStableEffect} from 'fp-ts-react-stable-hooks';
 import * as t from 'io-ts';
 import * as te from 'io-ts-extra';
 import {atom} from 'jotai';
 import * as RD from 'remote-data-ts';
-import * as TE from 'fp-ts/TaskEither';
-
-import {useStableEffect} from 'fp-ts-react-stable-hooks';
 
 import {useAtom} from '@/lib/jotai';
 import {useRouteOfType} from '@/lib/routing';
 
-import {AppSubscriptionsAtom, fetchSubscriptions} from './subscription';
 import {AppEndpointsAtom, fetchEndpoints} from './endpoint';
 import {AppLogsAtom, fetchLogs} from './log';
-import {FetchError} from '@/lib/fetch';
+import {AppSubscriptionsAtom, fetchSubscriptions} from './subscription';
 
 export const Application = te.sparseType({
   id: t.string,
@@ -51,7 +49,7 @@ export const SOON: AppOption = {
   type: 'soon',
   id: 'comming_soon',
   label: 'Comming soon',
-  image: () => '',
+  image: () => '+',
   disabled: true,
 };
 
@@ -95,12 +93,6 @@ export const useCurrentApp_ = () => {
 
 export const SelectedAppAtom = atom<O.Option<Application>>(O.none);
 
-export const useCurrentApp = () => {
-  const [currentApp, _setApp] = useAtom(SelectedAppAtom);
-
-  return currentApp;
-};
-
 const useFetchOnAppChange = <Data>(
   fetch: (app: Application) => TE.TaskEither<string, Data>,
   currentApp: O.Option<Application>,
@@ -135,7 +127,7 @@ const useFetchOnAppChange = <Data>(
 };
 
 export const useFetchAppData = () => {
-  const currentApp = useCurrentApp();
+  const [currentApp, _setApp] = useAtom(SelectedAppAtom);
 
   const [subscriptions, setSubscriptions] = useAtom(AppSubscriptionsAtom);
   const [endpoints, setEndpoints] = useAtom(AppEndpointsAtom);

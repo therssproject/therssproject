@@ -21,7 +21,7 @@ import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Skeleton} from '@/components/Skeleton';
 
 import {Create} from '@/features/CreateEndpoint';
-import {useCurrentApp} from '@/models/application';
+import {SelectedAppAtom} from '@/models/application';
 import {AppEndpointsAtom, Endpoint} from '@/models/endpoint';
 import {NextPageWithLayout} from '@/pages/_app';
 
@@ -31,7 +31,7 @@ const noOp = () => {};
 const AppEndpoints: NextPageWithLayout = () => {
   const route = useRouteOfType('AppEndpoints');
   const router = useRouter();
-  const currentApp = useCurrentApp();
+  const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [appEndpoints, _setEndpoints] = useAtom(AppEndpointsAtom);
   const [showForm, setShowForm] = useState(() =>
     Boolean(O.toUndefined(route)?.create),
