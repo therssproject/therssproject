@@ -7,6 +7,9 @@ import * as O from 'fp-ts/Option';
 import * as RD from 'remote-data-ts';
 
 import {useAtom} from '@/lib/jotai';
+import {Route} from '@/lib/routes';
+
+import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 import {AppEndpointsAtom} from '@/models/endpoint';
 import {Subscription} from '@/models/subscription';
@@ -55,9 +58,12 @@ export const SubscriptionItem = ({
               (endpoint) => (
                 <p className="truncate text-sm">
                   <span className="text-gray-600">Events sent to</span>{' '}
-                  <span className="font-medium text-indigo-600">
+                  <UnstyledLink
+                    href={Route.appEndpoints(endpoint.application, false)}
+                    className="font-medium text-indigo-600"
+                  >
                     {endpoint.title}
-                  </span>
+                  </UnstyledLink>
                 </p>
               ),
             ),
