@@ -6,6 +6,9 @@ import * as RD from 'remote-data-ts';
 
 import {clsxm} from '@/lib/clsxm';
 import {useAtom} from '@/lib/jotai';
+import {Route} from '@/lib/routes';
+
+import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 import {AppEndpointsAtom} from '@/models/endpoint';
 import {Log} from '@/models/log';
@@ -49,9 +52,12 @@ export const LogItem = ({log}: {log: Log}) => {
               (endpoint) => (
                 <p className="truncate text-sm">
                   <span className="text-gray-600">Sent to</span>{' '}
-                  <span className="font-medium text-indigo-600">
+                  <UnstyledLink
+                    href={Route.appEndpoints(endpoint.application, false)}
+                    className="font-medium text-indigo-600"
+                  >
                     {endpoint.title}
-                  </span>{' '}
+                  </UnstyledLink>{' '}
                   <time
                     className="text-gray-600"
                     dateTime={log.sent_at}
@@ -77,9 +83,12 @@ export const LogItem = ({log}: {log: Log}) => {
               (subscription) => (
                 <p className="truncate text-sm text-gray-500 group-hover:text-gray-900">
                   Subscription:{' '}
-                  <span className="font-mono font-medium">
+                  <UnstyledLink
+                    href={Route.appSubs(subscription.application)}
+                    className="font-mono font-medium"
+                  >
                     {subscription.url}
-                  </span>
+                  </UnstyledLink>
                 </p>
               ),
             ),
