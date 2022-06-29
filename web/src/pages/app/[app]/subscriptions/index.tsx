@@ -1,9 +1,9 @@
-import * as TE from 'fp-ts/TaskEither';
 import {PlusIcon} from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as NEA from 'fp-ts/NonEmptyArray';
 import * as O from 'fp-ts/Option';
+import * as TE from 'fp-ts/TaskEither';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
@@ -14,14 +14,18 @@ import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {Skeleton} from '@/components/Skeleton';
+import {useToast} from '@/components/Toast';
 
 import {Create} from '@/features/CreateSub';
 import {SubscriptionItem} from '@/features/SubscriptionItem';
 import {SelectedAppAtom} from '@/models/application';
 import {AppEndpointsAtom} from '@/models/endpoint';
-import {AppSubscriptionsAtom, Subscription, deleteSubscription} from '@/models/subscription';
+import {
+  AppSubscriptionsAtom,
+  deleteSubscription,
+  Subscription,
+} from '@/models/subscription';
 import {NextPageWithLayout} from '@/pages/_app';
-import {useToast} from '@/components/Toast';
 
 const AppSubs: NextPageWithLayout = () => {
   const toast = useToast();
@@ -42,7 +46,8 @@ const AppSubs: NextPageWithLayout = () => {
     const run = pipe(
       deleteSubscription(toDelete.application, toDelete.id),
       TE.match(
-        () => toast.showUnique(toDelete.id, 'Subscription deleted successfully'),
+        () =>
+          toast.showUnique(toDelete.id, 'Subscription deleted successfully'),
         () => {
           pipe(
             appSubscriptions,
