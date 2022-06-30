@@ -779,8 +779,9 @@ dependencies = [
 
 [[package]]
 name = "feed-rs"
-version = "1.0.0"
-source = "git+https://github.com/feed-rs/feed-rs#1dc26072071386e3e7a30704f6ff5624f8108fe4"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9408095b97e7be8e6fd0c72fe401d8823ba73a7d5a803d51cba51d9949af2f4d"
 dependencies = [
  "chrono",
  "lazy_static",
@@ -791,7 +792,7 @@ dependencies = [
  "serde_json",
  "siphasher",
  "url",
- "uuid 0.8.2",
+ "uuid 1.1.1",
 ]
 
 [[package]]
@@ -1872,9 +1873,9 @@ checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
 name = "quick-xml"
-version = "0.22.0"
+version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8533f14c8382aaad0d592c812ac3b826162128b65662331e1127b45c3d18536b"
+checksum = "9279fbdacaad3baf559d8cabe0acc3d06e30ea14931af31af79578ac0946decc"
 dependencies = [
  "encoding_rs",
  "memchr",
@@ -2113,8 +2114,6 @@ dependencies = [
  "serde_json",
  "thiserror",
  "tokio",
- "tokio-executor-trait",
- "tokio-reactor-trait",
  "tower-http",
  "tracing",
  "tracing-subscriber",
@@ -2647,17 +2646,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tokio-executor-trait"
-version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4b78630814cbcdf383c949bd8f17c3cfe3142e93b0d5801bdcae4b2a5275db7e"
-dependencies = [
- "async-trait",
- "executor-trait",
- "tokio",
-]
-
-[[package]]
 name = "tokio-macros"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2679,20 +2667,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tokio-reactor-trait"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e9481a72f36bd9cbb8d6dd349227c4783e234e4332cfe806225bc929c4b92486"
-dependencies = [
- "async-trait",
- "futures-core",
- "futures-io",
- "reactor-trait",
- "tokio",
- "tokio-stream",
-]
-
-[[package]]
 name = "tokio-rustls"
 version = "0.23.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2701,17 +2675,6 @@ dependencies = [
  "rustls",
  "tokio",
  "webpki",
-]
-
-[[package]]
-name = "tokio-stream"
-version = "0.1.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df54d54117d6fdc4e4fea40fe1e4e566b3505700e148a6827e59b34b0d2600d9"
-dependencies = [
- "futures-core",
- "pin-project-lite",
- "tokio",
 ]
 
 [[package]]
