@@ -1,3 +1,4 @@
+use again::RetryPolicy;
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use lazy_static::lazy_static;
@@ -112,8 +113,16 @@ impl Endpoint {
       metadata,
     };
 
+    // TODO: Update sent_at in case the webhook is retried. Also store the retry
+    // count.
     let sent_at = now();
-    let res = CLIENT.post(&endpoint_url).json(&payload).send().await;
+    let policy = RetryPolicy::exponential(Duration::from_millis(200))
+      .with_max_retries(3)
+      .with_max_delay(Duration::from_secs(1));
+
+    let res = policy
+      .retry(|| CLIENT.post(&endpoint_url).json(&payload).send())
+      .await;
 
     let status = match res {
       Err(_) => Status::Failed,
