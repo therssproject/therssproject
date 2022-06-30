@@ -83,7 +83,7 @@ async fn update_endpoint_by_id(
   Path(params): Path<HashMap<String, String>>,
   Json(payload): Json<CreateEndpoint>,
   Extension(application): Extension<Application>,
-) -> Result<(), Error> {
+) -> Result<Json<()>, Error> {
   let application_id = application.id.unwrap();
 
   let endpoint_id = params.get("id").unwrap().to_owned();
@@ -104,7 +104,7 @@ async fn update_endpoint_by_id(
     return Err(Error::NotFound(NotFound::new("endpoint")));
   }
 
-  Ok(())
+  Ok(Json(()))
 }
 
 async fn remove_endpoint_by_id(
