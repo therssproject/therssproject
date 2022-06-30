@@ -2,6 +2,7 @@ import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as R from 'fp-ts/Record';
+import * as TE from 'fp-ts/TaskEither';
 import * as t from 'io-ts';
 import * as te from 'io-ts-extra';
 import {atom} from 'jotai';
@@ -40,6 +41,17 @@ export type CreateEndpoint = {
 
 export const createEndpoint = (app: string, body: CreateEndpoint) =>
   http.post(`/applications/${app}/endpoints`, body, Endpoint);
+
+export const updateEndpoint = (
+  app: string,
+  endpoint: Endpoint,
+  body: CreateEndpoint,
+) =>
+  pipe(
+    // TODO: should be `t.void` instead but the library tries to parse the response body
+    http.put(`/applications/${app}/endpoints/${endpoint.id}`, body, t.unknown),
+    TE.map(() => ({...endpoint, ...body})),
+  );
 
 export const deleteEndpoint = (app: string, endpoint: string) =>
   http.del(`/applications/${app}/endpoints/${endpoint}`, t.void);
@@ -83,6 +95,31 @@ export const useSetNewEndpoint = () =>
             ),
           ),
         ),
+      [],
+    ),
+  );
+
+export const useUpdateEndpoint = (toUpdate: Endpoint) =>
+  useAtomCallback(
+    useCallback(
+      (get, set, updated: Endpoint) =>
+        pipe(
+          get(SelectedAppAtom),
+          O.match(noOp, (app) =>
+            set(
+              EndpointsAtom,
+              pipe(
+                get(EndpointsAtom),
+                R.modifyAt(
+                  app.id,
+                  RD.map(A.map((e) => (e.id === toUpdate.id ? updated : e))),
+                ),
+                O.getOrElse(() => get(EndpointsAtom)),
+              ),
+            ),
+          ),
+        ),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [],
     ),
   );
