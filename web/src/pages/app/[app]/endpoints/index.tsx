@@ -14,9 +14,10 @@ import {useRouteOfType} from '@/lib/routing';
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {Skeleton} from '@/components/Skeleton';
+import {SlideOver} from '@/components/SlideOver';
 import {useToast} from '@/components/Toast';
 
-import {Create} from '@/features/CreateEndpoint';
+import {Create, Edit} from '@/features/CreateEndpoint';
 import {EndpointItem} from '@/features/EndpointItem';
 import {SelectedAppAtom} from '@/models/application';
 import {AppEndpointsAtom, deleteEndpoint, Endpoint} from '@/models/endpoint';
@@ -25,17 +26,42 @@ import {NextPageWithLayout} from '@/pages/_app';
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
 
+type FormState =
+  | {tag: 'hide'}
+  | {tag: 'create'}
+  | {tag: 'edit'; endpoint: Endpoint};
+
+const hide: FormState = {tag: 'hide'};
+const create: FormState = {tag: 'create'};
+
 const AppEndpoints: NextPageWithLayout = () => {
   const toast = useToast();
   const route = useRouteOfType('AppEndpoints');
   const router = useRouter();
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [appEndpoints, setEndpoints] = useAtom(AppEndpointsAtom);
-  const [showForm, setShowForm] = useState(() =>
-    Boolean(O.toUndefined(route)?.create),
+  const [formState, setFormState] = useState<FormState>(() =>
+    pipe(
+      route,
+      O.filter((route) => route.create),
+      O.match(
+        (): FormState => hide,
+        () => create,
+      ),
+    ),
   );
 
-  const onOpen = () => setShowForm(true);
+  const openCreateForm = () => {
+    if (formState.tag === 'hide') {
+      setFormState(create);
+    }
+  };
+
+  const openEditForm = (endpoint: Endpoint) => {
+    if (formState.tag === 'hide') {
+      setFormState({tag: 'edit', endpoint});
+    }
+  };
 
   // Clear the `?create=true` from the URL
   useEffect(
@@ -82,14 +108,31 @@ const AppEndpoints: NextPageWithLayout = () => {
       () => null,
       (app) => (
         <div className="space-y-8">
-          <Create
-            app={app.id}
-            open={showForm}
-            onClose={() => setShowForm(false)}
-          />
+          <SlideOver
+            open={formState.tag !== 'hide'}
+            onClose={() => setFormState(hide)}
+          >
+            {
+              // To keep the slide out animation working, we have to render something.
+              // So we default to the Create form even when Edit is being closed
+              // TODO: this results in a flash of content changing from "Edit"
+              //       to "Create" as the slide out animation play.
+              //       Should we make the `Endpoint` optional in the edit form
+              //       instead?
+              formState.tag === 'edit' ? (
+                <Edit
+                  app={app.id}
+                  endpoint={formState.endpoint}
+                  onClose={() => setFormState(hide)}
+                />
+              ) : (
+                <Create app={app.id} onClose={() => setFormState(hide)} />
+              )
+            }
+          </SlideOver>
 
           <div className="flex w-full justify-end">
-            <Button onClick={onOpen}>
+            <Button onClick={openCreateForm}>
               <PlusIcon className="h-4 w-4" /> Add endpoint
             </Button>
           </div>
@@ -116,6 +159,7 @@ const AppEndpoints: NextPageWithLayout = () => {
                               key={endpoint.id}
                               endpoint={endpoint}
                               onDelete={onDeleteEndpoint}
+                              onEdit={openEditForm}
                             />
                           ))}
                         </ul>

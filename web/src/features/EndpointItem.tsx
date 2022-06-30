@@ -1,6 +1,5 @@
 import {LinkIcon, TrashIcon} from '@heroicons/react/outline';
-import {CalendarIcon} from '@heroicons/react/solid';
-import {CheckIcon} from '@heroicons/react/solid';
+import {CalendarIcon, CheckIcon, PencilAltIcon} from '@heroicons/react/solid';
 import * as date from 'date-fns';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
@@ -18,9 +17,10 @@ import {AppSubscriptionsAtom} from '@/models/subscription';
 type Props = {
   endpoint: Endpoint;
   onDelete: (endpoint: Endpoint) => void;
+  onEdit: (endpoint: Endpoint) => void;
 };
 
-export const EndpointItem = ({endpoint, onDelete}: Props) => {
+export const EndpointItem = ({endpoint, onDelete, onEdit}: Props) => {
   const toast = useToast();
   const [confirm, setConfirm] = useState(false);
   const [appSubscriptions, _setAppSubscriptions] =
@@ -78,17 +78,23 @@ export const EndpointItem = ({endpoint, onDelete}: Props) => {
               </p>
             </div>
 
-            <IconButton
-              onClick={onDeleteClick}
-              onBlur={() => setConfirm(false)}
-              variant={confirm ? 'danger' : 'info'}
-            >
-              {confirm ? (
-                <CheckIcon className="h-6 w-6" />
-              ) : (
-                <TrashIcon className="h-6 w-6" />
-              )}
-            </IconButton>
+            <div className="flex space-x-2">
+              <IconButton
+                onClick={onDeleteClick}
+                onBlur={() => setConfirm(false)}
+                variant={confirm ? 'danger' : 'info'}
+              >
+                {confirm ? (
+                  <CheckIcon className="h-6 w-6" />
+                ) : (
+                  <TrashIcon className="h-6 w-6" />
+                )}
+              </IconButton>
+
+              <IconButton onClick={() => onEdit(endpoint)}>
+                <PencilAltIcon className="h-6 w-6" />
+              </IconButton>
+            </div>
           </div>
         </div>
       </div>
