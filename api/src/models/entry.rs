@@ -2,12 +2,12 @@ use feed_rs::model::Entry as RawEntry;
 use futures::{stream, StreamExt};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
-use tracing::{info, warn};
+use tracing::{error, info};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::mongodb::options::FindOneOptions;
-use wither::mongodb::options::UpdateOptions;
 use wither::Model as WitherModel;
+use wither::WitherError;
 
 use crate::errors::Error;
 use crate::lib::database_model::ModelExt;
@@ -83,18 +83,15 @@ impl Entry {
       // using a bulk insert.
       .for_each(|entry| async move {
         let public_id = entry.public_id.clone();
-        let query = doc! { "feed": feed, "public_id": &public_id };
-        let options = UpdateOptions::builder().upsert(true).build();
-        let update = bson::to_document(&entry).expect("Failed to convert entry to BSON Document");
-        let update = doc! { "$set": update };
-        let res = <Entry as ModelExt>::update_one(query, update, Some(options)).await;
+        let res = <Entry as ModelExt>::create(entry).await;
         if let Err(err) = res {
-          // TODO: Check error and make sure the error is a duplicate key error.
-          // Otherwise, we should stop the operation.
-          warn!(
-            "Error inserting entry with public ID {} to feed {}. Error: {}",
-            public_id, &feed, err
-          );
+          let is_duplicate = is_duplicate_error(&err);
+          if !is_duplicate {
+            error!(
+              "Error inserting entry with public ID {} to feed {}. Error: {}",
+              public_id, &feed, err
+            );
+          }
         }
       })
       .await;
@@ -161,4 +158,28 @@ impl From<RawEntry> for PublicEntry {
       published_at,
     }
   }
+}
+
+// TODO: Extend wither error to do this.
+fn is_duplicate_error(error: &Error) -> bool {
+  use wither::mongodb::error::CommandError;
+  use wither::mongodb::error::ErrorKind;
+
+  // Is wither error.
+  let error = match error {
+    Error::Wither(error) => error,
+    _ => return false,
+  };
+
+  // Is Mongo error.
+  let error = match error {
+    WitherError::Mongo(error) => error,
+    _ => return false,
+  };
+
+  // TODO: Not sure how to pattern match a Box.
+  let kind = *error.kind.clone();
+
+  // Is duplicate
+  matches!(kind, ErrorKind::Command(CommandError { code: 11000, .. }))
 }
