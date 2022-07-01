@@ -181,8 +181,5 @@ fn is_duplicate_error(error: &Error) -> bool {
   let kind = *error.kind.clone();
 
   // Is duplicate
-  match kind {
-    ErrorKind::Command(CommandError { code: 11000, .. }) => true,
-    _ => return false,
-  }
+  matches!(kind, ErrorKind::Command(CommandError { code: 11000, .. }))
 }
