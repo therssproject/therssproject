@@ -45,7 +45,7 @@ const confirm = (key: Key): Status => ({tag: 'confirm', key});
 export const Create = ({open, app, onClose}: Props) => {
   const {copy, didCopy} = useCopyToClipboard();
   const toast = useToast();
-  const cancelButtonRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const setNewKey = useSetNewKey();
   const [status, setStatus] = useState<Status>(create);
 
@@ -92,7 +92,7 @@ export const Create = ({open, app, onClose}: Props) => {
       <Dialog
         as="div"
         className="relative z-10"
-        initialFocus={cancelButtonRef}
+        initialFocus={inputRef}
         onClose={() => {
           if (status.tag === 'create') {
             doClose();
@@ -204,6 +204,7 @@ export const Create = ({open, app, onClose}: Props) => {
 
                       <div>
                         <TextField
+                          ref={inputRef}
                           input={{
                             id: 'key_title',
                             placeholder: 'My key ...',
