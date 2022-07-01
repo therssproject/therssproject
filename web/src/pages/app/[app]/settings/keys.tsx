@@ -13,11 +13,14 @@ import {Tabs} from '@/components/SettingsTabs';
 import {Skeleton} from '@/components/Skeleton';
 
 import {Create} from '@/features/CreateKey';
+import {KeyItem} from '@/features/KeyItem';
 import {SelectedAppAtom, useFetchOnAppChange} from '@/models/application';
-import {AppKeysAtom, fetchKeys} from '@/models/key';
+import {AppKeysAtom, fetchKeys, Key, deleteKey} from '@/models/key';
 import {NextPageWithLayout} from '@/pages/_app';
+import {useToast} from '@/components/Toast';
 
 const AppSettingsKeys: NextPageWithLayout = () => {
+  const toast = useToast();
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [keys, setKeys] = useAtom(AppKeysAtom);
   const [newKeyOpen, setNewKeyOpen] = useState(false);
@@ -32,6 +35,26 @@ const AppSettingsKeys: NextPageWithLayout = () => {
     keys,
     setKeys,
   );
+
+  const onDeleteKey = (toDelete: Key) => {
+    pipe(keys, RD.map(A.filter((e) => e.id !== toDelete.id)), setKeys);
+
+    const run = pipe(
+      deleteKey(toDelete.application, toDelete.id),
+      TE.match(
+        () => toast.showUnique(toDelete.id, 'Key deleted successfully'),
+        () => {
+          pipe(
+            keys,
+            RD.map((rest) => A.snoc(rest, toDelete)),
+            setKeys,
+          );
+        },
+      ),
+    );
+
+    run();
+  };
 
   return pipe(
     currentApp,
@@ -96,13 +119,20 @@ const AppSettingsKeys: NextPageWithLayout = () => {
                                 </div>
                               ),
                               (keys) => (
-                                <>
-                                  {keys.map((key) => (
-                                    <div key={key.key}>
-                                      {key.title} / {key.key.slice(0, 10)}
-                                    </div>
-                                  ))}
-                                </>
+                                <div className="overflow-hidden bg-white sm:border border-gray-200 sm:rounded-md">
+                                  <ul
+                                    role="list"
+                                    className="divide-y divide-gray-200"
+                                  >
+                                    {keys.map((key) => (
+                                      <KeyItem
+                                        key={key.id}
+                                        key_={key}
+                                        onDelete={onDeleteKey}
+                                      />
+                                    ))}
+                                  </ul>
+                                </div>
                               ),
                             ),
                           )}
