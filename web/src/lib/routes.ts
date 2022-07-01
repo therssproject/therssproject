@@ -21,6 +21,8 @@ type AppDashboard = {tag: 'AppDashboard'; app: string};
 type AppEndpoints = {tag: 'AppEndpoints'; app: string; create: boolean};
 type AppSubs = {tag: 'AppSubs'; app: string};
 type AppLogs = {tag: 'AppLogs'; app: string};
+type AppSettingsKeys = {tag: 'AppSettingsKeys'; app: string};
+type AppSettingsMembers = {tag: 'AppSettingsMembers'; app: string};
 
 export type Route =
   | NotFound
@@ -38,7 +40,9 @@ export type Route =
   | AppDashboard
   | AppEndpoints
   | AppSubs
-  | AppLogs;
+  | AppLogs
+  | AppSettingsKeys
+  | AppSettingsMembers;
 
 export type RouteTag = Route['tag'];
 
@@ -62,6 +66,8 @@ type RouteMatcher<R> = {
   AppEndpoints: (r: AppEndpoints) => R;
   AppSubs: (r: AppSubs) => R;
   AppLogs: (r: AppLogs) => R;
+  AppSettingsKeys: (r: AppSettingsKeys) => R;
+  AppSettingsMembers: (r: AppSettingsMembers) => R;
 };
 
 export const match =
@@ -100,6 +106,10 @@ export const match =
         return matcher.AppSubs(route);
       case 'AppLogs':
         return matcher.AppLogs(route);
+      case 'AppSettingsKeys':
+        return matcher.AppSettingsKeys(route);
+      case 'AppSettingsMembers':
+        return matcher.AppSettingsMembers(route);
     }
   };
 
@@ -139,6 +149,10 @@ export const matchP =
         return (matcher.AppSubs ?? matcher.__)(route);
       case 'AppLogs':
         return (matcher.AppLogs ?? matcher.__)(route);
+      case 'AppSettingsKeys':
+        return (matcher.AppSettingsKeys ?? matcher.__)(route);
+      case 'AppSettingsMembers':
+        return (matcher.AppSettingsMembers ?? matcher.__)(route);
     }
   };
 
@@ -168,6 +182,11 @@ const appEndpoints = (app: string, create: boolean): Route => ({
 });
 const appSubs = (app: string): Route => ({tag: 'AppSubs', app});
 const appLogs = (app: string): Route => ({tag: 'AppLogs', app});
+const appSettingsKeys = (app: string): Route => ({tag: 'AppSettingsKeys', app});
+const appSettingsMembers = (app: string): Route => ({
+  tag: 'AppSettingsMembers',
+  app,
+});
 
 export const Route = {
   notFound,
@@ -189,6 +208,8 @@ export const Route = {
   appEndpoints,
   appSubs,
   appLogs,
+  appSettingsKeys,
+  appSettingsMembers,
 };
 
 // Optional query properties
@@ -233,6 +254,16 @@ const appLogsMatch = Routing.lit('app')
   .then(Routing.str('app'))
   .then(Routing.lit('logs'))
   .then(Routing.end);
+const appSettingsKeysMatch = Routing.lit('app')
+  .then(Routing.str('app'))
+  .then(Routing.lit('settings'))
+  .then(Routing.lit('keys'))
+  .then(Routing.end);
+const appSettingsMembersMatch = Routing.lit('app')
+  .then(Routing.str('app'))
+  .then(Routing.lit('settings'))
+  .then(Routing.lit('members'))
+  .then(Routing.end);
 
 export const Match = {
   _404: _404Match,
@@ -253,6 +284,8 @@ export const Match = {
   appEndpoints: appEndpointsMatch,
   appSubs: appSubsMatch,
   appLogs: appLogsMatch,
+  appSettingsKeys: appSettingsKeysMatch,
+  appSettingsMembers: appSettingsMembersMatch,
 };
 
 const parseBackTo =
@@ -298,6 +331,12 @@ const router = Routing.zero<Route>()
   )
   .alt(Match.appSubs.parser.map(({app}) => Route.appSubs(app)))
   .alt(Match.appLogs.parser.map(({app}) => Route.appLogs(app)))
+  .alt(Match.appSettingsKeys.parser.map(({app}) => Route.appSettingsKeys(app)))
+  .alt(
+    Match.appSettingsMembers.parser.map(({app}) =>
+      Route.appSettingsMembers(app),
+    ),
+  )
 
   // Misc
   .alt(Match._404.parser.map(() => Route.notFound));
@@ -346,5 +385,9 @@ export const format = (route: Route): string =>
         }),
       AppSubs: ({app}) => Routing.format(Match.appSubs.formatter, {app}),
       AppLogs: ({app}) => Routing.format(Match.appLogs.formatter, {app}),
+      AppSettingsKeys: ({app}) =>
+        Routing.format(Match.appSettingsKeys.formatter, {app}),
+      AppSettingsMembers: ({app}) =>
+        Routing.format(Match.appSettingsMembers.formatter, {app}),
     }),
   );

@@ -1,6 +1,7 @@
 import {Dialog, Transition} from '@headlessui/react';
 import {
   CalendarIcon,
+  CogIcon,
   DocumentTextIcon,
   FolderIcon,
   HomeIcon,
@@ -12,7 +13,7 @@ import {
 import {ComponentType, FC, Fragment} from 'react';
 
 import {clsxm} from '@/lib/clsxm';
-import {Route} from '@/lib/routes';
+import {Route, RouteTag} from '@/lib/routes';
 import {useCurrentRoute} from '@/lib/routing';
 
 import {Rss} from '@/components/icons/Rss';
@@ -27,6 +28,7 @@ import {UnstyledLink} from './links/UnstyledLink';
 type NavLink = {
   name: string;
   href: Route;
+  group: RouteTag[];
   icon: ComponentType<{className: string}>;
 };
 
@@ -35,18 +37,27 @@ const navigation = (app: string): NavLink[] => [
     name: 'Dashboard',
     icon: HomeIcon,
     href: Route.appDashboard(app),
+    group: [],
   },
   {
     name: 'Endpoints',
     icon: UsersIcon,
     href: Route.appEndpoints(app, false),
+    group: [],
   },
   {
     name: 'Subscriptions',
     icon: FolderIcon,
     href: Route.appSubs(app),
+    group: [],
   },
-  {name: 'Logs', icon: CalendarIcon, href: Route.appLogs(app)},
+  {name: 'Logs', icon: CalendarIcon, href: Route.appLogs(app), group: []},
+  {
+    name: 'Settings',
+    icon: CogIcon,
+    href: Route.appSettingsKeys(app),
+    group: ['AppSettingsKeys', 'AppSettingsMembers'],
+  },
 ];
 
 type SecondaryNavItem =
@@ -64,12 +75,14 @@ const secondaryNavigation = (onLogout: () => void): SecondaryNavItem[] => [
     name: 'Documentation',
     icon: DocumentTextIcon,
     href: Route.documentation,
+    group: [],
   },
   {
     type: 'link',
     name: 'Share feedback',
     icon: InformationCircleIcon,
     href: Route.notFound,
+    group: [],
   },
   {
     type: 'action',
@@ -214,7 +227,7 @@ const MainNav = ({app}: {app?: string}) => {
             key={item.name}
             href={item.href}
             className={clsxm(
-              item.href.tag === route.tag
+              item.group.includes(route.tag)
                 ? 'bg-gray-100 text-gray-900'
                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
               'group flex items-center rounded-md px-2 py-2 text-base font-medium',
@@ -222,7 +235,7 @@ const MainNav = ({app}: {app?: string}) => {
           >
             <item.icon
               className={clsxm(
-                item.href.tag === route.tag
+                item.group.includes(route.tag)
                   ? 'text-gray-500'
                   : 'text-gray-400 group-hover:text-gray-500',
                 'mr-4 h-6 w-6 flex-shrink-0',

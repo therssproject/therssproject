@@ -1,5 +1,3 @@
-import {sequenceS} from 'fp-ts/Apply';
-import * as A from 'fp-ts/Array';
 import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
 import {fold} from 'fp-ts/Monoid';
@@ -70,30 +68,15 @@ export const useAppIdFromPath = () =>
       useRouteOfType('AppEndpoints'),
       useRouteOfType('AppSubs'),
       useRouteOfType('AppLogs'),
+      useRouteOfType('AppSettingsKeys'),
     ],
     fold(O.getFirstMonoid()),
     O.map(({app}) => app),
   );
 
-// TODO: should I use this one or the one bellow?
-export const useCurrentApp_ = () => {
-  const appId = useAppIdFromPath();
-  const [apps, _setApps] = useAtom(AppsAtom);
-
-  return pipe(
-    sequenceS(O.Apply)({apps: RD.toOption(apps), id: appId}),
-    O.chain(({apps, id}) =>
-      pipe(
-        apps,
-        A.findFirst((app) => app.id === id),
-      ),
-    ),
-  );
-};
-
 export const SelectedAppAtom = atom<O.Option<Application>>(O.none);
 
-const useFetchOnAppChange = <Data>(
+export const useFetchOnAppChange = <Data>(
   fetch: (app: Application) => TE.TaskEither<string, Data>,
   currentApp: O.Option<Application>,
   currentData: RD.RemoteData<string, Data>,

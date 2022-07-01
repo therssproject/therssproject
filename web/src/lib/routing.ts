@@ -48,6 +48,8 @@ const loggedOutGuard = (push: (path: string) => void) => (route: Route) => {
       AppEndpoints: onPrivate,
       AppSubs: onPrivate,
       AppLogs: onPrivate,
+      AppSettingsKeys: onPrivate,
+      AppSettingsMembers: onPrivate,
     }),
   );
 };
@@ -76,6 +78,8 @@ const loggedInGuard = (push: (path: string) => void) => (route: Route) => {
       AppEndpoints: noOp,
       AppSubs: noOp,
       AppLogs: noOp,
+      AppSettingsKeys: noOp,
+      AppSettingsMembers: noOp,
     }),
   );
 };
