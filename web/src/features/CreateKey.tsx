@@ -24,7 +24,10 @@ import {
   createKey,
   Key,
   useSetNewKey,
+  CreateKey,
+  CreatedKey,
 } from '@/models/key';
+import {Alert} from '@/components/Alert';
 
 type Props = {
   app: Application;
@@ -36,11 +39,11 @@ const Inputs = yup.object({
   title: yup.string().required('Please provide a title for the new key'),
 });
 
-type Status = {tag: 'create'} | {tag: 'creating'} | {tag: 'confirm'; key: Key};
+type Status = {tag: 'create'} | {tag: 'creating'} | {tag: 'confirm'; key: CreatedKey};
 
 const create: Status = {tag: 'create'};
 const creating: Status = {tag: 'creating'};
-const confirm = (key: Key): Status => ({tag: 'confirm', key});
+const confirm = (key: CreatedKey): Status => ({tag: 'confirm', key});
 
 export const Create = ({open, app, onClose}: Props) => {
   const {copy, didCopy} = useCopyToClipboard();
@@ -66,9 +69,9 @@ export const Create = ({open, app, onClose}: Props) => {
           setStatus(create);
           toast.show('Failed to create key', {variant: 'danger'});
         },
-        (key) => {
-          setStatus(confirm(key));
-          setNewKey(key);
+        ({ key, ...rest }) => {
+          setStatus(confirm({key, ...rest}));
+          setNewKey(rest);
           reset();
         },
       ),
@@ -149,6 +152,10 @@ export const Create = ({open, app, onClose}: Props) => {
                           </div>
                         </div>
                       </div>
+
+                      <Alert variant="danger">
+                        You will not be able to copy the key afterwards.
+                      </Alert>
 
                       <div>
                         <TextField
