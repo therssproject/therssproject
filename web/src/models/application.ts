@@ -69,6 +69,7 @@ export const useAppIdFromPath = () =>
       useRouteOfType('AppSubs'),
       useRouteOfType('AppLogs'),
       useRouteOfType('AppSettingsKeys'),
+      useRouteOfType('AppSettingsMembers'),
     ],
     fold(O.getFirstMonoid()),
     O.map(({app}) => app),
