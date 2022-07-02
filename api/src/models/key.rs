@@ -24,6 +24,7 @@ pub struct Key {
   pub application: ObjectId,
   pub key: String,
   pub title: String,
+  // TODO: Implement this.
   pub used_at: Option<Date>,
   pub created_at: Date,
   pub created_by: ObjectId,
