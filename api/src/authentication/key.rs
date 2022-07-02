@@ -7,6 +7,7 @@ use http::header;
 use http::StatusCode;
 
 use crate::lib::database_model::ModelExt;
+use crate::lib::hash::sha256;
 use crate::models::application::Application;
 use crate::models::key::Key;
 
@@ -30,7 +31,8 @@ where
       None => return Err(StatusCode::UNAUTHORIZED),
     };
 
-    let key = Key::find_one(doc! { "key": key }, None).await.unwrap();
+    let hash = sha256(key);
+    let key = Key::find_one(doc! { "key": hash }, None).await.unwrap();
     let key = match key {
       Some(key) => key,
       None => return Err(StatusCode::UNAUTHORIZED),

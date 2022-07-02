@@ -75,7 +75,7 @@ fn get_feeds_with_valid_authentication_header() {
     let client = reqwest::Client::new();
     let res = client
       .get("http://localhost:8088/v1/feeds")
-      .header("Authorization", key.key)
+      .header("Authorization", key)
       .query(&[("url", feed_url)])
       .send()
       .await
