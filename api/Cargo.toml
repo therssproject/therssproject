@@ -1,5 +1,5 @@
 [package]
-name = "rss"
+name = "therssproject"
 version = "0.1.0"
 authors = ["ndelvalle <nicolas.delvalle@gmail.com>", "gillchristian <gillchristiang@gmail.com>"]
 edition = "2021"
