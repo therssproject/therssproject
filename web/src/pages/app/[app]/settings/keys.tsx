@@ -11,13 +11,13 @@ import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {Tabs} from '@/components/SettingsTabs';
 import {Skeleton} from '@/components/Skeleton';
+import {useToast} from '@/components/Toast';
 
 import {Create} from '@/features/CreateKey';
 import {KeyItem} from '@/features/KeyItem';
 import {SelectedAppAtom, useFetchOnAppChange} from '@/models/application';
-import {AppKeysAtom, fetchKeys, Key, deleteKey} from '@/models/key';
+import {AppKeysAtom, deleteKey, fetchKeys, Key} from '@/models/key';
 import {NextPageWithLayout} from '@/pages/_app';
-import {useToast} from '@/components/Toast';
 
 const AppSettingsKeys: NextPageWithLayout = () => {
   const toast = useToast();
@@ -119,7 +119,7 @@ const AppSettingsKeys: NextPageWithLayout = () => {
                                 </div>
                               ),
                               (keys) => (
-                                <div className="overflow-hidden bg-white sm:border border-gray-200 sm:rounded-md">
+                                <div className="overflow-hidden border-gray-200 bg-white sm:rounded-md sm:border">
                                   <ul
                                     role="list"
                                     className="divide-y divide-gray-200"
