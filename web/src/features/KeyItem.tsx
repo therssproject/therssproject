@@ -6,7 +6,7 @@ import {IconButton} from '@/components/buttons/IconButton';
 
 import {Key} from '@/models/key';
 
-type Props = {key_: Key, onDelete: (key: Key) => void}
+type Props = {key_: Key; onDelete: (key: Key) => void};
 
 export const KeyItem = ({key_, onDelete}: Props) => {
   const [confirm, setConfirm] = useState(false);

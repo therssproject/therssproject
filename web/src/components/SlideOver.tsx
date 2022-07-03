@@ -1,17 +1,26 @@
 import {Dialog, Transition} from '@headlessui/react';
 import {XIcon} from '@heroicons/react/outline';
-import {Fragment, ReactNode} from 'react';
+import {ComponentType, Fragment, ReactNode, RefObject} from 'react';
+import {match} from 'ts-pattern';
+
+import {clsxm} from '@/lib/clsxm';
 
 type Props = {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
+  initialFocus?: RefObject<HTMLElement>;
 };
 
-export const SlideOver = ({open, onClose, children}: Props) => {
+export const SlideOver = ({open, onClose, initialFocus, children}: Props) => {
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        onClose={onClose}
+        initialFocus={initialFocus}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-in-out duration-500"
@@ -70,19 +79,64 @@ export const SlideOver = ({open, onClose, children}: Props) => {
 };
 
 type HeaderProps = {
-  title: string;
-  description?: string;
+  icon?: {
+    variant: 'info' | 'success' | 'danger' | 'warn';
+    Component: ComponentType<{className: string}>;
+  };
+  title: ReactNode;
+  description?: ReactNode;
 };
 
-SlideOver.Header = ({title, description}: HeaderProps) => (
+SlideOver.Header = ({title, description, icon}: HeaderProps) => (
   <div className="bg-gray-50 px-4 py-6 sm:px-6">
-    <div className="flex items-start justify-between space-x-3">
-      <div className="space-y-1">
-        <Dialog.Title className="text-lg font-medium text-gray-900">
-          {title}
-        </Dialog.Title>
-        {description && <p className="text-sm text-gray-500">{description}</p>}
+    {icon ? (
+      <div className="sm:flex sm:items-start">
+        <div
+          className={clsxm(
+            'flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10',
+            match(icon.variant)
+              .with('warn', () => 'bg-yellow-100')
+              .with('danger', () => 'bg-red-100')
+              .with('success', () => 'bg-green-100')
+              .with('info', () => 'bg-blue-100')
+              .exhaustive(),
+          )}
+        >
+          <icon.Component
+            className={clsxm(
+              'h-6 w-6',
+              match(icon.variant)
+                .with('warn', () => 'text-yellow-600')
+                .with('danger', () => 'text-red-600')
+                .with('success', () => 'text-green-600')
+                .with('info', () => 'text-blue-600')
+                .exhaustive(),
+            )}
+            aria-hidden="true"
+          />
+        </div>
+
+        <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+          <Dialog.Title as="h3" className="text-lg font-medium text-gray-900">
+            Create API Key
+          </Dialog.Title>
+
+          {description && (
+            <p className="text-sm text-gray-500">{description}</p>
+          )}
+        </div>
       </div>
-    </div>
+    ) : (
+      <div className="flex items-start justify-between space-x-3">
+        <div className="space-y-1">
+          <Dialog.Title className="text-lg font-medium text-gray-900">
+            {title}
+          </Dialog.Title>
+          {description && (
+            <p className="text-sm text-gray-500">{description}</p>
+          )}
+        </div>
+      </div>
+    )}
   </div>
 );

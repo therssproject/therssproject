@@ -37,7 +37,7 @@ export const CreatedKey = te.sparseType({
   application: t.string,
   title: t.string,
   created_at: t.string,
-})
+});
 
 export interface CreatedKey extends t.TypeOf<typeof CreatedKey> {}
 
