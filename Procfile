@@ -1,1 +1,1 @@
-web: cd api && ./target/release/rss
+web: cd api && ./target/release/therssproject

@@ -180,23 +180,30 @@ export const Applications = ({title, children, seo}: Props) => {
 
 type Breadcrumb = {
   name: string;
-  href: Route;
+  href?: Route;
 };
 
 const getPages = (app: Application, current: Route): Breadcrumb[] =>
-  A.cons({name: app.name, href: Route.appDashboard(app.id)})(
-    pipe(
-      current,
-      matchRouteP({
-        __: () => [],
+  pipe(
+    current,
+    matchRouteP({
+      __: () => [],
 
-        AppEndpoints: () => [
-          {name: 'Endpoints', href: Route.appEndpoints(app.id, false)},
-        ],
-        AppSubs: () => [{name: 'Subscriptions', href: Route.appSubs(app.id)}],
-        AppLogs: () => [{name: 'Logs', href: Route.appLogs(app.id)}],
-      }),
-    ),
+      AppEndpoints: () => [
+        {name: 'Endpoints', href: Route.appEndpoints(app.id, false)},
+      ],
+      AppSubs: () => [{name: 'Subscriptions', href: Route.appSubs(app.id)}],
+      AppLogs: () => [{name: 'Logs', href: Route.appLogs(app.id)}],
+      AppSettingsKeys: () => [
+        {name: 'Settings'},
+        {name: 'Keys', href: Route.appSettingsKeys(app.id)},
+      ],
+      AppSettingsMembers: () => [
+        {name: 'Settings'},
+        {name: 'Members', href: Route.appLogs(app.id)},
+      ],
+    }),
+    A.cons<Breadcrumb>({name: app.name, href: Route.appDashboard(app.id)}),
   );
 
 const Breadcrumbs = () => {
@@ -239,12 +246,18 @@ const Breadcrumbs = () => {
                   >
                     <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
                   </svg>
-                  <UnstyledLink
-                    href={page.href}
-                    className="ml-4 text-xs font-medium text-gray-500 hover:text-gray-700"
-                  >
-                    {page.name}
-                  </UnstyledLink>
+                  {page.href ? (
+                    <UnstyledLink
+                      href={page.href}
+                      className="ml-4 text-xs font-medium text-gray-500 hover:text-gray-700"
+                    >
+                      {page.name}
+                    </UnstyledLink>
+                  ) : (
+                    <div className="ml-4 text-xs font-medium text-gray-500 hover:text-gray-700">
+                      {page.name}
+                    </div>
+                  )}
                 </div>
               </li>
             )),

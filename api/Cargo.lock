@@ -1737,41 +1737,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rss"
-version = "0.1.0"
-dependencies = [
- "again",
- "assert-json-diff",
- "async-trait",
- "axum",
- "bcrypt",
- "bson",
- "chrono",
- "config",
- "feed-rs",
- "futures",
- "http",
- "jsonwebtoken",
- "lazy_static",
- "mockito",
- "once_cell",
- "reqwest",
- "serde",
- "serde_derive",
- "serde_json",
- "sha2",
- "thiserror",
- "tokio",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "url",
- "uuid 1.1.1",
- "validator",
- "wither",
-]
-
-[[package]]
 name = "rust-ini"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2133,6 +2098,41 @@ dependencies = [
  "redox_syscall",
  "remove_dir_all",
  "winapi",
+]
+
+[[package]]
+name = "therssproject"
+version = "0.1.0"
+dependencies = [
+ "again",
+ "assert-json-diff",
+ "async-trait",
+ "axum",
+ "bcrypt",
+ "bson",
+ "chrono",
+ "config",
+ "feed-rs",
+ "futures",
+ "http",
+ "jsonwebtoken",
+ "lazy_static",
+ "mockito",
+ "once_cell",
+ "reqwest",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sha2",
+ "thiserror",
+ "tokio",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "uuid 1.1.1",
+ "validator",
+ "wither",
 ]
 
 [[package]]

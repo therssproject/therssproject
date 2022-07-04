@@ -16,7 +16,6 @@ import {SelectedAppAtom} from './application';
 export const Key = te.sparseType({
   id: t.string,
   application: t.string,
-  key: t.string,
   title: t.string,
   created_at: t.string,
 });
@@ -32,10 +31,23 @@ export const KeysAtom = atom<KeysState>({});
 export const fetchKeys = (app: string) =>
   http.get(`/applications/${app}/keys`, t.array(Key));
 
+export const CreatedKey = te.sparseType({
+  id: t.string,
+  key: t.string,
+  application: t.string,
+  title: t.string,
+  created_at: t.string,
+});
+
+export interface CreatedKey extends t.TypeOf<typeof CreatedKey> {}
+
 export type CreateKey = {title: string};
 
 export const createKey = (app: string, body: CreateKey) =>
-  http.post(`/applications/${app}/keys`, body, Key);
+  http.post(`/applications/${app}/keys`, body, CreatedKey);
+
+export const deleteKey = (app: string, key: string) =>
+  http.del(`/applications/${app}/keys/${key}`, t.void);
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};
