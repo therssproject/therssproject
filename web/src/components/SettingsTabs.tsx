@@ -1,5 +1,11 @@
+import * as A from 'fp-ts/Array';
+import {pipe} from 'fp-ts/function';
+import * as O from 'fp-ts/Option';
+import {useRouter} from 'next/router';
+
 import {clsxm} from '@/lib/clsxm';
 import {Route} from '@/lib/routes';
+import {format} from '@/lib/routes';
 import {useCurrentRoute} from '@/lib/routing';
 
 import {UnstyledLink} from '@/components/links/UnstyledLink';
@@ -9,9 +15,13 @@ const getTabs = (app: string) => [
   {name: 'Members', href: Route.appSettingsMembers(app), disabled: true},
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noOp = () => {};
+
 export const Tabs = ({app}: {app: string}) => {
   const tabs = getTabs(app);
   const currentRoute = useCurrentRoute();
+  const router = useRouter();
 
   return (
     <div>
@@ -19,7 +29,6 @@ export const Tabs = ({app}: {app: string}) => {
         <label htmlFor="tabs" className="sr-only">
           Select a tab
         </label>
-        {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
         <select
           id="tabs"
           name="tabs"
@@ -27,9 +36,21 @@ export const Tabs = ({app}: {app: string}) => {
           defaultValue={
             tabs.find((tab) => tab.href.tag === currentRoute.tag)?.name
           }
+          onChange={(e) => {
+            const {value} = e.target;
+
+            pipe(
+              tabs,
+              A.findFirst((t) => t.href.tag === value),
+              O.map((t) => format(t.href)),
+              O.match(noOp, (path) => router.push(path)),
+            );
+          }}
         >
           {tabs.map((tab) => (
-            <option key={tab.name}>{tab.name}</option>
+            <option key={tab.name} value={tab.href.tag}>
+              {tab.name}
+            </option>
           ))}
         </select>
       </div>
