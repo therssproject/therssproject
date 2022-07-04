@@ -18,6 +18,8 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-empty-interface': 'off',
 
+    '@next/next/no-img-element': 'off',
+
     'react/display-name': 'off',
     'react/no-children-prop': 'off',
     'react/jsx-curly-brace-presence': [
