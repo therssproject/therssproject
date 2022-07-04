@@ -10,7 +10,7 @@ export const useCopyToClipboard = () => {
   const copy = (text: string, onCopy: () => void = noOp) => {
     ref.current = setTimeout(
       () => setDidCopy(false),
-      1500,
+      2000,
       // Thank you TypeScript xD
     ) as unknown as number;
 
