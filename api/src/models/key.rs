@@ -8,6 +8,8 @@ use wither::Model as WitherModel;
 
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
+use crate::lib::hash::sha256;
+use crate::lib::serde::bson_datetime_option_as_rfc3339_string;
 
 impl ModelExt for Key {
   type T = Key;
@@ -22,22 +24,33 @@ pub struct Key {
   pub application: ObjectId,
   pub key: String,
   pub title: String,
+  // TODO: Implement this.
+  pub used_at: Option<Date>,
   pub created_at: Date,
+  pub created_by: ObjectId,
 }
 
 impl Key {
-  // TODO: Remove allow dead code when this fn is used.
-  #[allow(dead_code)]
-  pub fn new<T: Into<String>>(application: ObjectId, title: T) -> Self {
+  pub fn new<T: Into<String>>(
+    application: &ObjectId,
+    title: T,
+    created_by: &ObjectId,
+  ) -> (Self, String) {
     let now = now();
-    Self {
+    let key = Uuid::new_v4().to_string();
+    let hash = sha256(&key);
+
+    let this = Self {
       id: None,
-      application,
-      // TODO: Store a hashed version of the key.
-      key: Uuid::new_v4().to_string(),
+      application: *application,
+      key: hash,
       title: title.into(),
+      used_at: None,
       created_at: now,
-    }
+      created_by: *created_by,
+    };
+
+    (this, key)
   }
 }
 
@@ -47,10 +60,13 @@ pub struct PublicKey {
   pub id: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub application: ObjectId,
-  pub key: String,
   pub title: String,
+  #[serde(serialize_with = "bson_datetime_option_as_rfc3339_string")]
+  pub used_at: Option<Date>,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub created_at: Date,
+  #[serde(serialize_with = "serialize_object_id_as_hex_string")]
+  pub created_by: ObjectId,
 }
 
 impl From<Key> for PublicKey {
@@ -58,9 +74,10 @@ impl From<Key> for PublicKey {
     Self {
       id: key.id.unwrap(),
       application: key.application,
-      key: key.key,
       title: key.title,
+      used_at: key.used_at,
       created_at: key.created_at,
+      created_by: key.created_by,
     }
   }
 }

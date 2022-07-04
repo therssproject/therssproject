@@ -41,7 +41,7 @@ pub async fn create_application(user: &ObjectId) -> Result<Application, Error> {
   Ok(application)
 }
 
-pub async fn setup_application(user: &ObjectId) -> Result<(Application, Key, Endpoint), Error> {
+pub async fn setup_application(user: &ObjectId) -> Result<(Application, String, Endpoint), Error> {
   let application = create_application(user).await?;
 
   let url = "http://localhost:8080/endpoint";
@@ -50,10 +50,12 @@ pub async fn setup_application(user: &ObjectId) -> Result<(Application, Key, End
   let endpoint = Endpoint::create(endpoint).await?;
 
   let title = "Test Key";
-  let key = Key::new(application.id.unwrap().clone(), title);
-  let key = Key::create(key).await?;
+  let application_id = application.id.unwrap();
+  let created_by = user;
+  let (key, unhashed_key) = Key::new(&application_id, title, created_by);
+  Key::create(key).await?;
 
-  Ok((application, key, endpoint))
+  Ok((application, unhashed_key, endpoint))
 }
 
 pub async fn create_feed() -> Result<Feed, Error> {

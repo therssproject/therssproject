@@ -102,7 +102,7 @@ fn post_subscriptions_with_valid_authentication_header() {
     let client = reqwest::Client::new();
     let res = client
       .post("http://localhost:8088/v1/subscriptions")
-      .header("Authorization", key.key)
+      .header("Authorization", key)
       .json(&body)
       .send()
       .await
