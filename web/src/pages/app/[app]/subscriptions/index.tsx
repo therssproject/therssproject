@@ -10,6 +10,7 @@ import * as RD from 'remote-data-ts';
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
+import {Alert} from '@/components/Alert';
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
@@ -111,11 +112,7 @@ const AppSubs: NextPageWithLayout = () => {
                 pipe(
                   subscription,
                   A.match(
-                    () => (
-                      <div className="rounded-lg bg-yellow-50 p-4 text-gray-700">
-                        No subscriptions created yet ...
-                      </div>
-                    ),
+                    () => <Alert>No subscriptions created yet ...</Alert>,
                     (subscription) => (
                       <div className="overflow-hidden bg-white shadow sm:rounded-md">
                         <ul role="list" className="divide-y divide-gray-200">

@@ -7,6 +7,7 @@ import * as RD from 'remote-data-ts';
 
 import {useAtom} from '@/lib/jotai';
 
+import {Alert} from '@/components/Alert';
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {Tabs} from '@/components/SettingsTabs';
@@ -113,11 +114,7 @@ const AppSettingsKeys: NextPageWithLayout = () => {
                           {pipe(
                             keys,
                             A.match(
-                              () => (
-                                <div className="rounded-lg bg-yellow-50 p-4 text-gray-700">
-                                  No keys created yet ...
-                                </div>
-                              ),
+                              () => <Alert>No keys created yet ...</Alert>,
                               (keys) => (
                                 <div className="overflow-hidden border-gray-200 bg-white sm:rounded-md sm:border">
                                   <ul

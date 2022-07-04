@@ -6,6 +6,7 @@ import * as RD from 'remote-data-ts';
 
 import {useAtom} from '@/lib/jotai';
 
+import {Alert} from '@/components/Alert';
 import {Layout} from '@/components/layout/Layout';
 import {Skeleton} from '@/components/Skeleton';
 
@@ -32,11 +33,7 @@ const AppLogs: NextPageWithLayout = () => {
               pipe(
                 logs,
                 A.match(
-                  () => (
-                    <div className="rounded-lg bg-yellow-50 p-4 text-gray-700">
-                      No logs received yet ...
-                    </div>
-                  ),
+                  () => <Alert>No logs received yet ...</Alert>,
                   (logs) => (
                     <div className="overflow-hidden bg-white shadow sm:rounded-md">
                       <ul role="list" className="divide-y divide-gray-200">

@@ -20,7 +20,7 @@ const toast_ = (content: ReactNode, opts?: ToastOptions & {id?: string}) => {
   const {
     variant,
     id,
-    duration = 4000,
+    duration = 2000,
     position = 'bottom-right',
     onClose,
   }: ToastOptions & {id?: string} = opts ?? {};

@@ -117,7 +117,7 @@ export const Create = ({open, app, onClose}: Props) => {
             />
 
             <div className="space-y-6 p-6">
-              <Alert variant="danger">
+              <Alert variant="warning">
                 You will not be able to copy the key afterwards.
               </Alert>
 

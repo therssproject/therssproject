@@ -11,6 +11,7 @@ import {useAtom} from '@/lib/jotai';
 import {format as formatRoute, Route} from '@/lib/routes';
 import {useRouteOfType} from '@/lib/routing';
 
+import {Alert} from '@/components/Alert';
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {Skeleton} from '@/components/Skeleton';
@@ -146,11 +147,7 @@ const AppEndpoints: NextPageWithLayout = () => {
                 pipe(
                   endpoints,
                   A.match(
-                    () => (
-                      <div className="rounded-lg bg-yellow-50 p-4 text-gray-700">
-                        No endpoints created yet ...
-                      </div>
-                    ),
+                    () => <Alert>No endpoints created yet ...</Alert>,
                     (endpoints) => (
                       <div className="overflow-hidden bg-white shadow sm:rounded-md">
                         <ul role="list" className="divide-y divide-gray-200">
