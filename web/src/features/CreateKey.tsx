@@ -7,7 +7,7 @@ import {
 import {yupResolver} from '@hookform/resolvers/yup';
 import {pipe} from 'fp-ts/function';
 import * as TE from 'fp-ts/TaskEither';
-import {Fragment, useRef, useState} from 'react';
+import {useRef, useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 

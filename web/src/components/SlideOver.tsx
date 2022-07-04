@@ -35,7 +35,7 @@ export const SlideOver = ({open, onClose, initialFocus, children}: Props) => {
 
         <div className="fixed inset-0 overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
-            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
               <Transition.Child
                 as={Fragment}
                 enter="transform transition ease-in-out duration-500 sm:duration-700"
@@ -55,10 +55,10 @@ export const SlideOver = ({open, onClose, initialFocus, children}: Props) => {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                   >
-                    <div className="absolute top-0 left-0 -ml-8 flex pt-4 pr-2 sm:-ml-10 sm:pr-4">
+                    <div className="absolute top-0 right-0 flex pt-4 pr-8">
                       <button
                         type="button"
-                        className="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                        className="rounded-md text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-400"
                         onClick={onClose}
                       >
                         <span className="sr-only">Close panel</span>
