@@ -1,14 +1,18 @@
+import {BeakerIcon} from '@heroicons/react/outline';
+
+import {Alert} from '@/components/Alert';
 import {Layout} from '@/components/layout/Layout';
 
 import {NextPageWithLayout} from './_app';
 
 const Documentation: NextPageWithLayout = () => {
   return (
-    <div className="h-96 rounded-lg border-4 border-dashed border-gray-200">
-      <div className="p-4">
-        <p>Coming soon!</p>
+    <Alert variant="warning">
+      <div className="flex">
+        <BeakerIcon className="mr-2 h-8 w-8" />
+        <div className="text-lg">Coming soon ...</div>
       </div>
-    </div>
+    </Alert>
   );
 };
 
