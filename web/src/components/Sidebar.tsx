@@ -81,7 +81,7 @@ const secondaryNavigation = (onLogout: () => void): SecondaryNavItem[] => [
     type: 'link',
     name: 'Share feedback',
     icon: InformationCircleIcon,
-    href: Route.notFound,
+    href: Route.feedback,
     group: [],
   },
   {

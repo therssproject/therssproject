@@ -5,13 +5,14 @@ import * as t from 'io-ts';
 
 type NotFound = {tag: 'NotFound'};
 // Public
-type Documentation = {tag: 'Documentation'};
 type Index = {tag: 'Index'};
+type Documentation = {tag: 'Documentation'};
+type Feedback = {tag: 'Feedback'};
+type Components = {tag: 'Components'};
 
 // Public (logged-out only)
 type Login = {tag: 'Login'; returnTo?: Route};
 type Register = {tag: 'Register'; returnTo?: Route};
-type Components = {tag: 'Components'};
 type ResetPasswordRequest = {tag: 'ResetPasswordRequest'};
 type ResetPasswordConfirm = {tag: 'ResetPasswordConfirm'; token: string};
 
@@ -30,6 +31,7 @@ export type Route =
   | Index
   | Components
   | Documentation
+  | Feedback
   // Public (logged-out only)
   | Login
   | Register
@@ -52,6 +54,7 @@ type RouteMatcher<R> = {
   // Public
   Index: (r: Index) => R;
   Documentation: (r: Documentation) => R;
+  Feedback: (r: Feedback) => R;
   Components: (r: Components) => R;
 
   // Public (logged-out only)
@@ -78,10 +81,12 @@ export const match =
         return matcher.NotFound(route);
 
       // Public
-      case 'Documentation':
-        return matcher.Documentation(route);
       case 'Index':
         return matcher.Index(route);
+      case 'Documentation':
+        return matcher.Documentation(route);
+      case 'Feedback':
+        return matcher.Feedback(route);
       case 'Components':
         return matcher.Components(route);
 
@@ -121,10 +126,12 @@ export const matchP =
         return (matcher.NotFound ?? matcher.__)(route);
 
       // Public
-      case 'Documentation':
-        return (matcher.Documentation ?? matcher.__)(route);
       case 'Index':
         return (matcher.Index ?? matcher.__)(route);
+      case 'Documentation':
+        return (matcher.Documentation ?? matcher.__)(route);
+      case 'Feedback':
+        return (matcher.Feedback ?? matcher.__)(route);
       case 'Components':
         return (matcher.Components ?? matcher.__)(route);
 
@@ -161,6 +168,7 @@ const notFound: Route = {tag: 'NotFound'};
 // Public
 const index: Route = {tag: 'Index'};
 const documentation: Route = {tag: 'Documentation'};
+const feedback: Route = {tag: 'Feedback'};
 const components: Route = {tag: 'Components'};
 
 // Public (logged-out only)
@@ -194,6 +202,7 @@ export const Route = {
   // Public
   index,
   documentation,
+  feedback,
   components,
 
   // Public (logged-out only)
@@ -220,8 +229,9 @@ const _404Match = Routing.lit('404').then(Routing.end);
 
 // Public
 const indexMatch = Routing.end;
-const componentsMatch = Routing.lit('components').then(Routing.end);
 const documentationMatch = Routing.lit('documentation').then(Routing.end);
+const feedbackMatch = Routing.lit('feedback').then(Routing.end);
+const componentsMatch = Routing.lit('components').then(Routing.end);
 
 // Public (logged-out only)
 const loginMatch = Routing.lit('login').then(returnToQuery).then(Routing.end);
@@ -270,6 +280,7 @@ export const Match = {
   // Public
   index: indexMatch,
   documentation: documentationMatch,
+  feedback: feedbackMatch,
   components: componentsMatch,
 
   // Public (logged-out only)
@@ -309,6 +320,7 @@ const router = Routing.zero<Route>()
   // Public
   .alt(Match.index.parser.map(() => Route.index))
   .alt(Match.documentation.parser.map(() => Route.documentation))
+  .alt(Match.feedback.parser.map(() => Route.feedback))
   .alt(Match.components.parser.map(() => Route.components))
 
   // Public (logged-out only)
@@ -356,6 +368,7 @@ export const format = (route: Route): string =>
       // Public
       Index: () => Routing.format(Match.index.formatter, {}),
       Documentation: () => Routing.format(Match.documentation.formatter, {}),
+      Feedback: () => Routing.format(Match.feedback.formatter, {}),
       Components: () => Routing.format(Match.components.formatter, {}),
 
       // Public (logged-out only)

@@ -34,6 +34,7 @@ const loggedOutGuard = (push: (path: string) => void) => (route: Route) => {
       // Public
       Index: noOp,
       Documentation: noOp,
+      Feedback: noOp,
       Components: noOp,
 
       // Public (logged-out only)
@@ -63,8 +64,9 @@ const loggedInGuard = (push: (path: string) => void) => (route: Route) => {
 
       // Public
       Index: noOp,
-      Components: noOp,
       Documentation: noOp,
+      Feedback: noOp,
+      Components: noOp,
 
       // Public (logged-out only)
       Login: ({returnTo}) => pipe(returnTo ?? Route.dashboard, format, push),
