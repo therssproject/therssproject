@@ -8,6 +8,8 @@ use wither::bson;
 use wither::mongodb::error::Error as MongoError;
 use wither::WitherError;
 
+use crate::lib::get_feed::Error as GetFeedError;
+
 #[derive(thiserror::Error, Debug)]
 #[error("...")]
 pub enum Error {
@@ -40,6 +42,9 @@ pub enum Error {
 
   #[error("{0}")]
   HashPassword(#[from] BcryptError),
+
+  #[error("{0}")]
+  GetFeed(#[from] GetFeedError),
 }
 
 impl Error {
@@ -59,6 +64,7 @@ impl Error {
       // }
       Error::BadRequest(_) => (StatusCode::BAD_REQUEST, 40003),
       Error::NotFound(_) => (StatusCode::NOT_FOUND, 40003),
+      Error::GetFeed(_) => (StatusCode::BAD_REQUEST, 40003),
 
       Error::Authenticate(AuthenticateError::WrongCredentials) => (StatusCode::UNAUTHORIZED, 40003),
       Error::Authenticate(AuthenticateError::InvalidToken) => (StatusCode::UNAUTHORIZED, 40003),
