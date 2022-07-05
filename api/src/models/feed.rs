@@ -13,7 +13,7 @@ use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
-use crate::lib::fetch_rss::get_feed;
+use crate::lib::get_feed::get_feed;
 use crate::models::entry::Entry;
 use crate::models::subscription::Subscription;
 

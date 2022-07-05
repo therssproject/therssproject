@@ -34,7 +34,7 @@ where
     let Path(params) = Path::<HashMap<String, String>>::from_request(req)
       .await
       .map_err(|_err| {
-        // This should not happen. This middleware must be run on the
+        // This should never happen. This middleware must be run on the
         // "/applications/:application_id" routes.
         error!("No params found in the req path on the application middleware");
         StatusCode::INTERNAL_SERVER_ERROR
@@ -43,7 +43,7 @@ where
     let application_id = match params.get("application_id") {
       Some(id) => id,
       None => {
-        // This should not happen. This middleware must be run on the
+        // This should never happen. This middleware must be run on the
         // "/applications/:application_id" routes.
         error!("No application_id param found in the req path on the application middleware");
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
