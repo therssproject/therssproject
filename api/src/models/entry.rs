@@ -23,8 +23,6 @@ impl ModelExt for Entry {
   type T = Entry;
 }
 
-// TODO: Get struct values from:
-// https://docs.rs/feed-rs/latest/feed_rs/model/struct.Entry.html
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(keys = r#"doc!{ "feed": 1 }"#))]
 #[model(index(

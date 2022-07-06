@@ -21,8 +21,6 @@ impl ModelExt for Feed {
   type T = Feed;
 }
 
-// TODO: Get struct values from:
-// https://docs.rs/feed-rs/latest/feed_rs/model/struct.Feed.html
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(keys = r#"doc!{ "url": 1 }"#, options = r#"doc!{ "unique": true }"#))]
 #[model(index(keys = r#"doc!{ "synced_at": 1 }"#))]
