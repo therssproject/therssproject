@@ -36,7 +36,7 @@ async fn create_application(
 async fn query_application(
   Extension(user): Extension<UserFromToken>,
 ) -> Result<Json<Vec<PublicApplication>>, Error> {
-  let applications = Application::find(doc! { "user": &user.id }, None)
+  let applications = Application::find(doc! { "owner": &user.id }, None)
     .await?
     .into_iter()
     .map(Into::into)
@@ -51,7 +51,7 @@ async fn get_application_by_id(
   Path(id): Path<String>,
 ) -> Result<Json<PublicApplication>, Error> {
   let application_id = to_object_id(id)?;
-  let application = Application::find_one(doc! { "_id": application_id, "user": &user.id }, None)
+  let application = Application::find_one(doc! { "_id": application_id, "owner": &user.id }, None)
     .await?
     .map(PublicApplication::from);
 
@@ -73,7 +73,7 @@ async fn remove_application_by_id(
 ) -> Result<(), Error> {
   let application_id = to_object_id(id)?;
   let delete_result =
-    Application::delete_one(doc! { "_id": application_id, "user": &user.id }).await?;
+    Application::delete_one(doc! { "_id": application_id, "owner": &user.id }).await?;
 
   if delete_result.deleted_count == 0 {
     debug!("Application not found, returning 404 status code");

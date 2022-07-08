@@ -19,7 +19,7 @@ import {AppSubscriptionsAtom, fetchSubscriptions} from './subscription';
 
 export const Application = te.sparseType({
   id: t.string,
-  user: t.string,
+  owner: t.string,
   name: t.string,
   description: te.optional(t.string),
   created_at: t.string,

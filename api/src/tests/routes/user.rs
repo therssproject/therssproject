@@ -1,8 +1,12 @@
+use bson::doc;
 use reqwest;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 
+use crate::lib::database_model::ModelExt;
+use crate::models::application::Application;
 use crate::models::user::PublicUser;
+use crate::models::user::User;
 use crate::routes::user::AuthenticateResponse;
 use crate::tests::setup::with_app;
 use crate::tests::utils::create_user;
@@ -41,6 +45,16 @@ fn post_user_route() {
     let body = res.json::<PublicUser>().await.unwrap();
     assert_eq!(body.name, "Nahuel");
     assert_eq!(body.email, "nahuel@test.com");
+
+    // User from database:
+    let user = User::find_one(doc! {}, None).await.unwrap().unwrap();
+    assert_eq!(user.name, "Nahuel");
+    assert_eq!(user.email, "nahuel@test.com");
+
+    // Application:
+    let application = Application::find_one(doc! {}, None).await.unwrap().unwrap();
+    assert_eq!(application.owner, user.id.unwrap());
+    assert_eq!(application.name, "Nahuel");
   });
 }
 

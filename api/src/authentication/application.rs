@@ -55,9 +55,10 @@ where
       Err(_) => return Err(StatusCode::BAD_REQUEST),
     };
 
-    let application = Application::find_one(doc! { "_id": application_id, "user": &user.id }, None)
-      .await
-      .unwrap();
+    let application =
+      Application::find_one(doc! { "_id": application_id, "owner": &user.id }, None)
+        .await
+        .unwrap();
 
     let application = match application {
       Some(application) => application,
