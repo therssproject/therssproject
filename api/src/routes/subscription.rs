@@ -13,6 +13,7 @@ use wither::mongodb::options::FindOptions;
 use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
+use crate::lib::paginated_response::PaginatedResponse;
 use crate::lib::to_object_id::to_object_id;
 use crate::models::application::Application;
 use crate::models::endpoint::Endpoint;
@@ -66,7 +67,7 @@ async fn create_subscription(
 
 async fn query_subscriptions(
   Extension(application): Extension<Application>,
-) -> Result<Json<Vec<PublicSubscription>>, Error> {
+) -> Result<PaginatedResponse<Vec<PublicSubscription>>, Error> {
   let application_id = application.id.unwrap();
 
   let options = FindOptions::builder()
@@ -81,7 +82,16 @@ async fn query_subscriptions(
     .collect::<Vec<PublicSubscription>>();
 
   debug!("Returning subscriptions");
-  Ok(Json(subscriptions))
+
+  let res = PaginatedResponse {
+    body: subscriptions,
+    count: 100,
+    offset: 0,
+    limit: 50,
+  };
+
+  Ok(res)
+  // Ok(Json(subscriptions))
 }
 
 async fn get_subscription_by_id(
