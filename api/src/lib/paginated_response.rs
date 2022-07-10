@@ -6,14 +6,14 @@ use axum::{
 use serde::Serialize;
 
 #[derive(Serialize)]
-pub struct PaginatedResponse<T> {
+pub struct PaginatedJson<T> {
   pub body: T,
-  pub count: i64,
-  pub offset: i64,
-  pub limit: i64,
+  pub count: u64,
+  pub offset: u64,
+  pub limit: u64,
 }
 
-impl<T> IntoResponse for PaginatedResponse<T>
+impl<T> IntoResponse for PaginatedJson<T>
 where
   T: Serialize,
 {
@@ -26,15 +26,15 @@ where
             HeaderValue::from_static(mime::APPLICATION_JSON.as_ref()),
           ),
           (
-            HeaderName::from_static("X-Pagination-Count"),
+            HeaderName::from_static("x-pagination-count"),
             to_header_value(self.count),
           ),
           (
-            HeaderName::from_static("X-Pagination-offset"),
+            HeaderName::from_static("x-pagination-offset"),
             to_header_value(self.offset),
           ),
           (
-            HeaderName::from_static("X-Pagination-Limit"),
+            HeaderName::from_static("x-pagination-limit"),
             to_header_value(self.limit),
           ),
         ],
@@ -54,7 +54,7 @@ where
   }
 }
 
-fn to_header_value(value: i64) -> HeaderValue {
+fn to_header_value(value: u64) -> HeaderValue {
   let value = value.to_string();
   HeaderValue::from_str(&value).unwrap()
 }
