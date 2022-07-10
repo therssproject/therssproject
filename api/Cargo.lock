@@ -2112,6 +2112,7 @@ dependencies = [
  "http",
  "jsonwebtoken",
  "lazy_static",
+ "mime",
  "mockito",
  "once_cell",
  "reqwest",
