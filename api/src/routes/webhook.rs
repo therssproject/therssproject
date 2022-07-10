@@ -1,4 +1,4 @@
-use axum::{extract::Extension, routing::get, Json, Router};
+use axum::{extract::Extension, routing::get, Router};
 use bson::doc;
 use tracing::debug;
 use wither::mongodb::options::FindOptions;
