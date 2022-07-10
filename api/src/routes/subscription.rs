@@ -84,7 +84,6 @@ async fn query_subscriptions(
     .collect::<Vec<PublicSubscription>>();
 
   debug!("Returning subscriptions");
-
   let res = PaginatedJson {
     body: subscriptions,
     count,
@@ -93,7 +92,6 @@ async fn query_subscriptions(
   };
 
   Ok(res)
-  // Ok(Json(subscriptions))
 }
 
 async fn get_subscription_by_id(

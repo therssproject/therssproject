@@ -5,6 +5,7 @@ use wither::mongodb::options::FindOptions;
 
 use crate::errors::Error;
 use crate::lib::database_model::ModelExt;
+use crate::lib::paginated_response::PaginatedJson;
 use crate::models::application::Application;
 use crate::models::webhook::{PublicWebhook, Webhook};
 
@@ -14,7 +15,7 @@ pub fn create_router() -> Router {
 
 async fn query_webhooks(
   Extension(application): Extension<Application>,
-) -> Result<Json<Vec<PublicWebhook>>, Error> {
+) -> Result<PaginatedJson<Vec<PublicWebhook>>, Error> {
   let application_id = application.id.unwrap();
 
   let options = FindOptions::builder()
@@ -22,12 +23,21 @@ async fn query_webhooks(
     .limit(50)
     .build();
 
-  let webhooks = Webhook::find(doc! { "application": &application_id }, Some(options))
-    .await?
+  let (webhooks, count) =
+    Webhook::find_and_count(doc! { "application": &application_id}, Some(options)).await?;
+
+  let webhooks = webhooks
     .into_iter()
     .map(Into::into)
     .collect::<Vec<PublicWebhook>>();
 
   debug!("Returning webhooks");
-  Ok(Json(webhooks))
+  let res = PaginatedJson {
+    body: webhooks,
+    count,
+    offset: 0,
+    limit: 50,
+  };
+
+  Ok(res)
 }
