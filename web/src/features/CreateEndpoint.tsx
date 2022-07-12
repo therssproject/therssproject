@@ -10,6 +10,7 @@ import {FetchError} from '@/lib/fetch';
 import {Button} from '@/components/buttons/Button';
 import {TextField} from '@/components/inputs/TextField';
 import {SlideOver} from '@/components/SlideOver';
+import {Terminal} from '@/components/Terminal';
 
 import {
   CreateEndpoint as CreateEndpointBody,
@@ -143,6 +144,15 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
                 ...register('url'),
               }}
             />
+          </div>
+
+          <div className="space-y-6 p-6">
+            <div className="text-lg font-medium text-gray-900">
+              Create endpoints using the API
+            </div>
+            <Terminal>
+              {`curl https://api.therssproject.com/application/endpoint \\\n--data { "foo": "bar" }`}
+            </Terminal>
           </div>
         </div>
       </div>
