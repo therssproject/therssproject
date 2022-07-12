@@ -171,9 +171,10 @@ export const Create = ({open, app, onClose}: Props) => {
               <div>
                 <TextField
                   ref={inputRef}
+                  label="Key title"
                   input={{
                     id: 'key_title',
-                    placeholder: 'My key ...',
+                    placeholder: 'Subscription automation',
                     variant: errors.title ? 'error' : 'default',
                     ...register('title'),
                   }}

@@ -16,6 +16,7 @@ import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {Skeleton} from '@/components/Skeleton';
 import {SlideOver} from '@/components/SlideOver';
+import {Terminal} from '@/components/Terminal';
 import {useToast} from '@/components/Toast';
 
 import {Create, Edit} from '@/features/CreateEndpoint';
@@ -149,17 +150,32 @@ const AppEndpoints: NextPageWithLayout = () => {
                   A.match(
                     () => <Alert>No endpoints created yet ...</Alert>,
                     (endpoints) => (
-                      <div className="overflow-hidden bg-white shadow sm:rounded-md">
-                        <ul role="list" className="divide-y divide-gray-200">
-                          {endpoints.map((endpoint) => (
-                            <EndpointItem
-                              key={endpoint.id}
-                              endpoint={endpoint}
-                              onDelete={onDeleteEndpoint}
-                              onEdit={openEditForm}
-                            />
-                          ))}
-                        </ul>
+                      <div className="space-y-8">
+                        <div className="overflow-hidden bg-white shadow sm:rounded-md">
+                          <ul role="list" className="divide-y divide-gray-200">
+                            {endpoints.map((endpoint) => (
+                              <EndpointItem
+                                key={endpoint.id}
+                                endpoint={endpoint}
+                                onDelete={onDeleteEndpoint}
+                                onEdit={openEditForm}
+                              />
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="space-y-4 bg-white px-4 py-4 shadow sm:rounded-md sm:px-6">
+                          <h2 className="text-xl font-medium text-gray-800">
+                            Endpoints docs
+                          </h2>
+
+                          <p className="text-md text-gray-700">
+                            Create create subscriptions to your endpoints
+                          </p>
+                          <Terminal>
+                            {`curl https://api.therssproject.com/applications/add \\\n--data '{"endpoint": "asdf-1234-ghjk-5678", "url": "https://www.reddit.com/.rss"}'`}
+                          </Terminal>
+                        </div>
                       </div>
                     ),
                   ),
