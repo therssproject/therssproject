@@ -11,7 +11,6 @@ import {useAtom} from '@/lib/jotai';
 import {format as formatRoute, Route} from '@/lib/routes';
 import {useRouteOfType} from '@/lib/routing';
 
-import {Alert} from '@/components/Alert';
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {Skeleton} from '@/components/Skeleton';
@@ -109,7 +108,7 @@ const AppEndpoints: NextPageWithLayout = () => {
     O.match(
       () => null,
       (app) => (
-        <div className="space-y-8">
+        <>
           <SlideOver
             open={formState.tag !== 'hide'}
             onClose={() => setFormState(hide)}
@@ -132,60 +131,96 @@ const AppEndpoints: NextPageWithLayout = () => {
               )
             }
           </SlideOver>
-
-          <div className="flex w-full justify-end">
-            <Button onClick={openCreateForm}>
-              <PlusIcon className="h-4 w-4" /> Add endpoint
-            </Button>
-          </div>
-
-          {pipe(
-            appEndpoints,
-            RD.match({
-              notAsked: () => <Skeleton className="h-48 w-full rounded-lg" />,
-              loading: () => <Skeleton className="h-48 w-full rounded-lg" />,
-              success: (endpoints) =>
-                pipe(
-                  endpoints,
-                  A.match(
-                    () => <Alert>No endpoints created yet ...</Alert>,
-                    (endpoints) => (
-                      <div className="space-y-8">
-                        <div className="overflow-hidden bg-white shadow sm:rounded-md">
-                          <ul role="list" className="divide-y divide-gray-200">
-                            {endpoints.map((endpoint) => (
-                              <EndpointItem
-                                key={endpoint.id}
-                                endpoint={endpoint}
-                                onDelete={onDeleteEndpoint}
-                                onEdit={openEditForm}
-                              />
-                            ))}
-                          </ul>
-                        </div>
-
-                        <div className="space-y-4 bg-white px-4 py-4 shadow sm:rounded-md sm:px-6">
-                          <h2 className="text-xl font-medium text-gray-800">
-                            Endpoints docs
-                          </h2>
-
-                          <p className="text-md text-gray-700">
-                            Create create subscriptions to your endpoints
+          <div className="space-y-8">
+            {pipe(
+              appEndpoints,
+              RD.match({
+                notAsked: () => <Skeleton className="h-48 w-full rounded-lg" />,
+                loading: () => <Skeleton className="h-48 w-full rounded-lg" />,
+                success: (endpoints) =>
+                  pipe(
+                    endpoints,
+                    A.match(
+                      () => (
+                        <div className="mt-24 text-center">
+                          <svg
+                            className="mx-auto h-12 w-12 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path
+                              vectorEffect="non-scaling-stroke"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                            />
+                          </svg>
+                          <h3 className="mt-2 text-sm font-medium text-gray-900">
+                            No endpoints
+                          </h3>
+                          <p className="mt-1 text-sm text-gray-500">
+                            Get started by creating a new endpoint.
                           </p>
-                          <Terminal>
-                            {`curl https://api.therssproject.com/applications/add \\\n--data '{"endpoint": "asdf-1234-ghjk-5678", "url": "https://www.reddit.com/.rss"}'`}
-                          </Terminal>
+                          <div className="mt-6">
+                            <Button onClick={openCreateForm}>
+                              <PlusIcon className="h-4 w-4" /> Add endpoint
+                            </Button>
+                          </div>
                         </div>
-                      </div>
+                      ),
+
+                      (endpoints) => (
+                        <>
+                          <div className="flex w-full justify-end">
+                            <Button onClick={openCreateForm}>
+                              <PlusIcon className="h-4 w-4" /> Add endpoint
+                            </Button>
+                          </div>
+
+                          <div className="space-y-8">
+                            <div className="overflow-hidden bg-white shadow sm:rounded-md">
+                              <ul
+                                role="list"
+                                className="divide-y divide-gray-200"
+                              >
+                                {endpoints.map((endpoint) => (
+                                  <EndpointItem
+                                    key={endpoint.id}
+                                    endpoint={endpoint}
+                                    onDelete={onDeleteEndpoint}
+                                    onEdit={openEditForm}
+                                  />
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div className="space-y-4 bg-white px-4 py-4 shadow sm:rounded-md sm:px-6">
+                              <h2 className="text-xl font-medium text-gray-800">
+                                Endpoints docs
+                              </h2>
+
+                              <p className="text-md text-gray-700">
+                                Create create subscriptions to your endpoints
+                              </p>
+                              <Terminal>
+                                {`curl https://api.therssproject.com/applications/add \\\n--data '{"endpoint": "asdf-1234-ghjk-5678", "url": "https://www.reddit.com/.rss"}'`}
+                              </Terminal>
+                            </div>
+                          </div>
+                        </>
+                      ),
                     ),
                   ),
+                failure: (msg) => (
+                  <div className="rounded-lg bg-red-50 p-4">{msg}</div>
                 ),
-              failure: (msg) => (
-                <div className="rounded-lg bg-red-50 p-4">{msg}</div>
-              ),
-            }),
-          )}
-        </div>
+              }),
+            )}
+          </div>
+        </>
       ),
     ),
   );
