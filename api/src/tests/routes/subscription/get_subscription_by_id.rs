@@ -1,6 +1,4 @@
 use assert_json_diff::assert_json_eq;
-use bson::doc;
-use lazy_static::lazy_static;
 use reqwest;
 use reqwest::StatusCode;
 use serde_json::json;
@@ -13,10 +11,6 @@ use crate::tests::utils::create_feed;
 use crate::tests::utils::create_user;
 use crate::tests::utils::create_user_token;
 use crate::tests::utils::setup_application;
-
-lazy_static! {
-  static ref FIXTURE: &'static str = include_str!("../../fixture/reddit_atom.xml");
-}
 
 #[test]
 fn get_subscription_by_id_with_no_authentication_header() {
