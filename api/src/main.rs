@@ -19,6 +19,8 @@ mod schedulers;
 mod settings;
 
 #[cfg(test)]
+mod scripts;
+#[cfg(test)]
 mod tests;
 
 #[tokio::main]
