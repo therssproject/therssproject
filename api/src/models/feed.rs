@@ -115,6 +115,24 @@ impl Feed {
 
     Ok(())
   }
+
+  /// Remove this feed and all its entries from the database.
+  pub async fn remove(id: &ObjectId) -> Result<(), Error> {
+    <Entry as ModelExt>::delete_many(doc! { "feed": id }).await?;
+    Feed::delete_one(doc! { "_id": id }).await?;
+    Ok(())
+  }
+
+  /// Remove this feed and all its entries from the database if there are no
+  /// subscriptions associated with it.
+  pub async fn cleanup(id: &ObjectId) -> Result<(), Error> {
+    let subscription_count = Subscription::count(doc! { "feed": id }).await?;
+    let can_remove_feed = subscription_count == 0;
+    if can_remove_feed {
+      Self::remove(id).await?;
+    }
+    Ok(())
+  }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

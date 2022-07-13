@@ -127,18 +127,28 @@ async fn remove_subscription_by_id(
   Path(params): Path<HashMap<String, String>>,
 ) -> Result<(), Error> {
   let application_id = application.id.unwrap();
-
   let subscription_id = params.get("id").unwrap().to_owned();
   let subscription_id = to_object_id(subscription_id)?;
 
-  let delete_result =
-    Subscription::delete_one(doc! { "_id": subscription_id, "application": &application_id })
-      .await?;
+  let subscription = Subscription::find_one(
+    doc! {
+      "_id": &subscription_id,
+      "application": application_id
+    },
+    None,
+  )
+  .await?;
 
-  if delete_result.deleted_count == 0 {
-    debug!("subscription not found, returning 404 status code");
-    return Err(Error::NotFound(NotFound::new("subscription")));
-  }
+  let subscription = match subscription {
+    Some(subscription) => subscription,
+    None => {
+      debug!("subscription not found, returning 404 status code");
+      return Err(Error::NotFound(NotFound::new("subscription")));
+    }
+  };
+
+  Subscription::delete_one(doc! { "_id": subscription_id }).await?;
+  Feed::cleanup(&subscription.feed).await?;
 
   Ok(())
 }
