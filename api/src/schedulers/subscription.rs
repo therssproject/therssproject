@@ -32,7 +32,7 @@ async fn run_job() {
       }
     };
 
-    let concurrency = 50;
+    let concurrency = 10;
     subscriptions
       .filter_map(parse)
       .for_each_concurrent(concurrency, notify)
