@@ -3,8 +3,7 @@ use bson::serde_helpers::serialize_object_id_as_hex_string;
 use feed_rs;
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
-use tracing::error;
-use tracing::info;
+use tracing::{debug, error};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
@@ -65,7 +64,7 @@ impl Feed {
   /// Fetch the last RSS Feed version and store it's entries in the database.
   /// If the feed has new entries, update the related subscriptions.
   pub async fn sync(id: ObjectId) -> Result<(), Error> {
-    info!("Syncing feed {}", &id);
+    debug!("Syncing feed {}", &id);
     let start = Instant::now();
 
     let feed = Self::find_by_id(&id).await?;
@@ -112,7 +111,7 @@ impl Feed {
     Subscription::update_many(doc! { "feed": &id }, doc! { "$set": update}, None).await?;
 
     let duration = start.elapsed();
-    info!("Finished syncing feed {} elapsed={:.0?}", &id, duration);
+    debug!("Finished syncing feed {} elapsed={:.0?}", &id, duration);
 
     Ok(())
   }

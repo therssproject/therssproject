@@ -2,7 +2,7 @@ use feed_rs::model::Entry as RawEntry;
 use futures::{stream, StreamExt};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
-use tracing::{error, info};
+use tracing::{debug, error};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::mongodb::options::FindOneOptions;
@@ -73,7 +73,7 @@ impl Entry {
       .try_into()
       .expect("Failed to convert entries len to u64");
 
-    info!("Upserting {} new entries to feed {}", entries.len(), feed);
+    debug!("Upserting {} new entries to feed {}", entries.len(), feed);
     stream::iter(entries)
       // This is done sequential because we depend on the insertion order. We do
       // not use the insert_many function because it does not allow to insert
@@ -112,7 +112,7 @@ impl Entry {
       }
     };
 
-    info!("Removed {} outdated entries from feed {}", removed, feed);
+    debug!("Removed {} outdated entries from feed {}", removed, feed);
     // If items were removed, it means new entries were added. We don't care if
     // entries were updated.
     let was_synced = removed > 0;
