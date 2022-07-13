@@ -32,7 +32,7 @@ async fn run_job() {
       }
     };
 
-    let concurrency = 10;
+    let concurrency = 5;
     subscriptions
       .filter_map(parse)
       .for_each_concurrent(concurrency, notify)
@@ -53,7 +53,7 @@ async fn run_job() {
 async fn find_subscriptions() -> Result<Cursor<Subscription>, Error> {
   let options = FindOptions::builder()
     .sort(doc! { "scheduled_at": 1_i32 })
-    .limit(5_000)
+    .limit(1_000)
     .build();
 
   let query = doc! {

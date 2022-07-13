@@ -150,9 +150,9 @@ impl From<Subscription> for PublicSubscription {
 }
 
 async fn find_entries(subscription: &Subscription) -> Result<(Vec<Entry>, bool), Error> {
-  // Arbitrary limit of 20 entries. We probably allow the user to configure this
+  // Arbitrary limit of 30 entries. We probably allow the user to configure this
   // limit.
-  let limit = 10;
+  let limit = 30;
 
   let options = FindOptions::builder()
     .sort(doc! { "_id": 1_i32 })
