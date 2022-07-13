@@ -6,7 +6,7 @@ pub fn setup() {
   if env::var_os("RUST_LOG").is_none() {
     let settings = get_settings();
     let level = settings.logger.level.as_str();
-    let env = format!("rss={},tower_http={}", level, level);
+    let env = format!("therssproject={},tower_http={}", level, level);
 
     env::set_var("RUST_LOG", env);
   }
