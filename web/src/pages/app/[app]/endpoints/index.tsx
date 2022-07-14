@@ -19,6 +19,7 @@ import {SlideOver} from '@/components/SlideOver';
 import {Terminal} from '@/components/Terminal';
 import {useToast} from '@/components/Toast';
 
+import * as SNIPPETS from '@/content/snippets';
 import {Create, Edit} from '@/features/CreateEndpoint';
 import {EndpointItem} from '@/features/EndpointItem';
 import {SelectedAppAtom} from '@/models/application';
@@ -229,9 +230,7 @@ const EmptyState = ({
 
     <div className="flex flex-col items-center space-y-4 px-4 py-4 sm:px-6">
       <p className="text-md text-gray-600">Using the API</p>
-      <Terminal>
-        {`curl https://api.therssproject.com/applications/add \\\n-H "Authorization: Bearer <api-key>" \\\n-d '{"title": "My endpoint", "url": "https://myserver.com/webhooks/rss"}'`}
-      </Terminal>
+      <Terminal>{SNIPPETS.createEndpoint}</Terminal>
       <p className="text-sm text-gray-600">
         Go to{' '}
         <PrimaryLink href={Route.appSettingsKeys(app)}>
