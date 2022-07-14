@@ -6,9 +6,11 @@ import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
 import {FetchError} from '@/lib/fetch';
+import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
 import {TextField} from '@/components/inputs/TextField';
+import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {SlideOver} from '@/components/SlideOver';
 import {Terminal} from '@/components/Terminal';
 
@@ -115,11 +117,11 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
       <div className="flex-1">
         {/* Header */}
         <SlideOver.Header
-          title={endpoint ? 'Edit endpoint' : 'Create endpoint'}
+          title={endpoint ? 'Edit endpoint' : 'Register endpoint'}
           description="Webhook endpoint for your subscriptions"
         />
 
-        <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
+        <div className="space-y-6 py-6 sm:space-y-0 sm:py-0">
           {/* Title */}
           <div className="p-6">
             <TextField
@@ -145,32 +147,41 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
               }}
             />
           </div>
-
-          <div className="space-y-6 p-6">
-            <div className="text-lg font-medium text-gray-900">
-              Create endpoints using the API
-            </div>
-            <Terminal>
-              {`curl https://api.therssproject.com/application/endpoint \\\n--data { "foo": "bar" }`}
-            </Terminal>
-          </div>
         </div>
       </div>
 
       {/* Action buttons */}
-      <div className="flex-shrink-0 border-t border-gray-200 px-4 py-5 sm:px-6">
-        <div className="flex justify-end space-x-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={doClose}
-            disabled={loading}
-          >
-            Cancel
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {endpoint ? 'Save' : 'Create'}
-          </Button>
+      <div className="flex-shrink-0">
+        <div className="space-y-6 p-6">
+          <div className="font-medium text-gray-600">Or using the API</div>
+
+          <Terminal>
+            {`curl https://api.therssproject.com/applications/add \\\n-H "Authorization: Bearer <api-key>" \\\n-d '{"title": "My endpoint", "url": "https://myserver.com/webhooks/rss"}'`}
+          </Terminal>
+
+          <p className="text-sm text-gray-600">
+            Go to{' '}
+            <PrimaryLink href={Route.appSettingsKeys(app)}>
+              Settings {'>'} Keys
+            </PrimaryLink>{' '}
+            to create API Keys for this application.
+          </p>
+        </div>
+
+        <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+          <div className="flex justify-end space-x-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={doClose}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {endpoint ? 'Save' : 'Create'}
+            </Button>
+          </div>
         </div>
       </div>
     </form>
