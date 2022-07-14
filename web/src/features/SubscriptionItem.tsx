@@ -1,4 +1,5 @@
 import {CheckIcon, RssIcon, TrashIcon} from '@heroicons/react/outline';
+import {ClipboardCheckIcon, ClipboardIcon} from '@heroicons/react/outline';
 import {CalendarIcon} from '@heroicons/react/solid';
 import * as date from 'date-fns';
 import * as A from 'fp-ts/Array';
@@ -7,6 +8,7 @@ import * as O from 'fp-ts/Option';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
+import {useCopyToClipboard} from '@/lib/clipboard';
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
@@ -24,6 +26,7 @@ type Props = {
 export const SubscriptionItem = ({subscription, onDelete}: Props) => {
   const [confirm, setConfirm] = useState(false);
   const [appEndpoints] = useAtom(AppEndpointsAtom);
+  const clipboard = {id: useCopyToClipboard()};
 
   const onDeleteClick = () => {
     if (confirm) {
@@ -44,6 +47,31 @@ export const SubscriptionItem = ({subscription, onDelete}: Props) => {
             />
             <span className="font-mono">{subscription.url}</span>
           </p>
+
+          <button
+            type="button"
+            className="flex items-center space-x-2 text-gray-500"
+            onClick={() => clipboard.id.copy(subscription.id)}
+          >
+            <p className="text-md">{subscription.id}</p>
+            {clipboard.id.didCopy ? (
+              <div className="flex items-center text-sm">
+                <ClipboardCheckIcon
+                  className="mr-1 h-6 w-6 flex-shrink-0 text-gray-400"
+                  aria-hidden="true"
+                />
+                Copied!
+              </div>
+            ) : (
+              <div className="flex items-center text-sm">
+                <ClipboardIcon
+                  className="mr-1 h-6 w-6 flex-shrink-0 text-gray-400"
+                  aria-hidden="true"
+                />
+                Copy
+              </div>
+            )}
+          </button>
 
           {pipe(
             appEndpoints,

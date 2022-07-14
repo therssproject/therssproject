@@ -1,4 +1,5 @@
 import {LinkIcon, TrashIcon} from '@heroicons/react/outline';
+import {ClipboardCheckIcon, ClipboardIcon} from '@heroicons/react/outline';
 import {CalendarIcon, CheckIcon, PencilAltIcon} from '@heroicons/react/solid';
 import * as date from 'date-fns';
 import * as A from 'fp-ts/Array';
@@ -6,6 +7,7 @@ import {pipe} from 'fp-ts/function';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
+import {useCopyToClipboard} from '@/lib/clipboard';
 import {useAtom} from '@/lib/jotai';
 
 import {IconButton} from '@/components/buttons/IconButton';
@@ -25,6 +27,8 @@ export const EndpointItem = ({endpoint, onDelete, onEdit}: Props) => {
   const [confirm, setConfirm] = useState(false);
   const [appSubscriptions, _setAppSubscriptions] =
     useAtom(AppSubscriptionsAtom);
+
+  const clipboard = {id: useCopyToClipboard()};
 
   const hasSubs = pipe(
     RD.toNullable(appSubscriptions) ?? [],
@@ -52,6 +56,31 @@ export const EndpointItem = ({endpoint, onDelete, onEdit}: Props) => {
           <p className="text-md truncate font-medium text-indigo-600">
             {endpoint.title}
           </p>
+
+          <button
+            type="button"
+            className="flex items-center space-x-2 text-gray-500"
+            onClick={() => clipboard.id.copy(endpoint.id)}
+          >
+            <p className="text-md">{endpoint.id}</p>
+            {clipboard.id.didCopy ? (
+              <div className="flex items-center text-sm">
+                <ClipboardCheckIcon
+                  className="mr-1 h-6 w-6 flex-shrink-0 text-gray-400"
+                  aria-hidden="true"
+                />
+                Copied!
+              </div>
+            ) : (
+              <div className="flex items-center text-sm">
+                <ClipboardIcon
+                  className="mr-1 h-6 w-6 flex-shrink-0 text-gray-400"
+                  aria-hidden="true"
+                />
+                Copy
+              </div>
+            )}
+          </button>
 
           <p className="flex items-center text-sm text-gray-500">
             <LinkIcon
