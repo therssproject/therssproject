@@ -13,6 +13,7 @@ import {useRouteOfType} from '@/lib/routing';
 
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
+import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {Skeleton} from '@/components/Skeleton';
 import {SlideOver} from '@/components/SlideOver';
 import {Terminal} from '@/components/Terminal';
@@ -142,74 +143,37 @@ const AppEndpoints: NextPageWithLayout = () => {
                     endpoints,
                     A.match(
                       () => (
-                        <div className="mt-24 text-center">
-                          <svg
-                            className="mx-auto h-12 w-12 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            aria-hidden="true"
-                          >
-                            <path
-                              vectorEffect="non-scaling-stroke"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                            />
-                          </svg>
-                          <h3 className="mt-2 text-sm font-medium text-gray-900">
-                            No endpoints
-                          </h3>
-                          <p className="mt-1 text-sm text-gray-500">
-                            Get started by creating a new endpoint.
-                          </p>
-                          <div className="mt-6">
-                            <Button onClick={openCreateForm}>
-                              <PlusIcon className="h-4 w-4" /> Add endpoint
-                            </Button>
-                          </div>
-                        </div>
+                        <EmptyState
+                          app={app.id}
+                          openCreateForm={openCreateForm}
+                        />
                       ),
 
                       (endpoints) => (
                         <>
                           <div className="flex w-full justify-end">
                             <Button onClick={openCreateForm}>
-                              <PlusIcon className="h-4 w-4" /> Add endpoint
+                              <PlusIcon className="h-4 w-4" /> Register endpoint
                             </Button>
                           </div>
 
-                          <div className="space-y-8">
-                            <div className="overflow-hidden bg-white shadow sm:rounded-md">
-                              <ul
-                                role="list"
-                                className="divide-y divide-gray-200"
-                              >
-                                {endpoints.map((endpoint) => (
-                                  <EndpointItem
-                                    key={endpoint.id}
-                                    endpoint={endpoint}
-                                    onDelete={onDeleteEndpoint}
-                                    onEdit={openEditForm}
-                                  />
-                                ))}
-                              </ul>
-                            </div>
-
-                            <div className="space-y-4 bg-white px-4 py-4 shadow sm:rounded-md sm:px-6">
-                              <h2 className="text-xl font-medium text-gray-800">
-                                Endpoints docs
-                              </h2>
-
-                              <p className="text-md text-gray-700">
-                                Create create subscriptions to your endpoints
-                              </p>
-                              <Terminal>
-                                {`curl https://api.therssproject.com/applications/add \\\n--data '{"endpoint": "asdf-1234-ghjk-5678", "url": "https://www.reddit.com/.rss"}'`}
-                              </Terminal>
-                            </div>
+                          <div className="overflow-hidden bg-white shadow sm:rounded-md">
+                            <ul
+                              role="list"
+                              className="divide-y divide-gray-200"
+                            >
+                              {endpoints.map((endpoint) => (
+                                <EndpointItem
+                                  key={endpoint.id}
+                                  endpoint={endpoint}
+                                  onDelete={onDeleteEndpoint}
+                                  onEdit={openEditForm}
+                                />
+                              ))}
+                            </ul>
                           </div>
+
+                          <div className="space-y-8"></div>
                         </>
                       ),
                     ),
@@ -225,6 +189,59 @@ const AppEndpoints: NextPageWithLayout = () => {
     ),
   );
 };
+
+const EmptyState = ({
+  app,
+  openCreateForm,
+}: {
+  app: string;
+  openCreateForm: () => void;
+}) => (
+  <div className="mt-16 space-y-10">
+    <div className="text-center">
+      <svg
+        className="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          vectorEffect="non-scaling-stroke"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+        />
+      </svg>
+      <h3 className="mt-2 text-sm font-medium text-gray-900">No endpoints</h3>
+      <p className="mt-1 text-sm text-gray-500">
+        Get started by registering a new endpoint.
+      </p>
+      <div className="mt-6">
+        <Button onClick={openCreateForm}>
+          <PlusIcon className="h-4 w-4" /> Register endpoint
+        </Button>
+      </div>
+    </div>
+
+    <div className="text-center text-gray-500">OR</div>
+
+    <div className="flex flex-col items-center space-y-4 px-4 py-4 sm:px-6">
+      <p className="text-md text-gray-600">Using the API</p>
+      <Terminal>
+        {`curl https://api.therssproject.com/applications/add \\\n-H "Authorization: Bearer <api-key>" \\\n-d '{"title": "My endpoint", "url": "https://myserver.com/webhooks/rss"}'`}
+      </Terminal>
+      <p className="text-sm text-gray-600">
+        Go to{' '}
+        <PrimaryLink href={Route.appSettingsKeys(app)}>
+          Settings {'>'} Keys
+        </PrimaryLink>{' '}
+        to create API Keys for this application.
+      </p>
+    </div>
+  </div>
+);
 
 AppEndpoints.getLayout = (page) => (
   <Layout
