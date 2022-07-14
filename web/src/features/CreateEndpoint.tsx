@@ -14,6 +14,7 @@ import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {SlideOver} from '@/components/SlideOver';
 import {Terminal} from '@/components/Terminal';
 
+import * as SNIPPETS from '@/content/snippets';
 import {
   CreateEndpoint as CreateEndpointBody,
   createEndpoint,
@@ -155,9 +156,7 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
         <div className="space-y-6 p-6">
           <div className="font-medium text-gray-600">Or using the API</div>
 
-          <Terminal>
-            {`curl https://api.therssproject.com/applications/add \\\n-H "Authorization: Bearer <api-key>" \\\n-d '{"title": "My endpoint", "url": "https://myserver.com/webhooks/rss"}'`}
-          </Terminal>
+          <Terminal>{SNIPPETS.createEndpoint}</Terminal>
 
           <p className="text-sm text-gray-600">
             Go to{' '}
