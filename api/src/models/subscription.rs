@@ -42,9 +42,9 @@ pub struct Subscription {
   // This attribute is used by the subscription scheduler to determine if the
   // subscription needs to be notified. When subscription is notified, this
   // attribute is set to None.
-  // TODO: Update ser/de for this attribute to avoid inserting null values on
-  // the database when this value is None. This is because we have a sparse
-  // index on this field.
+  // Skip serializing to avoid inserting a null value in the database. This is
+  // because there is a sparse index on this field.
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub scheduled_at: Option<Date>,
 
   pub synced_at: Option<Date>,
