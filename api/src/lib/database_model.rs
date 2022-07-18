@@ -41,7 +41,7 @@ pub trait ModelExt {
     Ok(model)
   }
 
-  async fn collection() -> Collection<Self::T> {
+  fn collection() -> Collection<Self::T> {
     let connection = database::get_connection();
     Self::T::collection(connection)
   }
