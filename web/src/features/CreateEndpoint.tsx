@@ -16,32 +16,32 @@ import {Terminal} from '@/components/Terminal';
 
 import * as SNIPPETS from '@/content/snippets';
 import {
-  CreateEndpoint as CreateEndpointBody,
-  createEndpoint,
+  RegisterEndpoint as RegisterEndpointBody,
+  registerEndpoint,
   Endpoint,
   updateEndpoint,
   useSetNewEndpoint,
   useUpdateEndpoint,
 } from '@/models/endpoint';
 
-type CreateProps = {
+type RegisterProps = {
   app: string;
   onClose: () => void;
 };
 
-export const Create = (props: CreateProps) => {
+export const Register = (props: RegisterProps) => {
   const onSave = useSetNewEndpoint();
 
-  return <Form {...props} onSave={onSave} doSave={createEndpoint} />;
+  return <Form {...props} onSave={onSave} doSave={registerEndpoint} />;
 };
 
-type EditProps = {
+type UpdateProps = {
   endpoint: Endpoint;
   app: string;
   onClose: () => void;
 };
 
-export const Edit = (props: EditProps) => {
+export const Update = (props: UpdateProps) => {
   const onSave = useUpdateEndpoint(props.endpoint);
 
   return (
@@ -53,7 +53,7 @@ export const Edit = (props: EditProps) => {
   );
 };
 
-const CreateEndpoint_ = yup.object({
+const RegisterEndpoint_ = yup.object({
   title: yup.string().required(),
   url: yup.string().url().required(),
 });
@@ -65,7 +65,7 @@ type Props = {
   onSave: (endpoint: Endpoint) => void;
   doSave: (
     app: string,
-    body: CreateEndpointBody,
+    body: RegisterEndpointBody,
   ) => TE.TaskEither<FetchError, Endpoint>;
 };
 
@@ -76,8 +76,8 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
     handleSubmit,
     reset,
     formState: {errors},
-  } = useForm<CreateEndpointBody>({
-    resolver: yupResolver(CreateEndpoint_),
+  } = useForm<RegisterEndpointBody>({
+    resolver: yupResolver(RegisterEndpoint_),
     defaultValues: endpoint,
   });
 
@@ -88,7 +88,7 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
     }
   };
 
-  const onSubmit: SubmitHandler<CreateEndpointBody> = async (body) => {
+  const onSubmit: SubmitHandler<RegisterEndpointBody> = async (body) => {
     setLoading(true);
 
     const run = pipe(
@@ -118,7 +118,7 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
       <div className="flex-1">
         {/* Header */}
         <SlideOver.Header
-          title={endpoint ? 'Edit endpoint' : 'Register endpoint'}
+          title={endpoint ? 'Update endpoint' : 'Register endpoint'}
           description="Webhook endpoint for your subscriptions"
         />
 
@@ -154,17 +154,27 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
       {/* Action buttons */}
       <div className="flex-shrink-0">
         <div className="space-y-6 p-6">
-          <div className="font-medium text-gray-600">Or using the API</div>
-
-          <Terminal>{SNIPPETS.createEndpoint}</Terminal>
-
           <p className="text-sm text-gray-600">
-            Go to{' '}
-            <PrimaryLink href={Route.appSettingsKeys(app)}>
-              Settings {'>'} Keys
+            Want to register endpoints using the API instead?{' '}
+            <PrimaryLink href={Route.documentation}>
+              Check the docs
             </PrimaryLink>{' '}
-            to create API Keys for this application.
           </p>
+          {false && (
+            <>
+              <h3 className="text-lg font-medium text-gray-600">Created endpoints</h3>
+
+              <Terminal>{SNIPPETS.registerEndpoint}</Terminal>
+
+              <p className="text-sm text-gray-600">
+                Go to{' '}
+                <PrimaryLink href={Route.appSettingsKeys(app)}>
+                  Settings {'>'} Keys
+                </PrimaryLink>{' '}
+                to generate API Keys for this application.
+              </p>
+            </>
+          )}
         </div>
 
         <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
@@ -178,7 +188,7 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {endpoint ? 'Save' : 'Create'}
+              {endpoint ? 'Update' : 'Register'}
             </Button>
           </div>
         </div>

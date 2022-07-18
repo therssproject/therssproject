@@ -31,7 +31,7 @@ export const Terminal = ({children}: Props) => {
   const code = useMemo(() => formatCode(children), [children]);
 
   return (
-    <div className="h-full rounded-lg bg-gray-200">
+    <div className="h-full w-full rounded-lg bg-gray-200">
       <div className="w-full rounded-t-lg bg-gray-500 py-2">
         <div className="relative flex justify-between px-4 py-0.5 text-sm text-gray-100">
           <div>
@@ -50,7 +50,7 @@ export const Terminal = ({children}: Props) => {
           </div>
         </div>
       </div>
-      <pre className="text-md overflow-x-auto whitespace-pre px-4 pt-4 pb-6 font-mono text-gray-900">
+      <pre className="text-md overflow-x-scroll whitespace-pre px-4 pt-4 pb-6 font-mono text-gray-900">
         {code}
       </pre>
     </div>
