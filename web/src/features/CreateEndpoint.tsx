@@ -16,9 +16,9 @@ import {Terminal} from '@/components/Terminal';
 
 import * as SNIPPETS from '@/content/snippets';
 import {
+  Endpoint,
   RegisterEndpoint as RegisterEndpointBody,
   registerEndpoint,
-  Endpoint,
   updateEndpoint,
   useSetNewEndpoint,
   useUpdateEndpoint,
@@ -156,13 +156,13 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
         <div className="space-y-6 p-6">
           <p className="text-sm text-gray-600">
             Want to register endpoints using the API instead?{' '}
-            <PrimaryLink href={Route.documentation}>
-              Check the docs
-            </PrimaryLink>{' '}
+            <PrimaryLink href={Route.documentation}>Check the docs</PrimaryLink>{' '}
           </p>
           {false && (
             <>
-              <h3 className="text-lg font-medium text-gray-600">Created endpoints</h3>
+              <h3 className="text-lg font-medium text-gray-600">
+                Created endpoints
+              </h3>
 
               <Terminal>{SNIPPETS.registerEndpoint}</Terminal>
 
