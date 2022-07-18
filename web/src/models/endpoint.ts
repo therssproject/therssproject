@@ -34,18 +34,18 @@ export const EndpointsAtom = atom<EndpointsState>({});
 export const fetchEndpoints = (app: string) =>
   http.get(`/applications/${app}/endpoints`, t.array(Endpoint));
 
-export type CreateEndpoint = {
+export type RegisterEndpoint = {
   title: string;
   url: string;
 };
 
-export const createEndpoint = (app: string, body: CreateEndpoint) =>
+export const registerEndpoint = (app: string, body: RegisterEndpoint) =>
   http.post(`/applications/${app}/endpoints`, body, Endpoint);
 
 export const updateEndpoint = (
   app: string,
   endpoint: Endpoint,
-  body: CreateEndpoint,
+  body: RegisterEndpoint,
 ) =>
   pipe(
     // TODO: should be `t.void` instead but the library tries to parse the response body

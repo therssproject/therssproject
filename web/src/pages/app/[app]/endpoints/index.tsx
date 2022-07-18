@@ -20,7 +20,7 @@ import {Terminal} from '@/components/Terminal';
 import {useToast} from '@/components/Toast';
 
 import * as SNIPPETS from '@/content/snippets';
-import {Create, Edit} from '@/features/CreateEndpoint';
+import {Register, Update} from '@/features/CreateEndpoint';
 import {EndpointItem} from '@/features/EndpointItem';
 import {SelectedAppAtom} from '@/models/application';
 import {AppEndpointsAtom, deleteEndpoint, Endpoint} from '@/models/endpoint';
@@ -31,11 +31,11 @@ const noOp = () => {};
 
 type FormState =
   | {tag: 'hide'}
-  | {tag: 'create'}
-  | {tag: 'edit'; endpoint: Endpoint};
+  | {tag: 'register'}
+  | {tag: 'update'; endpoint: Endpoint};
 
 const hide: FormState = {tag: 'hide'};
-const create: FormState = {tag: 'create'};
+const register: FormState = {tag: 'register'};
 
 const AppEndpoints: NextPageWithLayout = () => {
   const toast = useToast();
@@ -46,23 +46,23 @@ const AppEndpoints: NextPageWithLayout = () => {
   const [formState, setFormState] = useState<FormState>(() =>
     pipe(
       route,
-      O.filter((route) => route.create),
+      O.filter((r) => r.create),
       O.match(
         (): FormState => hide,
-        () => create,
+        () => register,
       ),
     ),
   );
 
-  const openCreateForm = () => {
+  const openForm = () => {
     if (formState.tag === 'hide') {
-      setFormState(create);
+      setFormState(register);
     }
   };
 
   const openEditForm = (endpoint: Endpoint) => {
     if (formState.tag === 'hide') {
-      setFormState({tag: 'edit', endpoint});
+      setFormState({tag: 'update', endpoint});
     }
   };
 
@@ -120,16 +120,16 @@ const AppEndpoints: NextPageWithLayout = () => {
               // So we default to the Create form even when Edit is being closed
               // TODO: this results in a flash of content changing from "Edit"
               //       to "Create" as the slide out animation play.
-              //       Should we make the `Endpoint` optional in the edit form
+              //       Should we make the `Endpoint` optional in the update form
               //       instead?
-              formState.tag === 'edit' ? (
-                <Edit
+              formState.tag === 'update' ? (
+                <Update
                   app={app.id}
                   endpoint={formState.endpoint}
                   onClose={() => setFormState(hide)}
                 />
               ) : (
-                <Create app={app.id} onClose={() => setFormState(hide)} />
+                <Register app={app.id} onClose={() => setFormState(hide)} />
               )
             }
           </SlideOver>
@@ -143,17 +143,12 @@ const AppEndpoints: NextPageWithLayout = () => {
                   pipe(
                     endpoints,
                     A.match(
-                      () => (
-                        <EmptyState
-                          app={app.id}
-                          openCreateForm={openCreateForm}
-                        />
-                      ),
+                      () => <EmptyState app={app.id} openForm={openForm} />,
 
                       (endpoints) => (
                         <>
                           <div className="flex w-full justify-end">
-                            <Button onClick={openCreateForm}>
+                            <Button onClick={openForm}>
                               <PlusIcon className="h-4 w-4" /> Register endpoint
                             </Button>
                           </div>
@@ -191,13 +186,12 @@ const AppEndpoints: NextPageWithLayout = () => {
   );
 };
 
-const EmptyState = ({
-  app,
-  openCreateForm,
-}: {
+type EmptyStateProps = {
   app: string;
-  openCreateForm: () => void;
-}) => (
+  openForm: () => void;
+};
+
+const EmptyState = ({app, openForm}: EmptyStateProps) => (
   <div className="mt-16 space-y-10">
     <div className="text-center">
       <svg
@@ -220,7 +214,7 @@ const EmptyState = ({
         Get started by registering a new endpoint.
       </p>
       <div className="mt-6">
-        <Button onClick={openCreateForm}>
+        <Button onClick={openForm}>
           <PlusIcon className="h-4 w-4" /> Register endpoint
         </Button>
       </div>
@@ -228,15 +222,15 @@ const EmptyState = ({
 
     <div className="text-center text-gray-500">OR</div>
 
-    <div className="flex flex-col items-center space-y-4 px-4 py-4 sm:px-6">
-      <p className="text-md text-gray-600">Using the API</p>
-      <Terminal>{SNIPPETS.createEndpoint}</Terminal>
+    <div className="space-y-4 px-4 py-4 sm:px-6">
+      <p className="text-center text-md text-gray-600">Using the API</p>
+      <Terminal>{SNIPPETS.registerEndpoint}</Terminal>
       <p className="text-sm text-gray-600">
         Go to{' '}
         <PrimaryLink href={Route.appSettingsKeys(app)}>
           Settings {'>'} Keys
         </PrimaryLink>{' '}
-        to create API Keys for this application.
+        to generate API Keys for this application.
       </p>
     </div>
   </div>
