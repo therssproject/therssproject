@@ -223,7 +223,7 @@ const EmptyState = ({app, openForm}: EmptyStateProps) => (
     <div className="text-center text-gray-500">OR</div>
 
     <div className="space-y-4 px-4 py-4 sm:px-6">
-      <p className="text-center text-md text-gray-600">Using the API</p>
+      <p className="text-md text-center text-gray-600">Using the API</p>
       <Terminal>{SNIPPETS.registerEndpoint}</Terminal>
       <p className="text-sm text-gray-600">
         Go to{' '}

@@ -1,18 +1,17 @@
-import * as O from 'fp-ts/Option';
-import {pipe} from 'fp-ts/function';
 import {BeakerIcon} from '@heroicons/react/outline';
+import {pipe} from 'fp-ts/function';
+import * as O from 'fp-ts/Option';
+
+import {useAtom} from '@/lib/jotai';
+import {Route} from '@/lib/routes';
 
 import {Alert} from '@/components/Alert';
 import {Layout} from '@/components/layout/Layout';
-
+import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {Terminal} from '@/components/Terminal';
-import {SelectedAppAtom} from '@/models/application';
 
 import * as SNIPPETS from '@/content/snippets';
-import {PrimaryLink} from '@/components/links/PrimaryLink';
-
-import {Route} from '@/lib/routes';
-import {useAtom} from '@/lib/jotai';
+import {SelectedAppAtom} from '@/models/application';
 
 import {NextPageWithLayout} from './_app';
 
