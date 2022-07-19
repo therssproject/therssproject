@@ -31,7 +31,7 @@ export const KeysAtom = atom<KeysState>({});
 export const fetchKeys = (app: string) =>
   http.get(`/applications/${app}/keys`, t.array(Key));
 
-export const CreatedKey = te.sparseType({
+export const GeneratedKey = te.sparseType({
   id: t.string,
   key: t.string,
   application: t.string,
@@ -39,12 +39,12 @@ export const CreatedKey = te.sparseType({
   created_at: t.string,
 });
 
-export interface CreatedKey extends t.TypeOf<typeof CreatedKey> {}
+export interface GeneratedKey extends t.TypeOf<typeof GeneratedKey> {}
 
-export type CreateKey = {title: string};
+export type GenerateKey = {title: string};
 
-export const createKey = (app: string, body: CreateKey) =>
-  http.post(`/applications/${app}/keys`, body, CreatedKey);
+export const generateKey = (app: string, body: GenerateKey) =>
+  http.post(`/applications/${app}/keys`, body, GeneratedKey);
 
 export const deleteKey = (app: string, key: string) =>
   http.del(`/applications/${app}/keys/${key}`, t.void);

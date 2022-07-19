@@ -222,29 +222,35 @@ const MainNav = ({app}: {app?: string}) => {
   return (
     <>
       {app ? (
-        navigation(app).map((item) => (
-          <UnstyledLink
-            key={item.name}
-            href={item.href}
-            className={clsxm(
-              item.group.includes(route.tag)
-                ? 'bg-gray-100 text-gray-900'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-              'group flex items-center rounded-md px-2 py-2 text-base font-medium',
-            )}
-          >
-            <item.icon
+        navigation(app)
+          .map((item) => ({
+            item,
+            isActive:
+              item.group.includes(route.tag) || item.href.tag === route.tag,
+          }))
+          .map(({item, isActive}) => (
+            <UnstyledLink
+              key={item.name}
+              href={item.href}
               className={clsxm(
-                item.group.includes(route.tag)
-                  ? 'text-gray-500'
-                  : 'text-gray-400 group-hover:text-gray-500',
-                'mr-4 h-6 w-6 flex-shrink-0',
+                isActive
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                'group flex items-center rounded-md px-2 py-2 text-base font-medium',
               )}
-              aria-hidden="true"
-            />
-            {item.name}
-          </UnstyledLink>
-        ))
+            >
+              <item.icon
+                className={clsxm(
+                  isActive
+                    ? 'text-gray-500'
+                    : 'text-gray-400 group-hover:text-gray-500',
+                  'mr-4 h-6 w-6 flex-shrink-0',
+                )}
+                aria-hidden="true"
+              />
+              {item.name}
+            </UnstyledLink>
+          ))
       ) : (
         <>
           <Skeleton className="h-10 w-full rounded-md p-2" />

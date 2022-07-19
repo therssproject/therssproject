@@ -14,7 +14,7 @@ import {Tabs} from '@/components/SettingsTabs';
 import {Skeleton} from '@/components/Skeleton';
 import {useToast} from '@/components/Toast';
 
-import {Create} from '@/features/CreateKey';
+import {Generate} from '@/features/CreateKey';
 import {KeyItem} from '@/features/KeyItem';
 import {SelectedAppAtom, useFetchOnAppChange} from '@/models/application';
 import {AppKeysAtom, deleteKey, fetchKeys, Key} from '@/models/key';
@@ -79,7 +79,7 @@ const AppSettingsKeys: NextPageWithLayout = () => {
                   </p>
                 </div>
 
-                <Create
+                <Generate
                   app={app}
                   open={newKeyOpen}
                   onClose={() => setNewKeyOpen(false)}
@@ -114,7 +114,7 @@ const AppSettingsKeys: NextPageWithLayout = () => {
                           {pipe(
                             keys,
                             A.match(
-                              () => <Alert>No keys created yet ...</Alert>,
+                              () => <Alert>No keys generated yet ...</Alert>,
                               (keys) => (
                                 <div className="overflow-hidden border-gray-200 bg-white sm:rounded-md sm:border">
                                   <ul

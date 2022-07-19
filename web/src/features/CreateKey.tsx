@@ -21,9 +21,9 @@ import {useToast} from '@/components/Toast';
 
 import {Application} from '@/models/application';
 import {
-  CreatedKey,
-  CreateKey as CreateKeyBody,
-  createKey,
+  GeneratedKey,
+  GenerateKey as GenerateKeyBody,
+  generateKey,
   useSetNewKey,
 } from '@/models/key';
 
@@ -38,37 +38,37 @@ const Inputs = yup.object({
 });
 
 type Status =
-  | {tag: 'create'}
-  | {tag: 'creating'}
-  | {tag: 'confirm'; key: CreatedKey};
+  | {tag: 'generate'}
+  | {tag: 'generating'}
+  | {tag: 'confirm'; key: GeneratedKey};
 
-const create: Status = {tag: 'create'};
-const creating: Status = {tag: 'creating'};
-const confirm = (key: CreatedKey): Status => ({tag: 'confirm', key});
+const generate: Status = {tag: 'generate'};
+const generating: Status = {tag: 'generating'};
+const confirm = (key: GeneratedKey): Status => ({tag: 'confirm', key});
 
-export const Create = ({open, app, onClose}: Props) => {
+export const Generate = ({open, app, onClose}: Props) => {
   const {copy, didCopy} = useCopyToClipboard();
   const toast = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const setNewKey = useSetNewKey();
-  const [status, setStatus] = useState<Status>(create);
+  const [status, setStatus] = useState<Status>(generate);
 
   const {
     register,
     handleSubmit,
     reset,
     formState: {errors},
-  } = useForm<CreateKeyBody>({resolver: yupResolver(Inputs)});
+  } = useForm<GenerateKeyBody>({resolver: yupResolver(Inputs)});
 
-  const onSubmit: SubmitHandler<CreateKeyBody> = async (body) => {
-    setStatus(creating);
+  const onSubmit: SubmitHandler<GenerateKeyBody> = async (body) => {
+    setStatus(generating);
 
     const run = pipe(
-      createKey(app.id, body),
+      generateKey(app.id, body),
       TE.match(
         () => {
-          setStatus(create);
-          toast.show('Failed to create key', {variant: 'danger'});
+          setStatus(generate);
+          toast.show('Failed to generate key', {variant: 'danger'});
         },
         ({key, ...rest}) => {
           setStatus(confirm({key, ...rest}));
@@ -87,12 +87,12 @@ export const Create = ({open, app, onClose}: Props) => {
     // Allow the fade-out to play
     setTimeout(() => {
       reset();
-      setStatus(create);
+      setStatus(generate);
     }, 500);
   };
 
   const safeClose = () => {
-    if (status.tag === 'create') {
+    if (status.tag === 'generate') {
       doClose();
     }
   };
@@ -107,7 +107,7 @@ export const Create = ({open, app, onClose}: Props) => {
                 variant: 'success',
                 Component: CheckIcon,
               }}
-              title="API Key Created"
+              title="API Key Generated"
               description={
                 <>
                   The key will be used to interact with the{' '}
@@ -127,10 +127,7 @@ export const Create = ({open, app, onClose}: Props) => {
                     variant: 'success',
                     value: status.key.key,
                     iconAfter: {
-                      onClick: () =>
-                        copy(status.key.key, () =>
-                          toast.show('Key copied to clipboard'),
-                        ),
+                      onClick: () => copy(status.key.key),
                       component: didCopy ? ClipboardCheckIcon : ClipboardIcon,
                     },
                   }}
@@ -158,7 +155,7 @@ export const Create = ({open, app, onClose}: Props) => {
                 variant: 'warn',
                 Component: KeyIcon,
               }}
-              title="Create API Key"
+              title="Generate API Key"
               description={
                 <>
                   The key will be used to interact with the{' '}
@@ -190,12 +187,12 @@ export const Create = ({open, app, onClose}: Props) => {
                 type="button"
                 variant="outline"
                 onClick={doClose}
-                disabled={status.tag === 'creating'}
+                disabled={status.tag === 'generating'}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={status.tag === 'creating'}>
-                Create
+              <Button type="submit" disabled={status.tag === 'generating'}>
+                Generate
               </Button>
             </div>
           </div>
