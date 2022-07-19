@@ -151,32 +151,33 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
         </div>
       </div>
 
-      {/* Action buttons */}
       <div className="flex-shrink-0">
-        <div className="space-y-6 p-6">
+        {/* Mobile version */}
+        <div className="p-6 md:hidden">
           <p className="text-sm text-gray-600">
             Want to register endpoints using the API instead?{' '}
             <PrimaryLink href={Route.documentation}>Check the docs</PrimaryLink>{' '}
           </p>
-          {false && (
-            <>
-              <h3 className="text-lg font-medium text-gray-600">
-                Created endpoints
-              </h3>
-
-              <Terminal>{SNIPPETS.registerEndpoint}</Terminal>
-
-              <p className="text-sm text-gray-600">
-                Go to{' '}
-                <PrimaryLink href={Route.appSettingsKeys(app)}>
-                  Settings {'>'} Keys
-                </PrimaryLink>{' '}
-                to generate API Keys for this application.
-              </p>
-            </>
-          )}
         </div>
 
+        {/* Others */}
+        <div className="hidden space-y-4 p-6 md:block">
+          <h3 className="text-lg font-medium text-gray-600">
+            Or using the API
+          </h3>
+
+          <Terminal>{SNIPPETS.registerEndpoint}</Terminal>
+
+          <p className="text-sm text-gray-600">
+            Go to{' '}
+            <PrimaryLink href={Route.appSettingsKeys(app)}>
+              Settings {'>'} Keys
+            </PrimaryLink>{' '}
+            to generate API Keys for this application.
+          </p>
+        </div>
+
+        {/* Action buttons */}
         <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
           <div className="flex justify-end space-x-3">
             <Button

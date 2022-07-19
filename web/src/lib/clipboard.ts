@@ -8,6 +8,8 @@ export const useCopyToClipboard = () => {
   const ref = useRef<number | null>(null);
 
   const copy = (text: string, onCopy: () => void = noOp) => {
+    window.clearTimeout(ref.current ?? undefined);
+
     ref.current = setTimeout(
       () => setDidCopy(false),
       2000,
