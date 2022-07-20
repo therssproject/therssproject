@@ -3,13 +3,11 @@ import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
-import {useRouter} from 'next/router';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
 import {useAtom} from '@/lib/jotai';
-import {format as formatRoute, Route} from '@/lib/routes';
-import {useRouteOfType} from '@/lib/routing';
+import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
@@ -26,9 +24,6 @@ import {SelectedAppAtom} from '@/models/application';
 import {AppEndpointsAtom, deleteEndpoint, Endpoint} from '@/models/endpoint';
 import {NextPageWithLayout} from '@/pages/_app';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
-
 type FormState =
   | {tag: 'hide'}
   | {tag: 'register'}
@@ -39,20 +34,9 @@ const register: FormState = {tag: 'register'};
 
 const AppEndpoints: NextPageWithLayout = () => {
   const toast = useToast();
-  const route = useRouteOfType('AppEndpoints');
-  const router = useRouter();
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [appEndpoints, setEndpoints] = useAtom(AppEndpointsAtom);
-  const [formState, setFormState] = useState<FormState>(() =>
-    pipe(
-      route,
-      O.filter((r) => r.create),
-      O.match(
-        (): FormState => hide,
-        () => register,
-      ),
-    ),
-  );
+  const [formState, setFormState] = useState<FormState>(hide);
 
   const openForm = () => {
     if (formState.tag === 'hide') {
@@ -65,21 +49,6 @@ const AppEndpoints: NextPageWithLayout = () => {
       setFormState({tag: 'update', endpoint});
     }
   };
-
-  // Clear the `?create=true` from the URL
-  useEffect(
-    () => {
-      pipe(
-        route,
-        O.filter((r) => r.create),
-        O.match(noOp, (route) => {
-          router.replace(formatRoute(Route.appEndpoints(route.app, false)));
-        }),
-      );
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
 
   const onDeleteEndpoint = (toDelete: Endpoint) => {
     pipe(

@@ -1,7 +1,6 @@
 import {PlusIcon} from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
-import * as NEA from 'fp-ts/NonEmptyArray';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
 import {useState} from 'react';
@@ -10,17 +9,18 @@ import * as RD from 'remote-data-ts';
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
-import {Alert} from '@/components/Alert';
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {Skeleton} from '@/components/Skeleton';
+import {Terminal} from '@/components/Terminal';
 import {useToast} from '@/components/Toast';
 
+import * as SNIPPETS from '@/content/snippets';
 import {Create} from '@/features/CreateSub';
 import {SubscriptionItem} from '@/features/SubscriptionItem';
 import {SelectedAppAtom} from '@/models/application';
-import {AppEndpointsAtom} from '@/models/endpoint';
+import {AppEndpointsAtom, Endpoint} from '@/models/endpoint';
 import {
   AppSubscriptionsAtom,
   deleteSubscription,
@@ -66,78 +66,136 @@ const AppSubs: NextPageWithLayout = () => {
     currentApp,
     O.match(
       () => null,
-      (app) => (
-        <div className="space-y-8">
-          {pipe(
-            appEndpoints,
-            RD.toOption,
-            O.chain(NEA.fromArray),
-            O.match(
-              () => (
-                <div className="flex w-full justify-end">
-                  <div className="pb-4 text-gray-600">
-                    No endpoints created yet, please{' '}
-                    <PrimaryLink href={Route.appEndpoints(app.id, true)}>
-                      add an endpoint
-                    </PrimaryLink>{' '}
-                    first.
-                  </div>
-                </div>
-              ),
-              (endpoints) => (
-                <>
-                  <Create
-                    app={app.id}
-                    endpoints={endpoints}
-                    open={showForm}
-                    onClose={() => setShowForm(false)}
-                  />
+      (app) =>
+        pipe(
+          appSubscriptions,
+          RD.match({
+            notAsked: () => <Skeleton className="h-48 w-full rounded-lg" />,
+            loading: () => <Skeleton className="h-48 w-full rounded-lg" />,
+            success: (subscriptions) =>
+              pipe(
+                appEndpoints,
+                RD.toOption,
+                O.getOrElse((): Endpoint[] => []),
+                A.match(
+                  () => (
+                    <div className="mt-16 flex w-full flex-col items-center space-y-2">
+                      <p className="text-lg text-gray-600">
+                        No endpoints registered yet.
+                      </p>
+                      <p className="text-lg text-gray-600">
+                        Please{' '}
+                        <PrimaryLink href={Route.appEndpoints(app.id)}>
+                          register one
+                        </PrimaryLink>{' '}
+                        first.
+                      </p>
+                    </div>
+                  ),
+                  (es) => (
+                    <>
+                      <Create
+                        app={app.id}
+                        endpoints={es}
+                        open={showForm}
+                        onClose={() => setShowForm(false)}
+                      />
 
-                  <div className="flex w-full justify-end">
-                    <Button onClick={onOpen}>
-                      <PlusIcon className="h-4 w-4" /> Add subscription
-                    </Button>
-                  </div>
-                </>
-              ),
-            ),
-          )}
+                      {pipe(
+                        subscriptions,
+                        A.match(
+                          () => <EmptyState app={app.id} openForm={onOpen} />,
+                          (subs) => (
+                            <div className="space-y-8">
+                              <div className="flex w-full justify-end">
+                                <Button onClick={onOpen}>
+                                  <PlusIcon className="h-4 w-4" /> Create
+                                  subscription
+                                </Button>
+                              </div>
 
-          {pipe(
-            appSubscriptions,
-            RD.match({
-              notAsked: () => <Skeleton className="h-48 w-full rounded-lg" />,
-              loading: () => <Skeleton className="h-48 w-full rounded-lg" />,
-              success: (subscription) =>
-                pipe(
-                  subscription,
-                  A.match(
-                    () => <Alert>No subscriptions created yet ...</Alert>,
-                    (subscription) => (
-                      <div className="overflow-hidden bg-white shadow sm:rounded-md">
-                        <ul role="list" className="divide-y divide-gray-200">
-                          {subscription.map((subscription) => (
-                            <SubscriptionItem
-                              key={subscription.id}
-                              subscription={subscription}
-                              onDelete={onDeleteSubscription}
-                            />
-                          ))}
-                        </ul>
-                      </div>
-                    ),
+                              <div className="overflow-hidden bg-white shadow sm:rounded-md">
+                                <ul
+                                  role="list"
+                                  className="divide-y divide-gray-200"
+                                >
+                                  {subs.map((sub) => (
+                                    <SubscriptionItem
+                                      key={sub.id}
+                                      subscription={sub}
+                                      onDelete={onDeleteSubscription}
+                                    />
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          ),
+                        ),
+                      )}
+                    </>
                   ),
                 ),
-              failure: (msg) => (
-                <div className="rounded-lg bg-red-50 p-4">{msg}</div>
               ),
-            }),
-          )}
-        </div>
-      ),
+            failure: (msg) => (
+              <div className="rounded-lg bg-red-50 p-4">{msg}</div>
+            ),
+          }),
+        ),
     ),
   );
 };
+
+type EmptyStateProps = {
+  app: string;
+  openForm: () => void;
+};
+
+const EmptyState = ({app, openForm}: EmptyStateProps) => (
+  <div className="mt-16 space-y-10">
+    <div className="text-center">
+      <svg
+        className="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          vectorEffect="non-scaling-stroke"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+        />
+      </svg>
+      <h3 className="mt-2 text-sm font-medium text-gray-900">
+        No subscriptions
+      </h3>
+      <p className="mt-1 text-sm text-gray-500">
+        Get started by creating a new subscription.
+      </p>
+      <div className="mt-6">
+        <Button onClick={openForm}>
+          <PlusIcon className="h-4 w-4" /> Create subscription
+        </Button>
+      </div>
+    </div>
+
+    <div className="text-center text-gray-500">OR</div>
+
+    <div className="space-y-4 px-4 py-4 sm:px-6">
+      <p className="text-md text-center text-gray-600">Using the API</p>
+      <Terminal>{SNIPPETS.createSubscription}</Terminal>
+      <p className="text-sm text-gray-600">
+        Go to{' '}
+        <PrimaryLink href={Route.appSettingsKeys(app)}>
+          Settings {'>'} Keys
+        </PrimaryLink>{' '}
+        to generate API Keys for this application.
+      </p>
+    </div>
+  </div>
+);
 
 AppSubs.getLayout = (page) => (
   <Layout
