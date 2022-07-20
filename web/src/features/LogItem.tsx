@@ -53,7 +53,7 @@ export const LogItem = ({log}: {log: Log}) => {
                 <p className="truncate text-sm">
                   <span className="text-gray-600">Sent to</span>{' '}
                   <UnstyledLink
-                    href={Route.appEndpoints(endpoint.application, false)}
+                    href={Route.appEndpoints(endpoint.application)}
                     className="font-medium text-indigo-600"
                   >
                     {endpoint.title}

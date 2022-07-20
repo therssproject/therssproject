@@ -11,11 +11,15 @@ import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
 import {clsxm} from '@/lib/clsxm';
+import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
 import {TextField} from '@/components/inputs/TextField';
+import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {SlideOver} from '@/components/SlideOver';
+import {Terminal} from '@/components/Terminal';
 
+import * as SNIPPETS from '@/content/snippets';
 import {Endpoint} from '@/models/endpoint';
 import {
   CreateSubscription as CreateSubscriptionBody,
@@ -103,7 +107,7 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
             description="Create an RSS subscription"
           />
 
-          <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
+          <div className="space-y-6 py-6 sm:space-y-0 sm:py-0">
             {/* Feed URL */}
             <div className="p-6">
               <TextField
@@ -144,19 +148,48 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
         </div>
 
         {/* Action buttons */}
-        <div className="flex-shrink-0 border-t border-gray-200 px-4 py-5 sm:px-6">
-          <div className="flex justify-end space-x-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={doClose}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              Create
-            </Button>
+        <div className="flex-shrink-0">
+          {/* Mobile version */}
+          <div className="p-6 md:hidden">
+            <p className="text-sm text-gray-600">
+              Want to register endpoints using the API instead?{' '}
+              <PrimaryLink href={Route.documentation}>
+                Check the docs
+              </PrimaryLink>{' '}
+            </p>
+          </div>
+
+          {/* Others */}
+          <div className="hidden space-y-4 p-6 md:block">
+            <h3 className="text-lg font-medium text-gray-600">
+              Or using the API
+            </h3>
+
+            <Terminal>{SNIPPETS.createSubscription}</Terminal>
+
+            <p className="text-sm text-gray-600">
+              Go to{' '}
+              <PrimaryLink href={Route.appSettingsKeys(app)}>
+                Settings {'>'} Keys
+              </PrimaryLink>{' '}
+              to generate API Keys for this application.
+            </p>
+          </div>
+
+          <div className=" border-t border-gray-200 px-4 py-5 sm:px-6">
+            <div className="flex justify-end space-x-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={doClose}
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                Create
+              </Button>
+            </div>
           </div>
         </div>
       </form>

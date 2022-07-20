@@ -28,10 +28,7 @@ const Documentation: NextPageWithLayout = () => {
       </Alert>
 
       <section className="space-y-4">
-        <h3 className="text-xl font-medium text-gray-600">Register endpoint</h3>
-
-        <Terminal>{SNIPPETS.registerEndpoint}</Terminal>
-
+        <h3 className="text-xl font-medium text-gray-600">Creating API Keys</h3>
         <p className="text-sm text-gray-600">
           Go to{' '}
           {pipe(
@@ -49,6 +46,20 @@ const Documentation: NextPageWithLayout = () => {
             ),
           )}
         </p>
+      </section>
+
+      <section className="space-y-4">
+        <h3 className="text-xl font-medium text-gray-600">Register endpoint</h3>
+
+        <Terminal>{SNIPPETS.registerEndpoint}</Terminal>
+      </section>
+
+      <section className="space-y-4">
+        <h3 className="text-xl font-medium text-gray-600">
+          Subscribe to a feed
+        </h3>
+
+        <Terminal>{SNIPPETS.createSubscription}</Terminal>
       </section>
     </div>
   );

@@ -190,7 +190,7 @@ const getPages = (app: Application, current: Route): Breadcrumb[] =>
       __: () => [],
 
       AppEndpoints: () => [
-        {name: 'Endpoints', href: Route.appEndpoints(app.id, false)},
+        {name: 'Endpoints', href: Route.appEndpoints(app.id)},
       ],
       AppSubs: () => [{name: 'Subscriptions', href: Route.appSubs(app.id)}],
       AppLogs: () => [{name: 'Logs', href: Route.appLogs(app.id)}],

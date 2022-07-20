@@ -42,7 +42,7 @@ const navigation = (app: string): NavLink[] => [
   {
     name: 'Endpoints',
     icon: UsersIcon,
-    href: Route.appEndpoints(app, false),
+    href: Route.appEndpoints(app),
     group: [],
   },
   {
