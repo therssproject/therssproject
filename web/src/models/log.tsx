@@ -6,6 +6,7 @@ import * as te from 'io-ts-extra';
 import {atom} from 'jotai';
 import * as RD from 'remote-data-ts';
 
+import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 
 import {SelectedAppAtom} from './application';
@@ -34,9 +35,6 @@ export const LogsAtom = atom<LogsState>({});
 
 export const fetchLogs = (app: string, opts = {limit: 100}) =>
   http.get(`/applications/${app}/webhooks?limit=${opts.limit}`, t.array(Log));
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
 
 export const AppLogsAtom = atom(
   (get) =>

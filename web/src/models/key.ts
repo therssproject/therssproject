@@ -9,6 +9,7 @@ import {useAtomCallback} from 'jotai/utils';
 import {useCallback} from 'react';
 import * as RD from 'remote-data-ts';
 
+import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 
 import {SelectedAppAtom} from './application';
@@ -48,9 +49,6 @@ export const generateKey = (app: string, body: GenerateKey) =>
 
 export const deleteKey = (app: string, key: string) =>
   http.del(`/applications/${app}/keys/${key}`, t.void);
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
 
 export const AppKeysAtom = atom(
   (get) =>

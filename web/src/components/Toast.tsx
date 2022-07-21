@@ -4,6 +4,8 @@ import * as O from 'fp-ts/Option';
 import {ReactNode} from 'react';
 import * as Toast from 'react-hot-toast';
 
+import {noOp} from '@/lib/effect';
+
 import {Alert, Props as AlertProps} from './Alert';
 
 const remove = (id: string) => Toast.toast.remove(id);
@@ -50,9 +52,6 @@ const toast_ = (content: ReactNode, opts?: ToastOptions & {id?: string}) => {
 
 const show = (content: ReactNode, props?: ToastOptions): string =>
   toast_(content, props);
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
 
 export const useToast = () => {
   const {toasts} = Toast.useToasterStore();

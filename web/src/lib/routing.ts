@@ -10,10 +10,8 @@ import {useAtom} from '@/lib/jotai';
 
 import {AuthResponse, SessionAtom} from '@/models/user';
 
+import {noOp} from './effect';
 import {format, match, parse, parseO, Route, RouteTag} from './routes';
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
 
 // Navigates to login route on logged IN only pages
 const loggedOutGuard = (push: (path: string) => void) => (route: Route) => {
