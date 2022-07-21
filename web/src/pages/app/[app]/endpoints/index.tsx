@@ -7,17 +7,13 @@ import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
 import {useAtom} from '@/lib/jotai';
-import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
-import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {Skeleton} from '@/components/Skeleton';
 import {SlideOver} from '@/components/SlideOver';
-import {Terminal} from '@/components/Terminal';
 import {useToast} from '@/components/Toast';
 
-import * as SNIPPETS from '@/content/snippets';
 import {Register, Update} from '@/features/CreateEndpoint';
 import {EndpointItem} from '@/features/EndpointItem';
 import {SelectedAppAtom} from '@/models/application';
@@ -112,7 +108,7 @@ const AppEndpoints: NextPageWithLayout = () => {
                   pipe(
                     endpoints,
                     A.match(
-                      () => <EmptyState app={app.id} openForm={openForm} />,
+                      () => <EmptyState openForm={openForm} />,
 
                       (endpoints) => (
                         <>
@@ -156,12 +152,11 @@ const AppEndpoints: NextPageWithLayout = () => {
 };
 
 type EmptyStateProps = {
-  app: string;
   openForm: () => void;
 };
 
-const EmptyState = ({app, openForm}: EmptyStateProps) => (
-  <div className="mt-16 space-y-10">
+const EmptyState = ({openForm}: EmptyStateProps) => (
+  <div className="mt-16">
     <div className="text-center">
       <svg
         className="mx-auto h-12 w-12 text-gray-400"
@@ -187,20 +182,6 @@ const EmptyState = ({app, openForm}: EmptyStateProps) => (
           <PlusIcon className="h-4 w-4" /> Register endpoint
         </Button>
       </div>
-    </div>
-
-    <div className="text-center text-gray-500">OR</div>
-
-    <div className="space-y-4 px-4 py-4 sm:px-6">
-      <p className="text-md text-center text-gray-600">Using the API</p>
-      <Terminal>{SNIPPETS.registerEndpoint}</Terminal>
-      <p className="text-sm text-gray-600">
-        Go to{' '}
-        <PrimaryLink href={Route.appSettingsKeys(app)}>
-          Settings {'>'} Keys
-        </PrimaryLink>{' '}
-        to generate API Keys for this application.
-      </p>
     </div>
   </div>
 );
