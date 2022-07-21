@@ -53,6 +53,7 @@ export const SubscriptionItem = ({subscription, onDelete}: Props) => {
             className="flex items-center space-x-2 text-gray-500"
             onClick={() => clipboard.id.copy(subscription.id)}
           >
+            <span className="text-md font-bold">ID:</span>
             <p className="text-md">{subscription.id}</p>
             {clipboard.id.didCopy ? (
               <div className="flex items-center text-sm">
