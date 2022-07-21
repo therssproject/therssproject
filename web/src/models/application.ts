@@ -11,6 +11,7 @@ import * as te from 'io-ts-extra';
 import {atom} from 'jotai';
 import * as RD from 'remote-data-ts';
 
+import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 import {useRouteOfType} from '@/lib/routing';
@@ -131,9 +132,6 @@ const fetchStats = (app: string) =>
     TE.map(([subs, logs]) => ({subs, logs})),
     TE.mapLeft(() => 'Failed to fetch stats'),
   );
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
 
 const useFetchAppStats = (currentApp: O.Option<Application>) => {
   const [_stats, setStats] = useAtom(StatsAtom);

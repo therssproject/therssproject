@@ -62,6 +62,7 @@ export const EndpointItem = ({endpoint, onDelete, onEdit}: Props) => {
             className="flex items-center space-x-2 text-gray-500"
             onClick={() => clipboard.id.copy(endpoint.id)}
           >
+            <span className="text-md font-bold">ID:</span>
             <p className="text-md">{endpoint.id}</p>
             {clipboard.id.didCopy ? (
               <div className="flex items-center text-sm">

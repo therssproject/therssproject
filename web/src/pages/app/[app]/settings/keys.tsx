@@ -5,6 +5,7 @@ import * as TE from 'fp-ts/TaskEither';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
+import {noOp} from '@/lib/effect';
 import {useAtom} from '@/lib/jotai';
 
 import {Alert} from '@/components/Alert';
@@ -12,7 +13,6 @@ import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {Tabs} from '@/components/SettingsTabs';
 import {Skeleton} from '@/components/Skeleton';
-import {useToast} from '@/components/Toast';
 
 import {Generate} from '@/features/CreateKey';
 import {KeyItem} from '@/features/KeyItem';
@@ -21,7 +21,6 @@ import {AppKeysAtom, deleteKey, fetchKeys, Key} from '@/models/key';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppSettingsKeys: NextPageWithLayout = () => {
-  const toast = useToast();
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [keys, setKeys] = useAtom(AppKeysAtom);
   const [newKeyOpen, setNewKeyOpen] = useState(false);
@@ -43,16 +42,13 @@ const AppSettingsKeys: NextPageWithLayout = () => {
 
     const run = pipe(
       deleteKey(toDelete.application, toDelete.id),
-      TE.match(
-        () => toast.showUnique(toDelete.id, 'Key deleted successfully'),
-        () => {
-          pipe(
-            keys,
-            RD.map((rest) => A.snoc(rest, toDelete)),
-            setKeys,
-          );
-        },
-      ),
+      TE.match(noOp, () => {
+        pipe(
+          keys,
+          RD.map((rest) => A.snoc(rest, toDelete)),
+          setKeys,
+        );
+      }),
     );
 
     run();

@@ -6,6 +6,7 @@ import * as TE from 'fp-ts/TaskEither';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
+import {noOp} from '@/lib/effect';
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
@@ -13,7 +14,6 @@ import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {Skeleton} from '@/components/Skeleton';
-import {useToast} from '@/components/Toast';
 
 import {Create} from '@/features/CreateSub';
 import {SubscriptionItem} from '@/features/SubscriptionItem';
@@ -27,7 +27,6 @@ import {
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppSubs: NextPageWithLayout = () => {
-  const toast = useToast();
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [appEndpoints] = useAtom(AppEndpointsAtom);
   const [appSubscriptions, setSubscriptions] = useAtom(AppSubscriptionsAtom);
@@ -44,17 +43,13 @@ const AppSubs: NextPageWithLayout = () => {
 
     const run = pipe(
       deleteSubscription(toDelete.application, toDelete.id),
-      TE.match(
-        () =>
-          toast.showUnique(toDelete.id, 'Subscription deleted successfully'),
-        () => {
-          pipe(
-            appSubscriptions,
-            RD.map((rest) => A.snoc(rest, toDelete)),
-            setSubscriptions,
-          );
-        },
-      ),
+      TE.match(noOp, () => {
+        pipe(
+          appSubscriptions,
+          RD.map((rest) => A.snoc(rest, toDelete)),
+          setSubscriptions,
+        );
+      }),
     );
 
     run();

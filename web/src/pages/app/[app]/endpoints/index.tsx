@@ -6,13 +6,13 @@ import * as TE from 'fp-ts/TaskEither';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
+import {noOp} from '@/lib/effect';
 import {useAtom} from '@/lib/jotai';
 
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
 import {Skeleton} from '@/components/Skeleton';
 import {SlideOver} from '@/components/SlideOver';
-import {useToast} from '@/components/Toast';
 
 import {Register, Update} from '@/features/CreateEndpoint';
 import {EndpointItem} from '@/features/EndpointItem';
@@ -29,7 +29,6 @@ const hide: FormState = {tag: 'hide'};
 const register: FormState = {tag: 'register'};
 
 const AppEndpoints: NextPageWithLayout = () => {
-  const toast = useToast();
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [appEndpoints, setEndpoints] = useAtom(AppEndpointsAtom);
   const [formState, setFormState] = useState<FormState>(hide);
@@ -55,16 +54,13 @@ const AppEndpoints: NextPageWithLayout = () => {
 
     const run = pipe(
       deleteEndpoint(toDelete.application, toDelete.id),
-      TE.match(
-        () => toast.showUnique(toDelete.id, 'Endpoint deleted successfully'),
-        () => {
-          pipe(
-            appEndpoints,
-            RD.map((rest) => A.snoc(rest, toDelete)),
-            setEndpoints,
-          );
-        },
-      ),
+      TE.match(noOp, () => {
+        pipe(
+          appEndpoints,
+          RD.map((rest) => A.snoc(rest, toDelete)),
+          setEndpoints,
+        );
+      }),
     );
 
     run();
