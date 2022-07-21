@@ -7,6 +7,7 @@ import {Route} from '@/lib/routes';
 
 import {Alert} from '@/components/Alert';
 import {Layout} from '@/components/layout/Layout';
+import {ArrowLink} from '@/components/links/ArrowLink';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {Terminal} from '@/components/Terminal';
 
@@ -19,7 +20,14 @@ const Documentation: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
 
   return (
-    <div className="space-y-8">
+    <div className="layout min-h-screen space-y-8 py-20">
+      <div>
+        <h1 className="text-gray-700">Documentation</h1>
+        <ArrowLink direction="left" className="mt-2" href={Route.dashboard}>
+          Back to Dashboard
+        </ArrowLink>
+      </div>
+
       <Alert variant="warning">
         <div className="flex">
           <BeakerIcon className="mr-2 h-8 w-8" />
@@ -56,10 +64,18 @@ const Documentation: NextPageWithLayout = () => {
 
       <section className="space-y-4">
         <h3 className="text-xl font-medium text-gray-600">
-          Subscribe to a feed
+          Subscribe to an RSS feed
         </h3>
 
         <Terminal>{SNIPPETS.createSubscription}</Terminal>
+      </section>
+
+      <section className="space-y-4">
+        <h3 className="text-xl font-medium text-gray-600">
+          Parse and RSS feed
+        </h3>
+
+        <Terminal>{SNIPPETS.parseFeed}</Terminal>
       </section>
     </div>
   );
@@ -67,9 +83,7 @@ const Documentation: NextPageWithLayout = () => {
 
 Documentation.getLayout = (page) => (
   <Layout
-    variant="dashboard"
-    title="Documentation"
-    goToAppOnLoad={false}
+    variant="clean"
     seo={{
       templateTitle: 'Documentation',
       description: 'RSS docs',

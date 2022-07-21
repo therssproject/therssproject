@@ -59,11 +59,13 @@ export const LogItem = ({log}: {log: Log}) => {
                     {endpoint.title}
                   </UnstyledLink>{' '}
                   <time
+                    // TODO: do not use relative date
                     className="text-gray-600"
                     dateTime={log.sent_at}
-                    title={date.format(sentAt, 'yyyy/MM/dd HH:MM')}
+                    title={date.format(sentAt, 'yyyy/MM/dd HH:MM:SS')}
                   >
-                    {date.formatRelative(sentAt, Date.now())}
+                    {date.formatRelative(sentAt, Date.now())}{' '}
+                    {date.format(sentAt, 'yyyy/MM/dd HH:MM:SS')}
                   </time>
                 </p>
               ),
