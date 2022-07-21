@@ -4,6 +4,7 @@ import * as O from 'fp-ts/Option';
 import {useRouter} from 'next/router';
 
 import {clsxm} from '@/lib/clsxm';
+import {noOp} from '@/lib/effect';
 import {Route} from '@/lib/routes';
 import {format} from '@/lib/routes';
 import {useCurrentRoute} from '@/lib/routing';
@@ -14,9 +15,6 @@ const getTabs = (app: string) => [
   {name: 'Keys', href: Route.appSettingsKeys(app), disabled: false},
   {name: 'Members', href: Route.appSettingsMembers(app), disabled: true},
 ];
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
 
 export const Tabs = ({app}: {app: string}) => {
   const tabs = getTabs(app);

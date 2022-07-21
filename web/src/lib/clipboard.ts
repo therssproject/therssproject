@@ -1,7 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
+import {noOp} from './effect';
 
 export const useCopyToClipboard = () => {
   const [didCopy, setDidCopy] = useState(false);

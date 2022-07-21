@@ -9,6 +9,7 @@ import {useAtomCallback} from 'jotai/utils';
 import {useCallback} from 'react';
 import * as RD from 'remote-data-ts';
 
+import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 
 import {SelectedAppAtom} from './application';
@@ -48,9 +49,6 @@ export const createSubscription = (app: string, body: CreateSubscription) =>
 
 export const deleteSubscription = (app: string, subscription: string) =>
   http.del(`/applications/${app}/subscriptions/${subscription}`, t.void);
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
 
 export const AppSubscriptionsAtom = atom(
   (get) =>

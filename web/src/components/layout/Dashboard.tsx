@@ -9,6 +9,7 @@ import {ReactNode, useEffect, useState} from 'react';
 import * as RD from 'remote-data-ts';
 import {match} from 'ts-pattern';
 
+import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 import {format as formatRoute, Route} from '@/lib/routes';
@@ -33,9 +34,6 @@ type Props = {
   goToAppOnLoad: boolean;
   seo?: SeoProps;
 };
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
 
 export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

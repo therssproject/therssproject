@@ -10,6 +10,7 @@ import {ReactNode, useEffect, useState} from 'react';
 import * as RD from 'remote-data-ts';
 import {match} from 'ts-pattern';
 
+import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 import {
@@ -41,9 +42,6 @@ type Props = {
   children: ReactNode;
   seo?: SeoProps;
 };
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noOp = () => {};
 
 export const Applications = ({title, children, seo}: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
