@@ -69,10 +69,10 @@ export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
             }
           },
           (res) => {
-            setApps(RD.success(res));
+            setApps(RD.success(res.data));
 
             pipe(
-              res,
+              res.data,
               A.head,
               O.map(appToOption),
               O.filter(() => goToAppOnLoad),

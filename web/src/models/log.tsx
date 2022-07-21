@@ -32,8 +32,8 @@ export type LogsState = Record<string, LoadingLogs>;
 
 export const LogsAtom = atom<LogsState>({});
 
-export const fetchLogs = (app: string) =>
-  http.get(`/applications/${app}/webhooks`, t.array(Log));
+export const fetchLogs = (app: string, opts = {limit: 100}) =>
+  http.get(`/applications/${app}/webhooks?limit=${opts.limit}`, t.array(Log));
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noOp = () => {};

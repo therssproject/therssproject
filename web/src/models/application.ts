@@ -1,3 +1,4 @@
+import {sequenceT} from 'fp-ts/Apply';
 import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
 import {fold} from 'fp-ts/Monoid';
@@ -10,6 +11,7 @@ import * as te from 'io-ts-extra';
 import {atom} from 'jotai';
 import * as RD from 'remote-data-ts';
 
+import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 import {useRouteOfType} from '@/lib/routing';
 
@@ -110,6 +112,54 @@ export const useFetchOnAppChange = <Data>(
   );
 };
 
+type Stats = {
+  subs: number;
+  logs: number;
+};
+
+export const StatsAtom = atom<O.Option<Stats>>(O.none);
+
+const grabCount = (res: http.Res<unknown>) =>
+  parseInt(res.headers.get('x-pagination-count') ?? '');
+
+const fetchStats = (app: string) =>
+  pipe(
+    sequenceT(TE.ApplyPar)(
+      pipe(fetchSubscriptions(app, {limit: 0}), TE.map(grabCount)),
+      pipe(fetchLogs(app, {limit: 0}), TE.map(grabCount)),
+    ),
+    TE.map(([subs, logs]) => ({subs, logs})),
+    TE.mapLeft(() => 'Failed to fetch stats'),
+  );
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noOp = () => {};
+
+const useFetchAppStats = (currentApp: O.Option<Application>) => {
+  const [_stats, setStats] = useAtom(StatsAtom);
+
+  useStableEffect(
+    () => {
+      setStats(O.none);
+
+      const app = O.toUndefined(currentApp);
+
+      if (!app) {
+        return;
+      }
+
+      const run = pipe(
+        fetchStats(app.id),
+        TE.match(noOp, (stats) => setStats(O.some(stats))),
+      );
+
+      run();
+    },
+    [currentApp],
+    Eq.tuple(O.getEq(eqApplication)),
+  );
+};
+
 export const useFetchAppData = () => {
   const [currentApp, _setApp] = useAtom(SelectedAppAtom);
 
@@ -117,10 +167,13 @@ export const useFetchAppData = () => {
   const [endpoints, setEndpoints] = useAtom(AppEndpointsAtom);
   const [logs, setLogs] = useAtom(AppLogsAtom);
 
+  useFetchAppStats(currentApp);
+
   useFetchOnAppChange(
     (app) =>
       pipe(
         fetchSubscriptions(app.id),
+        TE.map((res) => res.data),
         TE.mapLeft(() => 'Failed to fetch subscriptions'),
       ),
     currentApp,
@@ -132,6 +185,7 @@ export const useFetchAppData = () => {
     (app) =>
       pipe(
         fetchEndpoints(app.id),
+        TE.map((res) => res.data),
         TE.mapLeft(() => 'Failed to fetch endpoints'),
       ),
     currentApp,
@@ -143,6 +197,7 @@ export const useFetchAppData = () => {
     (app) =>
       pipe(
         fetchLogs(app.id),
+        TE.map((res) => res.data),
         TE.mapLeft(() => 'Failed to fetch logs'),
       ),
     currentApp,

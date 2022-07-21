@@ -29,10 +29,16 @@ type RegisterProps = {
   onClose: () => void;
 };
 
+const register = (app: string, body: RegisterEndpointBody) =>
+  pipe(
+    registerEndpoint(app, body),
+    TE.map((res) => res.data),
+  );
+
 export const Register = (props: RegisterProps) => {
   const onSave = useSetNewEndpoint();
 
-  return <Form {...props} onSave={onSave} doSave={registerEndpoint} />;
+  return <Form {...props} onSave={onSave} doSave={register} />;
 };
 
 type UpdateProps = {

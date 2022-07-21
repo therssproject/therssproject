@@ -62,7 +62,7 @@ const Register: NextPageWithLayout = () => {
           console.log('Failed to register', error);
           setLoading(false);
         },
-        (user) => {
+        ({data: user}) => {
           setSession(O.some(user));
         },
       ),

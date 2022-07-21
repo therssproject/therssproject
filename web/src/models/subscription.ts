@@ -32,8 +32,11 @@ export type SubscriptionsState = Record<string, LoadingSubscriptions>;
 
 export const SubscriptionsAtom = atom<SubscriptionsState>({});
 
-export const fetchSubscriptions = (app: string) =>
-  http.get(`/applications/${app}/subscriptions`, t.array(Subscription));
+export const fetchSubscriptions = (app: string, opts = {limit: 100}) =>
+  http.get(
+    `/applications/${app}/subscriptions?limit=${opts.limit}`,
+    t.array(Subscription),
+  );
 
 export type CreateSubscription = {
   url: string;
