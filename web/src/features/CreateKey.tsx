@@ -70,7 +70,7 @@ export const Generate = ({open, app, onClose}: Props) => {
           setStatus(generate);
           toast.show('Failed to generate key', {variant: 'danger'});
         },
-        ({key, ...rest}) => {
+        ({data: {key, ...rest}}) => {
           setStatus(confirm({key, ...rest}));
           setNewKey(rest);
           reset();

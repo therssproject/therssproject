@@ -30,6 +30,7 @@ const AppSettingsKeys: NextPageWithLayout = () => {
     (app) =>
       pipe(
         fetchKeys(app.id),
+        TE.map((res) => res.data),
         TE.mapLeft(() => 'Failed to load keys'),
       ),
     currentApp,

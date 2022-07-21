@@ -46,9 +46,11 @@ const fetch_ = (code: number, message: string): FetchError => ({
   message,
 });
 
+export type Res<T> = {headers: Headers; data: T};
+
 const handleResponse =
   <T>(codec: t.Decoder<unknown, T>) =>
-  (res: Response): TE.TaskEither<FetchError, T> =>
+  (res: Response): TE.TaskEither<FetchError, Res<T>> =>
     pipe(
       TE.tryCatch(() => res.json(), unknown),
       TE.map((body) => ({
@@ -68,6 +70,7 @@ const handleResponse =
           E.mapLeft(reporter.report),
           E.mapLeft(decoding),
           TE.fromEither,
+          TE.map((data) => ({data, headers: res.headers})),
         ),
       ),
     );
@@ -117,7 +120,7 @@ const req =
     url: string,
     codec: t.Decoder<unknown, T>,
     opts?: RequestInit,
-  ): TE.TaskEither<FetchError, T> =>
+  ): TE.TaskEither<FetchError, Res<T>> =>
     pipe(
       grabSession,
       TE.chain((session) =>
@@ -141,7 +144,7 @@ const reqWithBody =
     body: unknown,
     codec: t.Decoder<unknown, T>,
     opts?: RequestInit,
-  ): TE.TaskEither<FetchError, T> =>
+  ): TE.TaskEither<FetchError, Res<T>> =>
     pipe(
       grabSession,
       TE.chain((session) =>

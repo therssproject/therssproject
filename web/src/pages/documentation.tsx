@@ -13,19 +13,41 @@ import {Terminal} from '@/components/Terminal';
 
 import * as SNIPPETS from '@/content/snippets';
 import {SelectedAppAtom} from '@/models/application';
+import {useSession} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
 
 const Documentation: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
+  const {session} = useSession();
 
   return (
     <div className="layout min-h-screen space-y-8 py-20">
       <div>
         <h1 className="text-gray-700">Documentation</h1>
-        <ArrowLink direction="left" className="mt-2" href={Route.dashboard}>
-          Back to Dashboard
-        </ArrowLink>
+        {pipe(
+          session,
+          O.match(
+            () => (
+              <ArrowLink
+                direction="left"
+                className="mt-2 text-gray-700"
+                href={Route.index}
+              >
+                Back Home
+              </ArrowLink>
+            ),
+            (_) => (
+              <ArrowLink
+                direction="left"
+                className="mt-2 text-gray-700"
+                href={Route.dashboard}
+              >
+                Back to Dashboard
+              </ArrowLink>
+            ),
+          ),
+        )}
       </div>
 
       <Alert variant="warning">

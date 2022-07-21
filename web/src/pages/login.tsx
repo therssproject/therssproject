@@ -56,7 +56,7 @@ const Login: NextPageWithLayout = () => {
 
           setLoading(false);
         },
-        (user) => {
+        ({data: user}) => {
           setSession(O.some(user));
         },
       ),

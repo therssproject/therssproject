@@ -80,7 +80,7 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
           // eslint-disable-next-line no-console
           console.log(err);
         },
-        (newSubscription) => {
+        ({data: newSubscription}) => {
           setNewSubscription(newSubscription);
           doClose();
         },

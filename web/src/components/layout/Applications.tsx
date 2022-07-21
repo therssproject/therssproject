@@ -88,10 +88,10 @@ export const Applications = ({title, children, seo}: Props) => {
             }
           },
           (res) => {
-            setApps(RD.success(res));
+            setApps(RD.success(res.data));
 
             pipe(
-              res,
+              res.data,
               A.head,
               O.filter(() => Boolean(!selected)),
               O.map(appToOption),
