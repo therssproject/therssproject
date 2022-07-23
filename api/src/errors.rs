@@ -115,8 +115,15 @@ pub struct BadRequest {
 }
 
 impl BadRequest {
-  pub fn new(field: String, message: String) -> Self {
-    BadRequest { field, message }
+  pub fn new<A, B>(field: A, message: B) -> Self
+  where
+    A: Into<String>,
+    B: Into<String>,
+  {
+    BadRequest {
+      field: field.into(),
+      message: message.into(),
+    }
   }
 
   // TODO: Implement a proper empty Bad Request error
