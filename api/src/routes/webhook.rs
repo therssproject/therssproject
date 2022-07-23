@@ -28,7 +28,7 @@ async fn query_webhooks(
     .limit(50)
     .build();
 
-  let mut query = doc! { "application_id": application_id };
+  let mut query = doc! { "application": application_id };
   if let Some(from) = from {
     query.insert("created_at", doc! { "$gte": to_date(from)? });
   }
