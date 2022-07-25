@@ -20,7 +20,7 @@ const formatCode = (code: string) => {
   const last = lines.length - 1;
 
   return lines.reduce(
-    (acc, line, i) => lineContinuation(acc, line, i === last),
+    (acc, line, i) => lineContinuation(acc, line.trim(), i === last),
     '$ ',
   );
 };

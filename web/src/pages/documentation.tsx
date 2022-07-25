@@ -93,9 +93,7 @@ const Documentation: NextPageWithLayout = () => {
       </section>
 
       <section className="space-y-4">
-        <h3 className="text-xl font-medium text-gray-600">
-          Parse and RSS feed
-        </h3>
+        <h3 className="text-xl font-medium text-gray-600">Parse an RSS feed</h3>
 
         <Terminal>{SNIPPETS.parseFeed}</Terminal>
       </section>
