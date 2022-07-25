@@ -23,6 +23,7 @@ pub fn create_router() -> Router {
       Router::new().nest(
         "/v1",
         Router::new()
+          .merge(endpoint::create_router())
           .merge(feed::create_router())
           .merge(subscription::create_router())
           .route_layer(from_extractor::<AuthenticateKey>()),
@@ -40,10 +41,10 @@ pub fn create_router() -> Router {
               .nest(
                 "/:application_id",
                 Router::new()
-                  .merge(subscription::create_router())
                   .merge(endpoint::create_router())
-                  .merge(webhook::create_router())
-                  .merge(key::create_router()),
+                  .merge(key::create_router())
+                  .merge(subscription::create_router())
+                  .merge(webhook::create_router()),
               )
               // Authorize the user before allowing access to the application
               // routes.
