@@ -1,6 +1,6 @@
 use axum::{
   extract::{Extension, Path},
-  routing::{delete, get, post},
+  routing::{get, post},
   Json, Router,
 };
 use bson::doc;
