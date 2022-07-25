@@ -13,6 +13,7 @@ use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::models::endpoint::Endpoint;
 use crate::models::entry::Entry;
+use crate::models::feed::Feed;
 
 impl ModelExt for Subscription {
   type T = Subscription;
@@ -114,6 +115,16 @@ impl Subscription {
     }
 
     Self::update_one(doc! {"_id": &id,}, update, None).await?;
+
+    Ok(())
+  }
+
+  pub async fn remove(&self) -> Result<(), Error> {
+    let subscription_id = self.id.unwrap();
+    let feed_id = self.feed;
+
+    Subscription::delete_one(doc! { "_id": subscription_id }).await?;
+    Feed::cleanup(&feed_id).await?;
 
     Ok(())
   }
