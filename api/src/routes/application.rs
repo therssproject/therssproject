@@ -19,7 +19,7 @@ pub fn create_router() -> Router {
     .route("/", post(create_application))
     .route("/", get(query_application))
     .route("/:application_id", get(get_application_by_id))
-    .route("/:application_id", delete(remove_application_by_id))
+    .route("/:application_id/reset", post(reset_application_by_id))
 }
 
 async fn create_application(
@@ -67,18 +67,19 @@ async fn get_application_by_id(
   Ok(Json(application))
 }
 
-async fn remove_application_by_id(
+async fn reset_application_by_id(
   Extension(user): Extension<UserFromToken>,
   Path(id): Path<String>,
 ) -> Result<(), Error> {
   let application_id = to_object_id(id)?;
-  let delete_result =
-    Application::delete_one(doc! { "_id": application_id, "owner": &user.id }).await?;
+  let exists = Application::exists(doc! { "_id": application_id, "owner": &user.id }).await?;
 
-  if delete_result.deleted_count == 0 {
+  if !exists {
     debug!("Application not found, returning 404 status code");
     return Err(Error::NotFound(NotFound::new("application")));
   }
+
+  Application::reset(&application_id).await?;
 
   Ok(())
 }

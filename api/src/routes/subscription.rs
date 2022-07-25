@@ -147,8 +147,7 @@ async fn remove_subscription_by_id(
     }
   };
 
-  Subscription::delete_one(doc! { "_id": subscription_id }).await?;
-  Feed::cleanup(&subscription.feed).await?;
+  subscription.remove().await?;
 
   Ok(())
 }

@@ -1,13 +1,20 @@
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
+use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
+use crate::errors::Error;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::now;
 use crate::lib::date::Date;
+use crate::models::endpoint::Endpoint;
+use crate::models::key::Key;
+use crate::models::webhook::Webhook;
+
+use super::subscription::Subscription;
 
 impl ModelExt for Application {
   type T = Application;
@@ -40,6 +47,30 @@ impl Application {
       updated_at: now,
       created_at: now,
     }
+  }
+
+  /// Removes all resourses associated with this application.
+  pub async fn reset(id: &ObjectId) -> Result<(), Error> {
+    // Remove all webhooks associated with this application.
+    <Webhook as ModelExt>::delete_many(doc! { "application": id }).await?;
+
+    // Remove all subscriptions associated with this application.
+    let subscriptions = Subscription::cursor(doc! { "application": id }, None).await?;
+    subscriptions
+      .map(|subscription| subscription.unwrap())
+      .for_each_concurrent(25, |subscription| async move {
+        // TODO: Handle error.
+        subscription.remove().await.unwrap();
+      })
+      .await;
+
+    // Remove all endpoints associated with this application.
+    <Endpoint as ModelExt>::delete_many(doc! { "application": id }).await?;
+
+    // Remove all keys associated with this application.
+    <Key as ModelExt>::delete_many(doc! { "application": id }).await?;
+
+    Ok(())
   }
 }
 
