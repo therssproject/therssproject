@@ -1,3 +1,4 @@
+import {KeyIcon, UserGroupIcon} from '@heroicons/react/outline';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -12,8 +13,18 @@ import {useCurrentRoute} from '@/lib/routing';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 const getTabs = (app: string) => [
-  {name: 'Keys', href: Route.appSettingsKeys(app), disabled: false},
-  {name: 'Members', href: Route.appSettingsMembers(app), disabled: true},
+  {
+    name: 'Keys',
+    Icon: KeyIcon,
+    href: Route.appSettingsKeys(app),
+    disabled: false,
+  },
+  {
+    name: 'Members',
+    Icon: UserGroupIcon,
+    href: Route.appSettingsMembers(app),
+    disabled: true,
+  },
 ];
 
 export const Tabs = ({app}: {app: string}) => {
@@ -63,13 +74,14 @@ export const Tabs = ({app}: {app: string}) => {
                   tab.href.tag === currentRoute.tag
                     ? 'border-indigo-500 text-indigo-600'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                  'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium',
+                  'flex items-center space-x-2 whitespace-nowrap border-b-2 py-4 px-2 text-sm font-medium',
                 )}
                 aria-current={
                   tab.href.tag === currentRoute.tag ? 'page' : undefined
                 }
               >
-                {tab.name}
+                <tab.Icon className="h-5 w-5" />
+                <span>{tab.name}</span>
               </UnstyledLink>
             ))}
           </nav>
