@@ -19,11 +19,13 @@ const AppDashboard: NextPageWithLayout = () => {
     O.match(
       () => null,
       (_app) => (
-        <div className="space-y-4">
+        <div className="space-y-8">
           <TopCardsStats />
-          <Skeleton className="h-48 w-full rounded-lg" />
-          <Skeleton className="h-96 w-full rounded-lg" />
-          <Skeleton className="h-24 w-full rounded-lg" />
+          <div className="space-y-4">
+            <Skeleton className="h-24 w-full rounded-lg" />
+            <Skeleton className="h-64 w-full rounded-lg" />
+            <Skeleton className="h-48 w-full rounded-lg" />
+          </div>
         </div>
       ),
     ),
@@ -96,11 +98,11 @@ const TopCardsStats = () => {
         </div>
       ),
       (stats) => (
-        <div>
-          <h3 className="text-center text-lg font-medium leading-6 text-gray-700">
+        <div className="space-y-3">
+          <h3 className="text-lg font-medium leading-6 text-gray-700">
             Last 7 days
           </h3>
-          <dl className="mt-5 grid grid-cols-1 divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow md:grid-cols-3 md:divide-y-0 md:divide-x">
+          <dl className="grid grid-cols-1 divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow md:grid-cols-3 md:divide-y-0 md:divide-x">
             {stats.map((item) =>
               item ? (
                 <div key={item.name} className="px-4 py-5 sm:p-6">
