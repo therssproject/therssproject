@@ -1,3 +1,4 @@
+import addDays from 'date-fns/addDays';
 import {sequenceT} from 'fp-ts/Apply';
 import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
@@ -113,23 +114,61 @@ export const useFetchOnAppChange = <Data>(
   );
 };
 
+type Trend = {
+  cur: number;
+  prev: number;
+  change: number;
+  trend: 'increase' | 'decrease' | 'none';
+};
+
 type Stats = {
-  subs: number;
-  logs: number;
+  subs: Trend;
+  logs: Trend;
 };
 
 export const StatsAtom = atom<O.Option<Stats>>(O.none);
 
+const mkTrend = ({cur, prev}: {cur: number; prev: number}): Trend => {
+  const change = Math.floor(Math.abs(100 - (cur * 100) / prev));
+
+  return {
+    cur,
+    prev,
+    change,
+    trend:
+      cur === prev || change === Infinity
+        ? 'none'
+        : cur > prev
+        ? 'increase'
+        : 'decrease',
+  };
+};
+
 const grabCount = (res: http.Res<unknown>) =>
   parseInt(res.headers.get('x-pagination-count') ?? '');
+
+const lastWeek = addDays(new Date(), -7).toISOString();
+const twoWeeksAgo = addDays(new Date(), -14).toISOString();
 
 const fetchStats = (app: string) =>
   pipe(
     sequenceT(TE.ApplyPar)(
-      pipe(fetchSubscriptions(app, {limit: 0}), TE.map(grabCount)),
-      pipe(fetchLogs(app, {limit: 0}), TE.map(grabCount)),
+      pipe(
+        fetchSubscriptions(app, {limit: 0, from: lastWeek}),
+        TE.map(grabCount),
+      ),
+      pipe(
+        fetchSubscriptions(app, {limit: 0, from: twoWeeksAgo}),
+        TE.map(grabCount),
+      ),
+
+      pipe(fetchLogs(app, {limit: 0, from: lastWeek}), TE.map(grabCount)),
+      pipe(fetchLogs(app, {limit: 0, from: twoWeeksAgo}), TE.map(grabCount)),
     ),
-    TE.map(([subs, logs]) => ({subs, logs})),
+    TE.map(([subsCur, subsPrev, logsCur, logsPrev]) => ({
+      subs: mkTrend({cur: subsCur, prev: subsPrev - subsCur}),
+      logs: mkTrend({cur: logsCur, prev: logsPrev - logsCur}),
+    })),
     TE.mapLeft(() => 'Failed to fetch stats'),
   );
 
