@@ -49,7 +49,7 @@ type Stat = {
   stat: string;
   previousStat?: string;
   change?: string;
-  changeType?: 'increase' | 'decrease';
+  changeType?: 'increase' | 'decrease' | 'none';
 };
 
 const TopCardsStats = () => {
@@ -60,18 +60,18 @@ const TopCardsStats = () => {
     O.map(
       ({logs, subs}): Array<Stat | undefined> => [
         {
-          name: 'Total subsciptions',
-          stat: subs.toString(),
-          /* previousStat: '70,946', */
-          /* change: '12%', */
-          /* changeType: 'increase', */
+          name: 'Subscriptions',
+          stat: subs.cur.toString(),
+          previousStat: subs.prev.toString(),
+          change: `${subs.change}%`,
+          changeType: subs.trend,
         },
         {
-          name: 'Total events',
-          stat: logs.toString(),
-          /* previousStat: '56,140,000', */
-          /* change: '2.02%', */
-          /* changeType: 'increase', */
+          name: 'Events',
+          stat: logs.cur.toString(),
+          previousStat: logs.prev.toString(),
+          change: `${logs.change}%`,
+          changeType: logs.trend,
         },
         undefined,
       ],
@@ -97,24 +97,29 @@ const TopCardsStats = () => {
       ),
       (stats) => (
         <div>
+          <h3 className="text-center text-lg font-medium leading-6 text-gray-700">
+            Last 7 days
+          </h3>
           <dl className="mt-5 grid grid-cols-1 divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow md:grid-cols-3 md:divide-y-0 md:divide-x">
             {stats.map((item) =>
               item ? (
                 <div key={item.name} className="px-4 py-5 sm:p-6">
-                  <dt className="text-base font-normal text-gray-900">
-                    {item.name}
+                  <dt className="flex flex-col">
+                    <span className="text-base font-normal text-gray-900">
+                      {item.name}
+                    </span>
                   </dt>
                   <dd className="mt-1 flex items-baseline justify-between md:block lg:flex">
                     <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
                       {item.stat}
-                      {item.previousStat && (
+                      {item.previousStat && item.changeType !== 'none' && (
                         <span className="ml-2 text-sm font-medium text-gray-500">
                           from {item.previousStat}
                         </span>
                       )}
                     </div>
 
-                    {item.previousStat && (
+                    {item.previousStat && item.changeType !== 'none' && (
                       <div
                         className={clsxm(
                           item.changeType === 'increase'
@@ -147,7 +152,7 @@ const TopCardsStats = () => {
                 </div>
               ) : (
                 <div className="flex items-center justify-center px-4 py-5 sm:p-6">
-                  <div className="text-gray-600">Soon ...</div>
+                  <div className="text-gray-600">More stats soon ...</div>
                 </div>
               ),
             )}

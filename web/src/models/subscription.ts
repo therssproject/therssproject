@@ -13,6 +13,7 @@ import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 
 import {SelectedAppAtom} from './application';
+import {withQuery} from '@/lib/qs';
 
 export const Subscription = te.sparseType({
   id: t.string,
@@ -33,9 +34,14 @@ export type SubscriptionsState = Record<string, LoadingSubscriptions>;
 
 export const SubscriptionsAtom = atom<SubscriptionsState>({});
 
-export const fetchSubscriptions = (app: string, opts = {limit: 100}) =>
+type Pagination = {
+  limit?: number;
+  from?: string;
+};
+
+export const fetchSubscriptions = (app: string, pagination?: Pagination) =>
   http.get(
-    `/applications/${app}/subscriptions?limit=${opts.limit}`,
+    withQuery(`/applications/${app}/subscriptions`, pagination),
     t.array(Subscription),
   );
 

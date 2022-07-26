@@ -10,6 +10,7 @@ import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 
 import {SelectedAppAtom} from './application';
+import {withQuery} from '@/lib/qs';
 
 export const Log = te.sparseType({
   id: t.string,
@@ -33,8 +34,14 @@ export type LogsState = Record<string, LoadingLogs>;
 
 export const LogsAtom = atom<LogsState>({});
 
-export const fetchLogs = (app: string, opts = {limit: 100}) =>
-  http.get(`/applications/${app}/webhooks?limit=${opts.limit}`, t.array(Log));
+
+type Pagination = {
+  limit?: number;
+  from?: string;
+};
+
+export const fetchLogs = (app: string, pagination?: Pagination) =>
+  http.get(withQuery(`/applications/${app}/webhooks`, pagination), t.array(Log));
 
 export const AppLogsAtom = atom(
   (get) =>
