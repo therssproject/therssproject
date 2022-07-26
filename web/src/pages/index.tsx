@@ -288,12 +288,20 @@ const HomePage: NextPageWithLayout = () => {
                       </>
                     ),
                     () => (
-                      <UnstyledLink
-                        href={Route.dashboard}
-                        className="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-base font-medium text-white hover:bg-gray-700"
-                      >
-                        Dashboard
-                      </UnstyledLink>
+                      <>
+                        <UnstyledLink
+                          href={Route.documentation}
+                          className="text-base font-medium text-white hover:text-gray-300"
+                        >
+                          Documentation
+                        </UnstyledLink>
+                        <UnstyledLink
+                          href={Route.dashboard}
+                          className="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-base font-medium text-white hover:bg-gray-700"
+                        >
+                          Dashboard
+                        </UnstyledLink>
+                      </>
                     ),
                   ),
                 )}
@@ -372,14 +380,26 @@ const HomePage: NextPageWithLayout = () => {
                         </>
                       ),
                       () => (
-                        <div className="mt-6 px-5">
-                          <UnstyledLink
-                            href={Route.dashboard}
-                            className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 py-3 px-4 text-center font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700"
-                          >
-                            Dashboard
-                          </UnstyledLink>
-                        </div>
+                        <>
+                          <div className="mt-6 px-5">
+                            <UnstyledLink
+                              href={Route.dashboard}
+                              className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 py-3 px-4 text-center font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700"
+                            >
+                              Dashboard
+                            </UnstyledLink>
+                          </div>
+                          <div className="mt-6 px-5">
+                            <p className="text-center text-base font-medium text-gray-500">
+                              <UnstyledLink
+                                href={Route.documentation}
+                                className="text-gray-900 hover:underline"
+                              >
+                                Documentation
+                              </UnstyledLink>
+                            </p>
+                          </div>
+                        </>
                       ),
                     ),
                   )}
@@ -412,15 +432,14 @@ const HomePage: NextPageWithLayout = () => {
                       </UnstyledLink>
                     )}
                     <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-white sm:mt-5 sm:text-6xl lg:mt-6 xl:text-6xl">
-                      <span className="block">A better way to</span>
+                      <span className="block">Turn RSS feeds</span>
                       <span className="block bg-gradient-to-r from-teal-200 to-cyan-400 bg-clip-text pb-3 text-transparent sm:pb-5">
-                        consume RSS feeds
+                        into webhook events
                       </span>
                     </h1>
                     <p className="text-base text-gray-300 sm:text-xl lg:text-lg xl:text-xl">
-                      Anim aute id magna aliqua ad ad non deserunt sunt. Qui
-                      irure qui Lorem cupidatat commodo. Elit sunt amet fugiat
-                      veniam occaecat fugiat.
+                      Programmatically subscribe and consume to RSS, Atom, and
+                      JSON feeds.
                     </p>
                     <div className="mt-10 sm:mt-12">
                       <form
@@ -449,12 +468,7 @@ const HomePage: NextPageWithLayout = () => {
                           </div>
                         </div>
                         <p className="mt-3 text-sm text-gray-300 sm:mt-4">
-                          Start your free 14-day trial, no credit card
-                          necessary. By providing your email, you agree to our{' '}
-                          <a href="#" className="font-medium text-white">
-                            terms of service
-                          </a>
-                          .
+                          Start your free trial, no credit card necessary.
                         </p>
                       </form>
                     </div>
@@ -474,38 +488,14 @@ const HomePage: NextPageWithLayout = () => {
             </div>
           </div>
 
-          {/* Feature section with screenshot */}
-          <div className="relative bg-gray-50 pt-16 sm:pt-24 lg:pt-32">
-            <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
-              <div>
-                <h2 className="text-base font-semibold uppercase tracking-wider text-cyan-600">
-                  Serverless
-                </h2>
-                <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-                  No server? No problem.
-                </p>
-                <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
-                  Phasellus lorem quam molestie id quisque diam aenean nulla in.
-                  Accumsan in quis quis nunc, ullamcorper malesuada. Eleifend
-                  condimentum id viverra nulla.
-                </p>
-              </div>
-              <div className="mt-12 -mb-10 sm:-mb-24 lg:-mb-80">
-                <img
-                  className="rounded-lg shadow-xl ring-1 ring-black ring-opacity-5"
-                  src="https://tailwindui.com/img/component-images/green-project-app-screenshot.jpg"
-                  alt=""
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Feature section with grid */}
           <div className="relative bg-white py-16 sm:py-24 lg:py-32">
             <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
-              <h2 className="text-base font-semibold uppercase tracking-wider text-cyan-600">
-                Deploy faster
-              </h2>
+              {false && (
+                <h2 className="text-base font-semibold uppercase tracking-wider text-cyan-600">
+                  Deploy faster
+                </h2>
+              )}
               <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
                 Everything you need to deploy your app
               </p>
@@ -543,63 +533,95 @@ const HomePage: NextPageWithLayout = () => {
             </div>
           </div>
 
-          {/* Testimonial section */}
-          <div className="bg-gradient-to-r from-teal-500 to-cyan-600 pb-16 lg:relative lg:z-10 lg:pb-0">
-            <div className="lg:mx-auto lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-8 lg:px-8">
-              <div className="relative lg:-my-8">
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-x-0 top-0 h-1/2 bg-white lg:hidden"
-                />
-                <div className="mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:h-full lg:p-0">
-                  <div className="aspect-w-10 aspect-h-6 sm:aspect-w-16 sm:aspect-h-7 lg:aspect-none overflow-hidden rounded-xl shadow-xl lg:h-full">
-                    <img
-                      className="object-cover lg:h-full lg:w-full"
-                      src="https://images.unsplash.com/photo-1520333789090-1afc82db536a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2102&q=80"
-                      alt=""
-                    />
-                  </div>
+          {/* Feature section with screenshot */}
+          {false && (
+            <div className="relative bg-gray-50 pt-16 sm:pt-24 lg:pt-32">
+              <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
+                <div>
+                  <h2 className="text-base font-semibold uppercase tracking-wider text-cyan-600">
+                    Serverless
+                  </h2>
+                  <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    No server? No problem.
+                  </p>
+                  <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
+                    Phasellus lorem quam molestie id quisque diam aenean nulla
+                    in. Accumsan in quis quis nunc, ullamcorper malesuada.
+                    Eleifend condimentum id viverra nulla.
+                  </p>
                 </div>
-              </div>
-              <div className="mt-12 lg:col-span-2 lg:m-0 lg:pl-8">
-                <div className="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0 lg:py-20">
-                  <blockquote>
-                    <div>
-                      <svg
-                        className="h-12 w-12 text-white opacity-25"
-                        fill="currentColor"
-                        viewBox="0 0 32 32"
-                        aria-hidden="true"
-                      >
-                        <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
-                      </svg>
-                      <p className="mt-6 text-2xl font-medium text-white">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Sed urna nulla vitae laoreet augue. Amet feugiat est
-                        integer dolor auctor adipiscing nunc urna, sit.
-                      </p>
-                    </div>
-                    <footer className="mt-6">
-                      <p className="text-base font-medium text-white">
-                        Judith Black
-                      </p>
-                      <p className="text-base font-medium text-cyan-100">
-                        CEO at PureInsights
-                      </p>
-                    </footer>
-                  </blockquote>
+                <div className="mt-12 -mb-10 sm:-mb-24 lg:-mb-80">
+                  <img
+                    className="rounded-lg shadow-xl ring-1 ring-black ring-opacity-5"
+                    src="https://tailwindui.com/img/component-images/green-project-app-screenshot.jpg"
+                    alt=""
+                  />
                 </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* Testimonial section */}
+          {false && (
+            <div className="bg-gradient-to-r from-teal-500 to-cyan-600 pb-16 lg:relative lg:z-10 lg:pb-0">
+              <div className="lg:mx-auto lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-8 lg:px-8">
+                <div className="relative lg:-my-8">
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-x-0 top-0 h-1/2 bg-white lg:hidden"
+                  />
+                  <div className="mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:h-full lg:p-0">
+                    <div className="aspect-w-10 aspect-h-6 sm:aspect-w-16 sm:aspect-h-7 lg:aspect-none overflow-hidden rounded-xl shadow-xl lg:h-full">
+                      <img
+                        className="object-cover lg:h-full lg:w-full"
+                        src="https://images.unsplash.com/photo-1520333789090-1afc82db536a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2102&q=80"
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-12 lg:col-span-2 lg:m-0 lg:pl-8">
+                  <div className="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0 lg:py-20">
+                    <blockquote>
+                      <div>
+                        <svg
+                          className="h-12 w-12 text-white opacity-25"
+                          fill="currentColor"
+                          viewBox="0 0 32 32"
+                          aria-hidden="true"
+                        >
+                          <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
+                        </svg>
+                        <p className="mt-6 text-2xl font-medium text-white">
+                          Lorem ipsum dolor sit amet, consectetur adipiscing
+                          elit. Sed urna nulla vitae laoreet augue. Amet feugiat
+                          est integer dolor auctor adipiscing nunc urna, sit.
+                        </p>
+                      </div>
+                      <footer className="mt-6">
+                        <p className="text-base font-medium text-white">
+                          Judith Black
+                        </p>
+                        <p className="text-base font-medium text-cyan-100">
+                          CEO at PureInsights
+                        </p>
+                      </footer>
+                    </blockquote>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Blog section */}
           <div className="relative bg-gray-50 py-16 sm:py-24 lg:py-32">
             <div className="relative">
               <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
-                <h2 className="text-base font-semibold uppercase tracking-wider text-cyan-600">
-                  Learn
-                </h2>
+                {false && (
+                  <h2 className="text-base font-semibold uppercase tracking-wider text-cyan-600">
+                    Learn
+                  </h2>
+                )}
                 <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
                   Helpful Resources
                 </p>

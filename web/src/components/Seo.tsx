@@ -3,13 +3,12 @@ import {useRouter} from 'next/router';
 
 import {openGraph} from '@/lib/helper';
 
-// TODO ...
 const defaultMeta = {
   title: 'RSS',
   siteName: 'RSS',
   description: 'RSS Webhooks done right',
   // IMPORTANT no additional '/' at the end
-  url: 'https://rss.dev',
+  url: 'https://therssproject.com',
   type: 'website',
   robots: 'follow, index',
   // No need to fill, will be populated by openGraph function
