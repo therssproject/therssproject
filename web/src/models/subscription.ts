@@ -11,9 +11,9 @@ import * as RD from 'remote-data-ts';
 
 import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
+import {withQuery} from '@/lib/qs';
 
 import {SelectedAppAtom} from './application';
-import {withQuery} from '@/lib/qs';
 
 export const Subscription = te.sparseType({
   id: t.string,

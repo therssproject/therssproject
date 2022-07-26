@@ -2,7 +2,7 @@ import {pipe} from 'fp-ts/function';
 import * as R from 'fp-ts/Record';
 import {Ord as ordString} from 'fp-ts/string';
 
-type QueryKey = string
+type QueryKey = string;
 type QueryVal = number | string | boolean | undefined;
 
 type Query = Record<QueryKey, QueryVal>;
