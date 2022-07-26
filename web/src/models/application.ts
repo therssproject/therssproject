@@ -1,5 +1,5 @@
 import addDays from 'date-fns/addDays';
-import {sequenceT} from 'fp-ts/Apply';
+import * as A from 'fp-ts/Array';
 import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
 import {fold} from 'fp-ts/Monoid';
@@ -152,19 +152,14 @@ const twoWeeksAgo = addDays(new Date(), -14).toISOString();
 
 const fetchStats = (app: string) =>
   pipe(
-    sequenceT(TE.ApplyPar)(
-      pipe(
-        fetchSubscriptions(app, {limit: 0, from: lastWeek}),
-        TE.map(grabCount),
-      ),
-      pipe(
-        fetchSubscriptions(app, {limit: 0, from: twoWeeksAgo}),
-        TE.map(grabCount),
-      ),
-
-      pipe(fetchLogs(app, {limit: 0, from: lastWeek}), TE.map(grabCount)),
-      pipe(fetchLogs(app, {limit: 0, from: twoWeeksAgo}), TE.map(grabCount)),
-    ),
+    [
+      fetchSubscriptions(app, {limit: 0, from: lastWeek}),
+      fetchSubscriptions(app, {limit: 0, from: twoWeeksAgo}),
+      fetchLogs(app, {limit: 0, from: lastWeek}),
+      fetchLogs(app, {limit: 0, from: twoWeeksAgo}),
+    ],
+    A.map(TE.map(grabCount)),
+    TE.sequenceArray,
     TE.map(([subsCur, subsPrev, logsCur, logsPrev]) => ({
       subs: mkTrend({cur: subsCur, prev: subsPrev - subsCur}),
       logs: mkTrend({cur: logsCur, prev: logsPrev - logsCur}),
