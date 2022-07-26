@@ -1,5 +1,5 @@
 use axum::{
-  extract::{Extension, Path},
+  extract::{Extension, Path, Query},
   routing::{delete, get, post},
   Json, Router,
 };
@@ -10,9 +10,11 @@ use std::collections::HashMap;
 use tracing::debug;
 use wither::mongodb::options::FindOptions;
 
+use crate::errors::BadRequest;
 use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
+use crate::lib::date::from_iso;
 use crate::lib::paginated_response::PaginatedJson;
 use crate::lib::to_object_id::to_object_id;
 use crate::models::application::Application;
@@ -67,16 +69,22 @@ async fn create_subscription(
 
 async fn query_subscriptions(
   Extension(application): Extension<Application>,
+  Query(query): Query<RequestQuery>,
 ) -> Result<PaginatedJson<Vec<PublicSubscription>>, Error> {
   let application_id = application.id.unwrap();
+  let from = query.from;
 
   let options = FindOptions::builder()
     .sort(doc! { "created_at": -1 })
     .limit(50)
     .build();
 
-  let (subscriptions, count) =
-    Subscription::find_and_count(doc! { "application": &application_id }, Some(options)).await?;
+  let mut query = doc! { "application": application_id };
+  if let Some(from) = from {
+    query.insert("created_at", doc! { "$gte": to_date(from)? });
+  }
+
+  let (subscriptions, count) = Subscription::find_and_count(query, Some(options)).await?;
 
   let subscriptions = subscriptions
     .into_iter()
@@ -157,4 +165,16 @@ struct CreateSubscription {
   url: String,
   endpoint: String,
   metadata: Option<JsonValue>,
+}
+
+#[derive(Deserialize)]
+struct RequestQuery {
+  from: Option<String>,
+}
+
+fn to_date<A>(iso: A) -> Result<chrono::DateTime<chrono::Utc>, BadRequest>
+where
+  A: AsRef<str>,
+{
+  from_iso(iso.as_ref()).map_err(|_e| BadRequest::new("from", "Invalid ISO string date"))
 }
