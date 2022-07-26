@@ -147,12 +147,14 @@ const mkTrend = ({cur, prev}: {cur: number; prev: number}): Trend => {
 const grabCount = (res: http.Res<unknown>) =>
   parseInt(res.headers.get('x-pagination-count') ?? '');
 
-const lastWeek = addDays(new Date(), -7).toISOString();
-const twoWeeksAgo = addDays(new Date(), -14).toISOString();
-
 const fetchStats = (app: string) =>
   pipe(
-    [
+    new Date(),
+    (now) => ({
+      lastWeek: addDays(now, -7).toISOString(),
+      twoWeeksAgo: addDays(now, -14).toISOString(),
+    }),
+    ({lastWeek, twoWeeksAgo}) => [
       fetchSubscriptions(app, {limit: 0, from: lastWeek}),
       fetchSubscriptions(app, {limit: 0, from: twoWeeksAgo}),
       fetchLogs(app, {limit: 0, from: lastWeek}),
