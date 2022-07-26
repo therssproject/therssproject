@@ -220,7 +220,13 @@ const Breadcrumbs = () => {
         <li>
           <div>
             <UnstyledLink
-              href={Route.dashboard}
+              href={pipe(
+                currentApp,
+                O.match(
+                  () => Route.dashboard,
+                  (app) => Route.appDashboard(app.id),
+                ),
+              )}
               className="text-gray-400 hover:text-gray-500"
             >
               <HomeIcon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />

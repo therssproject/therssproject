@@ -43,58 +43,65 @@ export const LogItem = ({log}: {log: Log}) => {
             <h2 className="text-sm font-medium">Webhook sent</h2>
           </div>
 
-          {pipe(
-            appEndpoints,
-            RD.toOption,
-            O.chain(A.findFirst(({id}) => id === log.endpoint)),
-            O.match(
-              () => null,
-              (endpoint) => (
-                <p className="truncate text-sm">
-                  <span className="text-gray-600">Sent to</span>{' '}
+          <p className="truncate text-sm">
+            <span className="text-gray-600">Sent to</span>{' '}
+            {pipe(
+              appEndpoints,
+              RD.toOption,
+              O.chain(A.findFirst(({id}) => id === log.endpoint)),
+              O.match(
+                () => (
+                  <span className="font-medium text-gray-600">
+                    {log.endpoint_url}
+                  </span>
+                ),
+                (endpoint) => (
                   <UnstyledLink
                     href={Route.appEndpoints(endpoint.application)}
                     className="font-medium text-indigo-600"
                   >
                     {endpoint.title}
-                  </UnstyledLink>{' '}
-                  <time
-                    // TODO: do not use relative date
-                    className="text-gray-600"
-                    dateTime={log.sent_at}
-                    title={date.format(sentAt, 'yyyy/MM/dd HH:MM:SS')}
-                  >
-                    {date.formatRelative(sentAt, Date.now())}{' '}
-                    {date.format(sentAt, 'yyyy/MM/dd HH:MM:SS')}
-                  </time>
-                </p>
+                  </UnstyledLink>
+                ),
               ),
-            ),
+            )}{' '}
+            <time
+              className="text-gray-600"
+              dateTime={log.sent_at}
+              title={date.format(sentAt, 'yyyy/MM/dd HH:MM:SS')}
+            >
+              {date.formatRelative(sentAt, Date.now())} (
+              {date.format(sentAt, 'yyyy/MM/dd HH:MM:SS')})
+            </time>
+          </p>
+
+          {log.feed_title && (
+            <p className="truncate text-sm text-gray-500 group-hover:text-gray-900">
+              Feed title: <span className="font-medium">{log.feed_title}</span>
+            </p>
           )}
 
           <p className="truncate text-sm text-gray-500 group-hover:text-gray-900">
-            Feed title: <span className="font-medium">{log.feed_title}</span>
-          </p>
-
-          {pipe(
-            appSubscriptions,
-            RD.toOption,
-            O.chain(A.findFirst(({id}) => id === log.subscription)),
-            O.match(
-              () => null,
-              (subscription) => (
-                <p className="truncate text-sm text-gray-500 group-hover:text-gray-900">
-                  Subscription:{' '}
+            Subscription:{' '}
+            {pipe(
+              appSubscriptions,
+              RD.toOption,
+              O.chain(A.findFirst(({id}) => id === log.subscription)),
+              O.match(
+                () => (
+                  <span className="font-mono font-medium">{log.feed_url}</span>
+                ),
+                (subscription) => (
                   <UnstyledLink
                     href={Route.appSubs(subscription.application)}
                     className="font-mono font-medium"
                   >
                     {subscription.url}
                   </UnstyledLink>
-                </p>
+                ),
               ),
-            ),
-          )}
+            )}
+          </p>
         </div>
       </div>
     </li>

@@ -1,13 +1,13 @@
 import {Dialog, Transition} from '@headlessui/react';
 import {
-  CalendarIcon,
   CogIcon,
   DocumentTextIcon,
-  FolderIcon,
-  HomeIcon,
   InformationCircleIcon,
+  LinkIcon,
   LogoutIcon,
-  UsersIcon,
+  RssIcon,
+  ViewGridIcon,
+  ViewListIcon,
   XIcon,
 } from '@heroicons/react/outline';
 import {ComponentType, FC, Fragment} from 'react';
@@ -35,23 +35,23 @@ type NavLink = {
 const navigation = (app: string): NavLink[] => [
   {
     name: 'Dashboard',
-    icon: HomeIcon,
+    icon: ViewGridIcon,
     href: Route.appDashboard(app),
     group: [],
   },
   {
     name: 'Endpoints',
-    icon: UsersIcon,
+    icon: LinkIcon,
     href: Route.appEndpoints(app),
     group: [],
   },
   {
     name: 'Subscriptions',
-    icon: FolderIcon,
+    icon: RssIcon,
     href: Route.appSubs(app),
     group: [],
   },
-  {name: 'Logs', icon: CalendarIcon, href: Route.appLogs(app), group: []},
+  {name: 'Logs', icon: ViewListIcon, href: Route.appLogs(app), group: []},
   {
     name: 'Settings',
     icon: CogIcon,
