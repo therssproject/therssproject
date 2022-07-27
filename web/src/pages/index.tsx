@@ -13,7 +13,7 @@ import {ChevronRightIcon} from '@heroicons/react/solid';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import {useAtom} from 'jotai';
-import {Fragment} from 'react';
+import {Fragment, useState} from 'react';
 
 import {external} from '@/lib/href';
 import {Route} from '@/lib/routes';
@@ -226,6 +226,7 @@ const footerNavigation = {
 
 const HomePage: NextPageWithLayout = () => {
   const [session] = useAtom(SessionAtom);
+  const [email, setEmail] = useState('');
 
   return (
     <div className="bg-white">
@@ -454,17 +455,20 @@ const HomePage: NextPageWithLayout = () => {
                             <input
                               id="email"
                               type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
                               placeholder="Enter your email"
                               className="block w-full rounded-md border-0 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
                             />
                           </div>
                           <div className="mt-3 sm:mt-0 sm:ml-3">
-                            <button
+                            <UnstyledLink
                               type="submit"
                               className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 py-3 px-4 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                              href={Route.register(email)}
                             >
                               Start free trial
-                            </button>
+                            </UnstyledLink>
                           </div>
                         </div>
                         <p className="mt-3 text-sm text-gray-300 sm:mt-4">

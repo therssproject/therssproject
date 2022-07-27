@@ -130,6 +130,7 @@ const Login: NextPageWithLayout = () => {
                     placeholder: 'doe.john@ymail.com',
                     autoComplete: 'email',
                     variant: errors.email ? 'error' : 'default',
+                    autoFocus: true,
                     ...register('email', {required: true}),
                   }}
                   message={errors.email?.message}
