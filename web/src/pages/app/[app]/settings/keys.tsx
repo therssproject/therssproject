@@ -6,6 +6,7 @@ import * as TE from 'fp-ts/TaskEither';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
+import * as crisp from '@/lib/crisp';
 import {noOp} from '@/lib/effect';
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
@@ -26,6 +27,18 @@ const AppSettingsKeys: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [keys, setKeys] = useAtom(AppKeysAtom);
   const [newKeyOpen, setNewKeyOpen] = useState(false);
+
+  const onOpen = () => {
+    setNewKeyOpen(true);
+    crisp.hide();
+  };
+
+  const onClose = () => {
+    setNewKeyOpen(false);
+    setTimeout(() => {
+      crisp.show();
+    }, 750);
+  };
 
   useFetchOnAppChange(
     (app) =>
@@ -82,11 +95,7 @@ const AppSettingsKeys: NextPageWithLayout = () => {
                   </p>
                 </div>
 
-                <Generate
-                  app={app}
-                  open={newKeyOpen}
-                  onClose={() => setNewKeyOpen(false)}
-                />
+                <Generate app={app} open={newKeyOpen} onClose={onClose} />
 
                 <div className="space-y-3">
                   {pipe(
@@ -111,15 +120,11 @@ const AppSettingsKeys: NextPageWithLayout = () => {
                           {pipe(
                             keys,
                             A.match(
-                              () => (
-                                <EmptyState
-                                  openForm={() => setNewKeyOpen(true)}
-                                />
-                              ),
+                              () => <EmptyState openForm={onOpen} />,
                               (keys) => (
                                 <>
                                   <div className="flex justify-end">
-                                    <Button onClick={() => setNewKeyOpen(true)}>
+                                    <Button onClick={onOpen}>
                                       Generate new key
                                     </Button>
                                   </div>

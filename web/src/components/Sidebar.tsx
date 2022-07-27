@@ -70,7 +70,10 @@ type SecondaryNavItem =
       action: () => void;
     };
 
-const secondaryNavigation = (onLogout: () => void): SecondaryNavItem[] => [
+const secondaryNavigation = (
+  email: string,
+  onLogout: () => void,
+): SecondaryNavItem[] => [
   {
     type: 'link',
     name: 'Documentation',
@@ -82,7 +85,10 @@ const secondaryNavigation = (onLogout: () => void): SecondaryNavItem[] => [
     type: 'action',
     name: 'Chat with us',
     icon: ChatIcon,
-    action: crisp.openChat,
+    action: () => {
+      crisp.setEmail(email);
+      crisp.openChat();
+    },
   },
   {
     type: 'action',
@@ -170,7 +176,7 @@ export const Sidebar: FC<Props> = ({
                   <MainNav app={appSelector.selected?.id} />
                 </nav>
               </div>
-              <SecondaryNav onLogout={onLogout} />
+              <SecondaryNav email={user.email} onLogout={onLogout} />
               <Profile username={user.name} />
             </div>
           </Transition.Child>
@@ -199,7 +205,7 @@ export const Sidebar: FC<Props> = ({
               </div>
             </nav>
           </div>
-          <SecondaryNav onLogout={onLogout} />
+          <SecondaryNav email={user.email} onLogout={onLogout} />
           <Profile username={user.name} />
         </div>
       </div>
@@ -263,7 +269,13 @@ const MainNav = ({app}: {app?: string}) => {
   );
 };
 
-const SecondaryNav = ({onLogout}: {onLogout: () => void}) => {
+const SecondaryNav = ({
+  email,
+  onLogout,
+}: {
+  email: string;
+  onLogout: () => void;
+}) => {
   const route = useCurrentRoute();
 
   return (
@@ -272,7 +284,7 @@ const SecondaryNav = ({onLogout}: {onLogout: () => void}) => {
       role="group"
       aria-labelledby="projects-headline"
     >
-      {secondaryNavigation(onLogout).map((item) =>
+      {secondaryNavigation(email, onLogout).map((item) =>
         item.type === 'link' ? (
           <UnstyledLink
             key={item.name}

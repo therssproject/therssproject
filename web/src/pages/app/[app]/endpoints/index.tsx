@@ -5,6 +5,7 @@ import * as TE from 'fp-ts/TaskEither';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
+import * as crisp from '@/lib/crisp';
 import {noOp} from '@/lib/effect';
 import {useAtom} from '@/lib/jotai';
 
@@ -26,6 +27,7 @@ type FormState =
 
 const hide: FormState = {tag: 'hide'};
 const register: FormState = {tag: 'register'};
+const update = (endpoint: Endpoint): FormState => ({tag: 'update', endpoint});
 
 const AppEndpoints: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
@@ -35,13 +37,22 @@ const AppEndpoints: NextPageWithLayout = () => {
   const openForm = () => {
     if (formState.tag === 'hide') {
       setFormState(register);
+      crisp.hide();
     }
   };
 
   const openEditForm = (endpoint: Endpoint) => {
     if (formState.tag === 'hide') {
-      setFormState({tag: 'update', endpoint});
+      setFormState(update(endpoint));
+      crisp.hide();
     }
+  };
+
+  const onClose = () => {
+    setFormState(hide);
+    setTimeout(() => {
+      crisp.show();
+    }, 750);
   };
 
   const onDeleteEndpoint = (toDelete: Endpoint) => {
@@ -71,10 +82,7 @@ const AppEndpoints: NextPageWithLayout = () => {
       () => null,
       (app) => (
         <>
-          <SlideOver
-            open={formState.tag !== 'hide'}
-            onClose={() => setFormState(hide)}
-          >
+          <SlideOver open={formState.tag !== 'hide'} onClose={onClose}>
             {
               // To keep the slide out animation working, we have to render something.
               // So we default to the Create form even when Edit is being closed
@@ -86,10 +94,10 @@ const AppEndpoints: NextPageWithLayout = () => {
                 <Update
                   app={app.id}
                   endpoint={formState.endpoint}
-                  onClose={() => setFormState(hide)}
+                  onClose={onClose}
                 />
               ) : (
-                <Register app={app.id} onClose={() => setFormState(hide)} />
+                <Register app={app.id} onClose={onClose} />
               )
             }
           </SlideOver>
