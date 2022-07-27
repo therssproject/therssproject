@@ -6,9 +6,11 @@ import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
 import {Alert} from '@/components/Alert';
+import {Footer} from '@/components/Footer';
 import {Layout} from '@/components/layout/Layout';
 import {ArrowLink} from '@/components/links/ArrowLink';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
+import {Logo} from '@/components/Logo';
 import {Terminal} from '@/components/Terminal';
 
 import * as SNIPPETS from '@/content/snippets';
@@ -22,9 +24,10 @@ const Documentation: NextPageWithLayout = () => {
   const {session} = useSession();
 
   return (
-    <div className="layout min-h-screen space-y-8 py-20">
+    <div className="layout min-h-screen space-y-8 pt-10 pb-20">
       <div>
-        <h1 className="text-gray-700">Documentation</h1>
+        <Logo />
+        <h1 className="mt-6 text-gray-700">Documentation</h1>
         {pipe(
           session,
           O.match(
@@ -110,6 +113,7 @@ Documentation.getLayout = (page) => (
     }}
   >
     {page}
+    <Footer />
   </Layout>
 );
 
