@@ -17,11 +17,11 @@ import {PasswordField} from '@/components/inputs/PasswordField';
 import {TextField} from '@/components/inputs/TextField';
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
+import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 import {authenticate, SessionAtom} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
-import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 type Inputs = {
   email: string;
