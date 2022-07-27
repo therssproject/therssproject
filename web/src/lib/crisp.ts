@@ -21,3 +21,7 @@ export const setEmail = (email: string) =>
   window.$crisp.push(['set', 'user:email', [email]]);
 
 export const openChat = () => window.$crisp.push(['do', 'chat:open']);
+
+export const hide = () => window.$crisp.push(['do', 'chat:hide']);
+
+export const show = () => window.$crisp.push(['do', 'chat:show']);

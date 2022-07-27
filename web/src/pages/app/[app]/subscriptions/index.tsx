@@ -5,6 +5,7 @@ import * as TE from 'fp-ts/TaskEither';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
+import * as crisp from '@/lib/crisp';
 import {noOp} from '@/lib/effect';
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
@@ -31,7 +32,17 @@ const AppSubs: NextPageWithLayout = () => {
   const [appSubscriptions, setSubscriptions] = useAtom(AppSubscriptionsAtom);
   const [showForm, setShowForm] = useState(false);
 
-  const onOpen = () => setShowForm(true);
+  const onOpen = () => {
+    setShowForm(true);
+    crisp.hide();
+  };
+
+  const onClose = () => {
+    setShowForm(false);
+    setTimeout(() => {
+      crisp.show();
+    }, 750);
+  };
 
   const onDeleteSubscription = (toDelete: Subscription) => {
     pipe(
@@ -77,7 +88,7 @@ const AppSubs: NextPageWithLayout = () => {
                         app={app.id}
                         endpoints={es}
                         open={showForm}
-                        onClose={() => setShowForm(false)}
+                        onClose={onClose}
                       />
 
                       {pipe(
