@@ -6,9 +6,7 @@ import {Eq as eqString} from 'fp-ts/string';
 import {useStableEffect} from 'fp-ts-react-stable-hooks';
 import {useRouter} from 'next/router';
 
-import {useAtom} from '@/lib/jotai';
-
-import {AuthResponse, SessionAtom} from '@/models/user';
+import {AuthResponse, useSession} from '@/models/user';
 
 import {noOp} from './effect';
 import {format, match, parse, parseO, Route, RouteTag} from './routes';
@@ -92,7 +90,7 @@ const eqSession = pipe(
 
 export const useSessionGuard = () => {
   const router = useRouter();
-  const [session] = useAtom(SessionAtom);
+  const {session} = useSession();
 
   useStableEffect(
     () => {

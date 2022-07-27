@@ -12,7 +12,6 @@ import {
 import {ChevronRightIcon} from '@heroicons/react/solid';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
-import {useAtom} from 'jotai';
 import {Fragment, useState} from 'react';
 
 import {external} from '@/lib/href';
@@ -22,7 +21,7 @@ import {Layout} from '@/components/layout/Layout';
 import {UnderlineLink} from '@/components/links/UnderlineLink';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
 
-import {SessionAtom} from '@/models/user';
+import {useSession} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
 
@@ -225,7 +224,7 @@ const footerNavigation = {
 };
 
 const HomePage: NextPageWithLayout = () => {
-  const [session] = useAtom(SessionAtom);
+  const {session} = useSession();
   const [email, setEmail] = useState('');
 
   return (

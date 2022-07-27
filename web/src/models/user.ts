@@ -5,6 +5,7 @@ import {useSetAtom} from 'jotai';
 import {atomWithStorage} from 'jotai/utils';
 import * as RD from 'remote-data-ts';
 
+import * as crisp from '@/lib/crisp';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 
@@ -36,7 +37,7 @@ export const Session = tt.option(AuthResponse);
 
 export const SESSION_KEY = '__user_session';
 
-export const SessionAtom = atomWithStorage<Session>(SESSION_KEY, O.none);
+const SessionAtom = atomWithStorage<Session>(SESSION_KEY, O.none);
 
 export const authenticate = (payload: {email: string; password: string}) =>
   http.post('/users/authenticate', payload, AuthResponse);
@@ -62,7 +63,14 @@ export const useSession = () => {
     setSubscriptions({});
     setLogs({});
     setEndpoints({});
+
+    crisp.clearEmail();
   };
 
-  return {session, setSession, logOut};
+  const login = (session: AuthResponse) => {
+    setSession(O.some(session));
+    crisp.setEmail(session.user.email);
+  };
+
+  return {session, login, logOut};
 };
