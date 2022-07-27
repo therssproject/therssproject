@@ -106,7 +106,7 @@ Documentation.getLayout = (page) => (
     variant="clean"
     seo={{
       templateTitle: 'Documentation',
-      description: 'RSS docs',
+      description: 'Getting started guide',
     }}
   >
     {page}

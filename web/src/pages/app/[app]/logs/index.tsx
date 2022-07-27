@@ -19,6 +19,7 @@ const AppLogs: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [appLogs, _setLogs] = useAtom(AppLogsAtom);
 
+  // TODO: currentApp to RemoteData and then sequence
   return pipe(
     currentApp,
     O.match(
@@ -55,14 +56,7 @@ const AppLogs: NextPageWithLayout = () => {
 };
 
 AppLogs.getLayout = (page) => (
-  <Layout
-    variant="applications"
-    title="Logs"
-    seo={{
-      templateTitle: 'Components',
-      description: 'Pre-built components with awesome default',
-    }}
-  >
+  <Layout variant="applications" title="Logs" seo={{}}>
     {page}
   </Layout>
 );

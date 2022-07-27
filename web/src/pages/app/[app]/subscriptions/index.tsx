@@ -1,4 +1,3 @@
-import {PlusIcon} from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -71,20 +70,7 @@ const AppSubs: NextPageWithLayout = () => {
                 RD.toOption,
                 O.getOrElse((): Endpoint[] => []),
                 A.match(
-                  () => (
-                    <div className="mt-16 flex w-full flex-col items-center space-y-2">
-                      <p className="text-lg text-gray-600">
-                        No endpoints registered yet.
-                      </p>
-                      <p className="text-lg text-gray-600">
-                        Please{' '}
-                        <PrimaryLink href={Route.appEndpoints(app.id)}>
-                          register one
-                        </PrimaryLink>{' '}
-                        first.
-                      </p>
-                    </div>
-                  ),
+                  () => <NoEndpoints app={app.id} />,
                   (es) => (
                     <>
                       <Create
@@ -102,8 +88,7 @@ const AppSubs: NextPageWithLayout = () => {
                             <div className="space-y-8">
                               <div className="flex w-full justify-end">
                                 <Button onClick={onOpen}>
-                                  <PlusIcon className="h-4 w-4" /> Create
-                                  subscription
+                                  Create subscription
                                 </Button>
                               </div>
 
@@ -167,23 +152,44 @@ const EmptyState = ({openForm}: EmptyStateProps) => (
         Get started by creating a new subscription.
       </p>
       <div className="mt-6">
-        <Button onClick={openForm}>
-          <PlusIcon className="h-4 w-4" /> Create subscription
-        </Button>
+        <Button onClick={openForm}>Create subscription</Button>
+      </div>
+    </div>
+  </div>
+);
+
+const NoEndpoints = ({app}: {app: string}) => (
+  <div className="mt-16">
+    <div className="text-center">
+      <svg
+        className="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          vectorEffect="non-scaling-stroke"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+        />
+      </svg>
+      <h3 className="mt-2 text-sm font-medium text-gray-900">No endpoints</h3>
+      <p className="mt-1 text-sm text-gray-500">No endpoints registered yet.</p>
+      <p className="text-sm text-gray-500">Register one first.</p>
+      <div className="mt-6">
+        <PrimaryLink href={Route.appEndpoints(app)}>
+          Register endpoint
+        </PrimaryLink>
       </div>
     </div>
   </div>
 );
 
 AppSubs.getLayout = (page) => (
-  <Layout
-    variant="applications"
-    title="Subscriptions"
-    seo={{
-      templateTitle: 'Components',
-      description: 'Pre-built components with awesome default',
-    }}
-  >
+  <Layout variant="applications" title="Subscriptions" seo={{}}>
     {page}
   </Layout>
 );

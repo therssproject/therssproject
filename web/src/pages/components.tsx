@@ -312,7 +312,11 @@ const ComponentsPage: NextPageWithLayout = () => {
   );
 };
 
-ComponentsPage.getLayout = (page) => <Layout variant="clean">{page}</Layout>;
+ComponentsPage.getLayout = (page) => (
+  <Layout variant="clean" seo={{templateTitle: 'Component library'}}>
+    {page}
+  </Layout>
+);
 
 const colorList = [
   'rose',

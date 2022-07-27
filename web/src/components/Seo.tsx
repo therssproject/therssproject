@@ -4,9 +4,9 @@ import {useRouter} from 'next/router';
 import {openGraph} from '@/lib/helper';
 
 const defaultMeta = {
-  title: 'RSS',
-  siteName: 'RSS',
-  description: 'RSS Webhooks done right',
+  title: 'therssproject',
+  siteName: 'therssproject',
+  description: 'Turn RSS feeds into webhook events',
   // IMPORTANT no additional '/' at the end
   url: 'https://therssproject.com',
   type: 'website',
@@ -22,10 +22,8 @@ export type Props = {
 
 export const Seo = (props: Props) => {
   const router = useRouter();
-  const meta = {
-    ...defaultMeta,
-    ...props,
-  };
+  const meta = {...defaultMeta, ...props};
+
   meta['title'] = props.templateTitle
     ? `${props.templateTitle} | ${meta.siteName}`
     : meta.title;

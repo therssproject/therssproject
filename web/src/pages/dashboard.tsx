@@ -8,15 +8,7 @@ const Dashboard: NextPageWithLayout = () => (
 );
 
 Dashboard.getLayout = (page) => (
-  <Layout
-    variant="dashboard"
-    title="RSS"
-    goToAppOnLoad
-    seo={{
-      templateTitle: 'RSS',
-      description: 'Pre-built components with awesome default',
-    }}
-  >
+  <Layout variant="dashboard" title="therssproject" seo={{}} goToAppOnLoad>
     {page}
   </Layout>
 );
