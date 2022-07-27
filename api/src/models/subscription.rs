@@ -134,9 +134,11 @@ impl Subscription {
 pub struct PublicSubscription {
   #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub id: ObjectId,
+  // TODO: Remove this field on this public subscription representation.
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub application: ObjectId,
   pub url: String,
+  // TODO: Remove this field on this public subscription representation.
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub feed: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]

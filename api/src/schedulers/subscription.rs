@@ -46,7 +46,7 @@ async fn run_job() {
 
     // We currently have a small amount of feeds. Once we have a decent amount
     // of feeds we can start running this job continuously.
-    if duration > Duration::seconds(10).to_std().unwrap() {
+    if duration < Duration::seconds(10).to_std().unwrap() {
       sleep(Duration::seconds(10).to_std().unwrap()).await;
     }
   }
