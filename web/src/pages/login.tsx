@@ -6,6 +6,7 @@ import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
+import {is4xx} from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
@@ -18,6 +19,7 @@ import {TextField} from '@/components/inputs/TextField';
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
+import {useToast} from '@/components/Toast';
 
 import {authenticate, SessionAtom} from '@/models/user';
 
@@ -34,8 +36,11 @@ const Inputs = yup.object({
   password: yup.string().min(3).max(50).required(),
 });
 
+const ToastConf = {variant: 'danger', position: 'bottom-left'} as const;
+
 const Login: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
   const {
     register,
     handleSubmit,
@@ -51,9 +56,12 @@ const Login: NextPageWithLayout = () => {
       authenticate({email, password}),
       TE.match(
         (error) => {
-          // TODO: show a toast or inline error
-          // eslint-disable-next-line no-console
-          console.log('Failed to login', error);
+          toast.show(
+            is4xx(error)
+              ? 'Incorrect username or password.'
+              : 'Something went wrong on our side.',
+            ToastConf,
+          );
 
           setLoading(false);
         },
@@ -153,6 +161,7 @@ const Login: NextPageWithLayout = () => {
                   isFullWidth
                   isLoading={loading}
                   disabled={loading}
+                  className="py-2 text-base"
                 >
                   Sign in
                 </Button>

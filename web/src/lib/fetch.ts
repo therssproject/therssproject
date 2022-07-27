@@ -1,5 +1,5 @@
 import * as E from 'fp-ts/Either';
-import {pipe} from 'fp-ts/function';
+import {pipe, Predicate} from 'fp-ts/function';
 import * as IOE from 'fp-ts/IOEither';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
@@ -45,6 +45,15 @@ const fetch_ = (code: number, message: string): FetchError => ({
   code,
   message,
 });
+
+export const isOfStatus =
+  (status: number | Predicate<number>) => (error: FetchError) =>
+    error.tag === 'fetch' &&
+    (typeof status === 'function' ? status(error.code) : error.code === status);
+
+export const is4xx = isOfStatus((code) => code >= 400 && code < 500);
+
+export const is5xx = isOfStatus((code) => code >= 500);
 
 export type Res<T> = {headers: Headers; data: T};
 
