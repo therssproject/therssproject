@@ -435,40 +435,45 @@ const HomePage: NextPageWithLayout = () => {
                       Programmatically subscribe and consume to RSS, Atom, and
                       JSON feeds.
                     </p>
-                    <div className="mt-10 sm:mt-12">
-                      <form
-                        action="#"
-                        className="sm:mx-auto sm:max-w-xl lg:mx-0"
-                      >
-                        <div className="sm:flex">
-                          <div className="min-w-0 flex-1">
-                            <label htmlFor="email" className="sr-only">
-                              Email address
-                            </label>
-                            <input
-                              id="email"
-                              type="email"
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              placeholder="Enter your email"
-                              className="block w-full rounded-md border-0 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-                            />
+                    {pipe(
+                      session,
+                      O.match(
+                        () => (
+                          <div className="mt-10 sm:mt-12">
+                            <div className="sm:mx-auto sm:max-w-xl lg:mx-0">
+                              <div className="sm:flex">
+                                <div className="min-w-0 flex-1">
+                                  <label htmlFor="email" className="sr-only">
+                                    Email address
+                                  </label>
+                                  <input
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Enter your email"
+                                    className="block w-full rounded-md border-0 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                                  />
+                                </div>
+                                <div className="mt-3 sm:mt-0 sm:ml-3">
+                                  <UnstyledLink
+                                    type="submit"
+                                    className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 py-3 px-4 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                                    href={Route.register(email)}
+                                  >
+                                    Start free trial
+                                  </UnstyledLink>
+                                </div>
+                              </div>
+                              <p className="mt-3 text-sm text-gray-300 sm:mt-4">
+                                Start your free trial, no credit card necessary.
+                              </p>
+                            </div>
                           </div>
-                          <div className="mt-3 sm:mt-0 sm:ml-3">
-                            <UnstyledLink
-                              type="submit"
-                              className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 py-3 px-4 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-                              href={Route.register(email)}
-                            >
-                              Start free trial
-                            </UnstyledLink>
-                          </div>
-                        </div>
-                        <p className="mt-3 text-sm text-gray-300 sm:mt-4">
-                          Start your free trial, no credit card necessary.
-                        </p>
-                      </form>
-                    </div>
+                        ),
+                        () => null,
+                      ),
+                    )}
                   </div>
                 </div>
                 <div className="mt-12 -mb-16 sm:-mb-48 lg:relative lg:m-0">
