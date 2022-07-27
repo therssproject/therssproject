@@ -1,3 +1,4 @@
+import {KeyIcon} from '@heroicons/react/outline';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -7,10 +8,11 @@ import * as RD from 'remote-data-ts';
 
 import {noOp} from '@/lib/effect';
 import {useAtom} from '@/lib/jotai';
+import {Route} from '@/lib/routes';
 
-import {Alert} from '@/components/Alert';
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
+import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {Tabs} from '@/components/SettingsTabs';
 import {Skeleton} from '@/components/Skeleton';
 
@@ -72,7 +74,11 @@ const AppSettingsKeys: NextPageWithLayout = () => {
                   <p className="mt-1 text-sm text-gray-500">
                     These keys can be used to interact with the with the{' '}
                     <code>therssproject</code> API on behalf of this
-                    application.
+                    application. See the{' '}
+                    <PrimaryLink href={Route.documentation}>
+                      documentation
+                    </PrimaryLink>{' '}
+                    for more information.
                   </p>
                 </div>
 
@@ -82,51 +88,56 @@ const AppSettingsKeys: NextPageWithLayout = () => {
                   onClose={() => setNewKeyOpen(false)}
                 />
 
-                <div className="flex justify-end">
-                  <Button onClick={() => setNewKeyOpen(true)}>
-                    Generate new key
-                  </Button>
-                </div>
-
                 <div className="space-y-3">
                   {pipe(
                     keys,
                     RD.match({
                       notAsked: () => (
-                        <>
-                          <Skeleton className="h-6 w-1/2 rounded-md" />
-                          <Skeleton className="h-6 w-2/3 rounded-md" />
-                          <Skeleton className="h-6 w-3/5 rounded-md" />
-                        </>
+                        <div className="mt-10 space-y-2">
+                          <Skeleton className="h-16 w-full rounded-md" />
+                          <Skeleton className="h-16 w-full rounded-md" />
+                          <Skeleton className="h-16 w-full rounded-md" />
+                        </div>
                       ),
                       loading: () => (
-                        <>
-                          <Skeleton className="h-6 w-1/2 rounded-md" />
-                          <Skeleton className="h-6 w-2/3 rounded-md" />
-                          <Skeleton className="h-6 w-3/5 rounded-md" />
-                        </>
+                        <div className="mt-10 space-y-2">
+                          <Skeleton className="h-16 w-full rounded-md" />
+                          <Skeleton className="h-16 w-full rounded-md" />
+                          <Skeleton className="h-16 w-full rounded-md" />
+                        </div>
                       ),
                       success: (keys) => (
                         <>
                           {pipe(
                             keys,
                             A.match(
-                              () => <Alert>No keys generated yet ...</Alert>,
+                              () => (
+                                <EmptyState
+                                  openForm={() => setNewKeyOpen(true)}
+                                />
+                              ),
                               (keys) => (
-                                <div className="overflow-hidden border-gray-200 bg-white sm:rounded-md sm:border">
-                                  <ul
-                                    role="list"
-                                    className="divide-y divide-gray-200"
-                                  >
-                                    {keys.map((key) => (
-                                      <KeyItem
-                                        key={key.id}
-                                        key_={key}
-                                        onDelete={onDeleteKey}
-                                      />
-                                    ))}
-                                  </ul>
-                                </div>
+                                <>
+                                  <div className="flex justify-end">
+                                    <Button onClick={() => setNewKeyOpen(true)}>
+                                      Generate new key
+                                    </Button>
+                                  </div>
+                                  <div className="overflow-hidden border-gray-200 bg-white sm:rounded-md sm:border">
+                                    <ul
+                                      role="list"
+                                      className="divide-y divide-gray-200"
+                                    >
+                                      {keys.map((key) => (
+                                        <KeyItem
+                                          key={key.id}
+                                          key_={key}
+                                          onDelete={onDeleteKey}
+                                        />
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </>
                               ),
                             ),
                           )}
@@ -146,6 +157,25 @@ const AppSettingsKeys: NextPageWithLayout = () => {
     ),
   );
 };
+
+type EmptyStateProps = {
+  openForm: () => void;
+};
+
+const EmptyState = ({openForm}: EmptyStateProps) => (
+  <div className="mt-16">
+    <div className="text-center">
+      <KeyIcon className="mx-auto h-12 w-12 text-gray-400" />
+      <h3 className="mt-2 text-sm font-medium text-gray-900">No keys</h3>
+      <p className="mt-1 text-sm text-gray-500">
+        Generate a key to use the API.
+      </p>
+      <div className="mt-6">
+        <Button onClick={openForm}>Generate an API key</Button>
+      </div>
+    </div>
+  </div>
+);
 
 AppSettingsKeys.getLayout = (page) => (
   <Layout variant="applications" title="Settings" seo={{}}>
