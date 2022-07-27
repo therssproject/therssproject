@@ -1,5 +1,6 @@
-import {FC} from 'react';
 import {RssIcon} from '@heroicons/react/outline';
+import {FC} from 'react';
+
 import {clsxm} from '@/lib/clsxm';
 
 type Props = {

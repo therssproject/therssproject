@@ -1,5 +1,6 @@
-import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {Route} from '@/lib/routes';
+
+import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 import {Rss} from './icons/Rss';
 

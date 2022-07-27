@@ -16,13 +16,12 @@ import {PasswordField} from '@/components/inputs/PasswordField';
 import {TextField} from '@/components/inputs/TextField';
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
-import {UnstyledLink} from '@/components/links/UnstyledLink';
+import {Logo} from '@/components/Logo';
 import {useToast} from '@/components/Toast';
 
 import {authenticate, register, useSession} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
-import {Logo} from '@/components/Logo';
 
 type Inputs = {
   name: string;

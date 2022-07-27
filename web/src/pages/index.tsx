@@ -20,11 +20,11 @@ import {Route} from '@/lib/routes';
 import {Layout} from '@/components/layout/Layout';
 import {UnderlineLink} from '@/components/links/UnderlineLink';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
+import {Logo} from '@/components/Logo';
 
 import {useSession} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
-import {Logo} from '@/components/Logo';
 
 type NavLink = {
   name: string;
