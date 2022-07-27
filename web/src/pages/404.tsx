@@ -5,6 +5,7 @@ import {Route} from '@/lib/routes';
 
 import {Layout} from '@/components/layout/Layout';
 import {ArrowLink} from '@/components/links/ArrowLink';
+import {Logo} from '@/components/Logo';
 
 import {NextPageWithLayout} from './_app';
 
@@ -16,8 +17,13 @@ const NotFoundPage: NextPageWithLayout = () => {
           size={60}
           className="drop-shadow-glow animate-flicker text-red-500"
         />
-        <h1 className="mt-8 text-4xl md:text-6xl">Page Not Found</h1>
-        <ArrowLink className="mt-4 md:text-lg" href={Route.index}>
+        <div className="mt-8">
+          <Logo />
+        </div>
+        <h1 className="mt-8 text-4xl text-gray-700 md:text-6xl">
+          Page Not Found
+        </h1>
+        <ArrowLink className="mt-4 text-gray-700 md:text-lg" href={Route.index}>
           Back to Home
         </ArrowLink>
       </div>
