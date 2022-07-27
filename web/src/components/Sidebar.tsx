@@ -1,8 +1,8 @@
 import {Dialog, Transition} from '@headlessui/react';
 import {
+  ChatIcon,
   CogIcon,
   DocumentTextIcon,
-  InformationCircleIcon,
   LinkIcon,
   LogoutIcon,
   RssIcon,
@@ -13,6 +13,7 @@ import {
 import {ComponentType, FC, Fragment} from 'react';
 
 import {clsxm} from '@/lib/clsxm';
+import * as crisp from '@/lib/crisp';
 import {Route, RouteTag} from '@/lib/routes';
 import {useCurrentRoute} from '@/lib/routing';
 
@@ -78,11 +79,10 @@ const secondaryNavigation = (onLogout: () => void): SecondaryNavItem[] => [
     group: [],
   },
   {
-    type: 'link',
-    name: 'Share feedback',
-    icon: InformationCircleIcon,
-    href: Route.feedback,
-    group: [],
+    type: 'action',
+    name: 'Chat with us',
+    icon: ChatIcon,
+    action: crisp.openChat,
   },
   {
     type: 'action',

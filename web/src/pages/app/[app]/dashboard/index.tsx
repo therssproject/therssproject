@@ -95,7 +95,7 @@ const TopCardsStats = () => {
             Last 7 days
           </h3>
           <dl className="grid grid-cols-1 divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow md:grid-cols-3 md:divide-y-0 md:divide-x">
-            {stats.map((item) =>
+            {stats.map((item, i) =>
               item ? (
                 <div key={item.name} className="px-4 py-5 sm:p-6">
                   <dt className="flex flex-col">
@@ -145,7 +145,10 @@ const TopCardsStats = () => {
                   </dd>
                 </div>
               ) : (
-                <div className="flex items-center justify-center px-4 py-5 sm:p-6">
+                <div
+                  key={`soon-${i}`}
+                  className="flex items-center justify-center px-4 py-5 sm:p-6"
+                >
                   <div className="text-gray-600">More stats soon ...</div>
                 </div>
               ),

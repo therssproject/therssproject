@@ -2,12 +2,10 @@ import {yupResolver} from '@hookform/resolvers/yup';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
-import {useAtom} from 'jotai';
 import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
-import {is4xx} from '@/lib/fetch';
 import {Route} from '@/lib/routes';
 import {useRouteOfType} from '@/lib/routing';
 
@@ -22,7 +20,7 @@ import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {useToast} from '@/components/Toast';
 
-import {authenticate, register, SessionAtom} from '@/models/user';
+import {authenticate, register, useSession} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
 
@@ -58,7 +56,7 @@ const Register: NextPageWithLayout = () => {
     defaultValues: {email: O.toUndefined(route)?.email},
   });
 
-  const [_session, setSession] = useAtom(SessionAtom);
+  const {login} = useSession();
 
   const onSubmit: SubmitHandler<Inputs> = ({name, email, password}) => {
     setLoading(true);
@@ -67,18 +65,13 @@ const Register: NextPageWithLayout = () => {
       register({name, email, password}),
       TE.chain(() => authenticate({email, password})),
       TE.match(
-        (error) => {
-          toast.show(
-            is4xx(error)
-              ? 'Incorrect username or password.'
-              : 'Something went wrong on our side.',
-            ToastConf,
-          );
+        () => {
+          toast.show('Something went wrong.', ToastConf);
 
           setLoading(false);
         },
         ({data: user}) => {
-          setSession(O.some(user));
+          login(user);
         },
       ),
     )();

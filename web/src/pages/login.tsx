@@ -1,13 +1,11 @@
 import {yupResolver} from '@hookform/resolvers/yup';
 import {pipe} from 'fp-ts/function';
-import * as O from 'fp-ts/Option';
 import * as TE from 'fp-ts/TaskEither';
 import {useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
 import {is4xx} from '@/lib/fetch';
-import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
@@ -21,7 +19,7 @@ import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {useToast} from '@/components/Toast';
 
-import {authenticate, SessionAtom} from '@/models/user';
+import {authenticate, useSession} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
 
@@ -47,7 +45,7 @@ const Login: NextPageWithLayout = () => {
     formState: {errors},
   } = useForm<Inputs>({resolver: yupResolver(Inputs)});
 
-  const [_session, setSession] = useAtom(SessionAtom);
+  const {login} = useSession();
 
   const onSubmit: SubmitHandler<Inputs> = ({email, password}) => {
     setLoading(true);
@@ -66,7 +64,7 @@ const Login: NextPageWithLayout = () => {
           setLoading(false);
         },
         ({data: user}) => {
-          setSession(O.some(user));
+          login(user);
         },
       ),
     )();

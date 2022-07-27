@@ -1,10 +1,13 @@
 import {identity} from 'fp-ts/lib/function';
 import {NextPage} from 'next';
 import {AppProps} from 'next/app';
+import dynamic from 'next/dynamic';
 import {ReactElement, ReactNode} from 'react';
 import {Toaster} from 'react-hot-toast';
 
 import '@/styles/globals.css';
+
+const CripsNoSSR = dynamic(() => import('@/components/Crisp'), {ssr: false});
 
 export type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactNode;
@@ -23,6 +26,7 @@ function MyApp({Component, pageProps}: AppPropsWithLayout) {
     <>
       <Toaster reverseOrder />
       {getLayout(<Component {...pageProps} />)}
+      <CripsNoSSR />
     </>
   );
 }
