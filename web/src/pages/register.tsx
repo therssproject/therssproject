@@ -12,7 +12,6 @@ import {useRouteOfType} from '@/lib/routing';
 import {Button} from '@/components/buttons/Button';
 import {GitHub} from '@/components/icons/GitHub';
 import {Google} from '@/components/icons/Google';
-import {Rss} from '@/components/icons/Rss';
 import {PasswordField} from '@/components/inputs/PasswordField';
 import {TextField} from '@/components/inputs/TextField';
 import {Layout} from '@/components/layout/Layout';
@@ -23,6 +22,7 @@ import {useToast} from '@/components/Toast';
 import {authenticate, register, useSession} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
+import {Logo} from '@/components/Logo';
 
 type Inputs = {
   name: string;
@@ -82,10 +82,8 @@ const Register: NextPageWithLayout = () => {
       <div className="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
-            <UnstyledLink href={Route.index}>
-              <Rss className="h-12 w-auto" />
-            </UnstyledLink>
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+            <Logo />
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-700">
               Create an account
             </h2>
           </div>
