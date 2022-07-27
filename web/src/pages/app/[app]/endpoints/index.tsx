@@ -173,9 +173,7 @@ const EmptyState = ({openForm}: EmptyStateProps) => (
         Get started by registering a new endpoint.
       </p>
       <div className="mt-6">
-        <Button onClick={openForm}>
-          Register endpoint
-        </Button>
+        <Button onClick={openForm}>Register endpoint</Button>
       </div>
     </div>
   </div>
