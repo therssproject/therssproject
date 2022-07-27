@@ -76,7 +76,7 @@ const Register: NextPageWithLayout = () => {
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
             <UnstyledLink href={Route.index}>
-              <Rss className="h-12 w-auto text-red-300" />
+              <Rss className="h-12 w-auto" />
             </UnstyledLink>
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
               Create an account

@@ -97,8 +97,8 @@ export const Input = forwardRef<HTMLInputElement, Props>(
               'text-gray-900',
               'disabled:placeholder-gray-400',
               'disabled:text-gray-400',
-              'focus:border-main',
-              'focus:ring-main',
+              'focus:border-cyan-600',
+              'focus:ring-cyan-600',
             ])
             .with('error', () => [
               'bg-red-50',

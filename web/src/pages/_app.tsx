@@ -5,8 +5,6 @@ import {ReactElement, ReactNode} from 'react';
 import {Toaster} from 'react-hot-toast';
 
 import '@/styles/globals.css';
-// TODO remove after picking colors
-import '@/styles/colors.css';
 
 export type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactNode;

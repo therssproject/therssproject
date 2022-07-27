@@ -22,7 +22,7 @@ export const Alert = ({
   const text = match(variant ?? 'info')
     .with('success', () => ['text-green-700'])
     .with('danger', () => ['text-red-700'])
-    .with('info', () => ['text-primary-700'])
+    .with('info', () => ['text-cyan-700'])
     .with('warning', () => ['text-orange-700'])
     .exhaustive();
 
@@ -34,7 +34,7 @@ export const Alert = ({
         match(variant ?? 'info')
           .with('success', () => ['bg-green-100'])
           .with('danger', () => ['bg-red-100'])
-          .with('info', () => ['bg-primary-100'])
+          .with('info', () => ['bg-cyan-100'])
           .with('warning', () => ['bg-orange-100'])
           .exhaustive(),
         className,
