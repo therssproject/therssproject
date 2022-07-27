@@ -726,7 +726,9 @@ const HomePage: NextPageWithLayout = () => {
                 <div className="mt-8">
                   <div className="inline-flex rounded-md shadow">
                     <UnstyledLink
-                      href={external('https://github.com/therssproject/documentation')}
+                      href={external(
+                        'https://github.com/therssproject/documentation',
+                      )}
                       className="inline-flex items-center justify-center rounded-md border border-transparent bg-white px-5 py-3 text-base font-medium text-gray-900 hover:bg-gray-50"
                     >
                       Visit the documentation repo
