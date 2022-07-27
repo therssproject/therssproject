@@ -22,7 +22,7 @@ async fn run_job() {
     info!("Running feed scheduler");
 
     let start = Instant::now();
-    let concurrency = 5;
+    let concurrency = 4;
     let feeds = match find_feeds().await {
       Ok(feeds) => feeds,
       Err(error) => {

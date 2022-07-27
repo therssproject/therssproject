@@ -32,7 +32,7 @@ async fn run_job() {
       }
     };
 
-    let concurrency = 5;
+    let concurrency = 2;
     subscriptions
       .filter_map(parse)
       .for_each_concurrent(concurrency, notify)
@@ -46,7 +46,9 @@ async fn run_job() {
 
     // We currently have a small amount of feeds. Once we have a decent amount
     // of feeds we can start running this job continuously.
-    sleep(Duration::seconds(10).to_std().unwrap()).await;
+    if duration > Duration::seconds(10).to_std().unwrap() {
+      sleep(Duration::seconds(10).to_std().unwrap()).await;
+    }
   }
 }
 
