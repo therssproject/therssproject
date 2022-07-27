@@ -215,7 +215,7 @@ const Select = ({options, selected, onSelect}: SelectProps) => (
     {({open}) => (
       <>
         <div className="relative mt-1">
-          <Listbox.Button className="focus:border-main focus:ring-main relative w-full cursor-default rounded-lg border-2 border-gray-300 bg-gray-50 py-3 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-2 sm:text-sm">
+          <Listbox.Button className="relative w-full cursor-default rounded-lg border-2 border-gray-300 bg-gray-50 py-3 pl-3 pr-10 text-left shadow-sm focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-600 sm:text-sm">
             <span className="inline-flex w-full truncate">
               <span className="truncate">{selected?.label}</span>
               <span className="ml-2 truncate text-gray-500">

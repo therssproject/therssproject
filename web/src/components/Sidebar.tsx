@@ -210,7 +210,7 @@ export const Sidebar: FC<Props> = ({
 const Logo = () => (
   <UnstyledLink href={Route.index}>
     <div className="flex flex-shrink-0 items-center px-4">
-      <Rss className="h-8 w-auto text-red-300" />
+      <Rss className="h-8 w-auto" />
       <h2 className="ml-2 text-gray-600">rss</h2>
     </div>
   </UnstyledLink>
