@@ -9,6 +9,7 @@ import * as yup from 'yup';
 
 import {is4xx} from '@/lib/fetch';
 import {Route} from '@/lib/routes';
+import {useRouteOfType} from '@/lib/routing';
 
 import {Button} from '@/components/buttons/Button';
 import {GitHub} from '@/components/icons/GitHub';
@@ -45,13 +46,17 @@ const Inputs = yup.object({
 const ToastConf = {variant: 'danger', position: 'bottom-left'} as const;
 
 const Register: NextPageWithLayout = () => {
+  const route = useRouteOfType('Register');
   const [loading, setLoading] = useState(false);
   const toast = useToast();
   const {
     register: registerField,
     handleSubmit,
     formState: {errors},
-  } = useForm<Inputs>({resolver: yupResolver(Inputs)});
+  } = useForm<Inputs>({
+    resolver: yupResolver(Inputs),
+    defaultValues: {email: O.toUndefined(route)?.email},
+  });
 
   const [_session, setSession] = useAtom(SessionAtom);
 
@@ -135,8 +140,9 @@ const Register: NextPageWithLayout = () => {
                     id: 'name',
                     type: 'name',
                     placeholder: 'John Doe',
-                    autoComplete: 'name',
+                    autoComplete: 'new-name',
                     variant: errors.name ? 'error' : 'default',
+                    autoFocus: true,
                     ...registerField('name', {required: true}),
                   }}
                   message={errors.name?.message}
@@ -148,7 +154,7 @@ const Register: NextPageWithLayout = () => {
                     id: 'email',
                     type: 'email',
                     placeholder: 'doe.john@ymail.com',
-                    autoComplete: 'email',
+                    autoComplete: 'new-email',
                     variant: errors.email ? 'error' : 'default',
                     ...registerField('email', {required: true}),
                   }}
@@ -160,7 +166,7 @@ const Register: NextPageWithLayout = () => {
                   input={{
                     id: 'password',
                     placeholder: '****************',
-                    autoComplete: 'password',
+                    autoComplete: 'new-password',
                     variant: errors.password ? 'error' : 'default',
                     ...registerField('password', {required: true}),
                   }}
@@ -172,7 +178,7 @@ const Register: NextPageWithLayout = () => {
                   input={{
                     id: 'passwordCheck',
                     placeholder: '****************',
-                    autoComplete: 'passwordCheck',
+                    autoComplete: 'new-passwordCheck',
                     variant: errors.passwordCheck ? 'error' : 'default',
                     ...registerField('passwordCheck', {required: true}),
                   }}

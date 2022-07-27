@@ -12,7 +12,7 @@ type Components = {tag: 'Components'};
 
 // Public (logged-out only)
 type Login = {tag: 'Login'; returnTo?: Route};
-type Register = {tag: 'Register'; returnTo?: Route};
+type Register = {tag: 'Register'; email?: string; returnTo?: Route};
 type ResetPasswordRequest = {tag: 'ResetPasswordRequest'};
 type ResetPasswordConfirm = {tag: 'ResetPasswordConfirm'; token: string};
 
@@ -173,7 +173,11 @@ const components: Route = {tag: 'Components'};
 
 // Public (logged-out only)
 const login = (returnTo?: Route): Route => ({tag: 'Login', returnTo});
-const register = (returnTo?: Route): Route => ({tag: 'Register', returnTo});
+const register = (email?: string, returnTo?: Route): Route => ({
+  tag: 'Register',
+  email,
+  returnTo,
+});
 const resetPasswordRequest: Route = {tag: 'ResetPasswordRequest'};
 const resetPasswordConfirm = (token: string): Route => ({
   tag: 'ResetPasswordConfirm',
@@ -217,10 +221,6 @@ export const Route = {
   appSettingsMembers,
 };
 
-// Optional query properties
-// @reference: https://github.com/gcanti/fp-ts-routing/issues/59#issuecomment-800801913
-const returnToQuery = Routing.query(t.exact(t.partial({returnTo: t.string})));
-
 const _404Match = Routing.lit('404').then(Routing.end);
 
 // Public
@@ -230,9 +230,16 @@ const feedbackMatch = Routing.lit('feedback').then(Routing.end);
 const componentsMatch = Routing.lit('components').then(Routing.end);
 
 // Public (logged-out only)
-const loginMatch = Routing.lit('login').then(returnToQuery).then(Routing.end);
+//
+// Optional query properties
+// @reference: https://github.com/gcanti/fp-ts-routing/issues/59#issuecomment-800801913
+const loginMatch = Routing.lit('login')
+  .then(Routing.query(t.exact(t.partial({returnTo: t.string}))))
+  .then(Routing.end);
 const registerMatch = Routing.lit('register')
-  .then(returnToQuery)
+  .then(
+    Routing.query(t.exact(t.partial({email: t.string, returnTo: t.string}))),
+  )
   .then(Routing.end);
 const resetPasswordRequestMatch = Routing.lit('reset-password').then(
   Routing.end,
@@ -320,7 +327,11 @@ const router = Routing.zero<Route>()
 
   // Public (logged-out only)
   .alt(Match.login.parser.map(parseBackTo(Route.login)))
-  .alt(Match.register.parser.map(parseBackTo(Route.register)))
+  .alt(
+    Match.register.parser.map(({email, ...rest}) =>
+      parseBackTo((route) => Route.register(email, route))(rest),
+    ),
+  )
   .alt(Match.resetPasswordRequest.parser.map(() => Route.resetPasswordRequest))
   .alt(
     Match.resetPasswordConfirm.parser.map(({token}) =>
@@ -368,10 +379,10 @@ export const format = (route: Route): string =>
           Match.login.formatter,
           returnTo ? {returnTo: format(returnTo)} : {},
         ),
-      Register: ({returnTo}) =>
+      Register: ({email, returnTo}) =>
         Routing.format(
           Match.register.formatter,
-          returnTo ? {returnTo: format(returnTo)} : {},
+          returnTo ? {email, returnTo: format(returnTo)} : {email},
         ),
       ResetPasswordRequest: () =>
         Routing.format(Match.resetPasswordRequest.formatter, {}),
