@@ -17,7 +17,6 @@ import * as crisp from '@/lib/crisp';
 import {Route, RouteTag} from '@/lib/routes';
 import {useCurrentRoute} from '@/lib/routing';
 
-import {Rss} from '@/components/icons/Rss';
 import {Select} from '@/components/Select';
 import {Skeleton} from '@/components/Skeleton';
 
@@ -25,6 +24,7 @@ import {AppOption} from '@/models/application';
 import {PublicUser} from '@/models/user';
 
 import {UnstyledLink} from './links/UnstyledLink';
+import {Logo} from './Logo';
 
 type NavLink = {
   name: string;
@@ -171,7 +171,9 @@ export const Sidebar: FC<Props> = ({
               </Transition.Child>
               {/* ... */}
               <div className="h-0 flex-1 overflow-y-auto pt-5 pb-4">
-                <Logo />
+                <div className="px-4">
+                  <Logo />
+                </div>
                 <nav className="mt-5 space-y-2 px-2">
                   <MainNav app={appSelector.selected?.id} />
                 </nav>
@@ -190,7 +192,9 @@ export const Sidebar: FC<Props> = ({
       <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <div className="flex flex-grow flex-col overflow-y-auto border-x border-gray-200 bg-white pt-5">
-          <Logo />
+          <div className="px-4">
+            <Logo />
+          </div>
           <div className="mx-2 mt-5">
             <Select {...appSelector} />
           </div>
@@ -212,15 +216,6 @@ export const Sidebar: FC<Props> = ({
     </>
   );
 };
-
-const Logo = () => (
-  <UnstyledLink href={Route.index}>
-    <div className="flex flex-shrink-0 items-center px-4">
-      <Rss className="h-8 w-auto" />
-      <h2 className="ml-2 text-gray-600">rss</h2>
-    </div>
-  </UnstyledLink>
-);
 
 const MainNav = ({app}: {app?: string}) => {
   const route = useCurrentRoute();

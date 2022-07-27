@@ -24,6 +24,7 @@ import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {useSession} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
+import {Logo} from '@/components/Logo';
 
 type NavLink = {
   name: string;
@@ -238,14 +239,7 @@ const HomePage: NextPageWithLayout = () => {
             >
               <div className="flex flex-1 items-center">
                 <div className="flex w-full items-center justify-between md:w-auto">
-                  <a href="#">
-                    <span className="sr-only">Workflow</span>
-                    <img
-                      className="h-8 w-auto sm:h-10"
-                      src="https://tailwindui.com/img/logos/workflow-mark-teal-200-cyan-400.svg"
-                      alt=""
-                    />
-                  </a>
+                  <Logo />
                   <div className="-mr-2 flex items-center md:hidden">
                     <Popover.Button className="focus-ring-inset inline-flex items-center justify-center rounded-md bg-gray-900 p-2 text-gray-400 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-white">
                       <span className="sr-only">Open main menu</span>
