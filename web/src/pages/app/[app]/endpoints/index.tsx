@@ -1,4 +1,3 @@
-import {PlusIcon} from '@heroicons/react/solid';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -110,7 +109,7 @@ const AppEndpoints: NextPageWithLayout = () => {
                         <>
                           <div className="flex w-full justify-end">
                             <Button onClick={openForm}>
-                              <PlusIcon className="h-4 w-4" /> Register endpoint
+                              Register endpoint
                             </Button>
                           </div>
 
@@ -175,7 +174,7 @@ const EmptyState = ({openForm}: EmptyStateProps) => (
       </p>
       <div className="mt-6">
         <Button onClick={openForm}>
-          <PlusIcon className="h-4 w-4" /> Register endpoint
+          Register endpoint
         </Button>
       </div>
     </div>
@@ -183,14 +182,7 @@ const EmptyState = ({openForm}: EmptyStateProps) => (
 );
 
 AppEndpoints.getLayout = (page) => (
-  <Layout
-    variant="applications"
-    title="Endpoints"
-    seo={{
-      templateTitle: 'Components',
-      description: 'Pre-built components with awesome default',
-    }}
-  >
+  <Layout variant="applications" title="Endpoints" seo={{}}>
     {page}
   </Layout>
 );

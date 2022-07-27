@@ -32,16 +32,8 @@ const AppDashboard: NextPageWithLayout = () => {
   );
 };
 
-// TODO: move the `useCurrentApp()` logic to the layout to be able to show the title?
 AppDashboard.getLayout = (page) => (
-  <Layout
-    variant="applications"
-    title="Dashboard"
-    seo={{
-      templateTitle: 'Components',
-      description: 'Pre-built components with awesome default',
-    }}
-  >
+  <Layout variant="applications" title="Dashboard" seo={{}}>
     {page}
   </Layout>
 );

@@ -23,7 +23,7 @@ Feedback.getLayout = (page) => (
     goToAppOnLoad={false}
     seo={{
       templateTitle: 'Feedback',
-      description: 'RSS docs',
+      description: 'Get in contact with us',
     }}
   >
     {page}

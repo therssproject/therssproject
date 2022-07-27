@@ -147,16 +147,8 @@ const AppSettingsKeys: NextPageWithLayout = () => {
   );
 };
 
-// TODO: move the `useCurrentApp()` logic to the layout to be able to show the title?
 AppSettingsKeys.getLayout = (page) => (
-  <Layout
-    variant="applications"
-    title="Settings"
-    seo={{
-      templateTitle: 'Components',
-      description: 'Pre-built components with awesome default',
-    }}
-  >
+  <Layout variant="applications" title="Settings" seo={{}}>
     {page}
   </Layout>
 );

@@ -21,6 +21,7 @@ import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {authenticate, register, SessionAtom} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
+import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 type Inputs = {
   name: string;
@@ -74,7 +75,9 @@ const Register: NextPageWithLayout = () => {
       <div className="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
-            <Rss className="h-12 w-auto text-red-300" />
+            <UnstyledLink href={Route.index}>
+              <Rss className="h-12 w-auto text-red-300" />
+            </UnstyledLink>
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
               Create an account
             </h2>
@@ -201,6 +204,10 @@ const Register: NextPageWithLayout = () => {
   );
 };
 
-Register.getLayout = (page) => <Layout variant="clean">{page}</Layout>;
+Register.getLayout = (page) => (
+  <Layout variant="clean" seo={{templateTitle: 'Register'}}>
+    {page}
+  </Layout>
+);
 
 export default Register;
