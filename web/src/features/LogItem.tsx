@@ -57,7 +57,7 @@ export const LogItem = ({log}: {log: Log}) => {
                 ),
                 (endpoint) => (
                   <UnstyledLink
-                    href={Route.appEndpoints(endpoint.application)}
+                    href={Route.appEndpoints(log.application)}
                     className="font-medium text-indigo-600"
                   >
                     {endpoint.title}
