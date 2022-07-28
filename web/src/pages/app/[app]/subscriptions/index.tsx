@@ -44,7 +44,7 @@ const AppSubs: NextPageWithLayout = () => {
     }, 750);
   };
 
-  const onDeleteSubscription = (toDelete: Subscription) => {
+  const onDeleteSubscription = (appId: string) => (toDelete: Subscription) => {
     pipe(
       appSubscriptions,
       RD.map(A.filter((e) => e.id !== toDelete.id)),
@@ -52,7 +52,7 @@ const AppSubs: NextPageWithLayout = () => {
     );
 
     const run = pipe(
-      deleteSubscription(toDelete.application, toDelete.id),
+      deleteSubscription(appId, toDelete.id),
       TE.match(noOp, () => {
         pipe(
           appSubscriptions,
@@ -112,7 +112,7 @@ const AppSubs: NextPageWithLayout = () => {
                                     <SubscriptionItem
                                       key={sub.id}
                                       subscription={sub}
-                                      onDelete={onDeleteSubscription}
+                                      onDelete={onDeleteSubscription(app.id)}
                                     />
                                   ))}
                                 </ul>
