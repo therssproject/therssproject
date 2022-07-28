@@ -134,13 +134,9 @@ impl Subscription {
 pub struct PublicSubscription {
   #[serde(alias = "_id", serialize_with = "serialize_object_id_as_hex_string")]
   pub id: ObjectId,
-  // TODO: Remove this field on this public subscription representation.
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub application: ObjectId,
   pub url: String,
-  // TODO: Remove this field on this public subscription representation.
-  #[serde(serialize_with = "serialize_object_id_as_hex_string")]
-  pub feed: ObjectId,
   #[serde(serialize_with = "serialize_object_id_as_hex_string")]
   pub endpoint: ObjectId,
   pub metadata: Option<Json>,
@@ -154,7 +150,6 @@ impl From<Subscription> for PublicSubscription {
       id: subscription.id.unwrap(),
       application: subscription.application,
       url: subscription.url.clone(),
-      feed: subscription.feed,
       endpoint: subscription.endpoint,
       metadata: subscription.metadata,
       created_at: subscription.created_at,
