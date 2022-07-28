@@ -19,6 +19,7 @@ impl ModelExt for Webhook {
   type T = Webhook;
 }
 
+// TODO: Add response status to the webhook model.
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
 #[model(index(keys = r#"doc!{ "application": 1, "sent_at": 1 }"#))]
 #[model(index(keys = r#"doc!{ "application": 1, "subscription": 1, "sent_at": 1 }"#))]
