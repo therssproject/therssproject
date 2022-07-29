@@ -54,24 +54,6 @@ const features = [
     description: 'All types of feeds supported',
     icon: RssIcon,
   },
-  {
-    name: '...',
-    description:
-      'Rerum quas incidunt deleniti quaerat suscipit mollitia. Amet repellendus ut odit dolores qui.',
-    icon: RefreshIcon,
-  },
-  {
-    name: '...',
-    description:
-      'Ullam laboriosam est voluptatem maxime ut mollitia commodi. Et dignissimos suscipit perspiciatis.',
-    icon: ShieldCheckIcon,
-  },
-  {
-    name: '...',
-    description:
-      'Quia qui et est officia cupiditate qui consectetur. Ratione similique et impedit ea ipsum et.',
-    icon: ServerIcon,
-  },
 ];
 
 const blogPosts = [
@@ -88,7 +70,7 @@ const blogPosts = [
       imageUrl: 'https://avatars.githubusercontent.com/u/6719053?v=4',
       href: 'https://github.com/ndelvalle',
     },
-    readingLength: '4 min',
+    readingLength: '5 min',
   },
   {
     title: 'Send messages to Discord on new feed entries',
