@@ -179,7 +179,7 @@ const Login: NextPageWithLayout = () => {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="absolute inset-0 h-full w-full object-cover"
-          src="https://images.unsplash.com/photo-1542382257-80dedb725088?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2128&q=80"
+          src="/images/connected.jpg"
           alt=""
         />
       </div>
