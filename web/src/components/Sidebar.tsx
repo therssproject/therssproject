@@ -175,10 +175,14 @@ export const Sidebar: FC<Props> = ({
                   <Logo />
                 </div>
                 <nav className="mt-5 space-y-2 px-2">
-                  <MainNav app={appSelector.selected?.id} />
+                  <MainNav app={appSelector.selected?.id} closeNav={onClose} />
                 </nav>
               </div>
-              <SecondaryNav email={user.email} onLogout={onLogout} />
+              <SecondaryNav
+                email={user.email}
+                onLogout={onLogout}
+                closeNav={onClose}
+              />
               <Profile username={user.name} />
             </div>
           </Transition.Child>
@@ -204,12 +208,11 @@ export const Sidebar: FC<Props> = ({
               aria-label="Sidebar"
             >
               <div className="space-y-2">
-                {/* TODO: `getAppId` getter that ignores the `type: 'soon'` ???  */}
-                <MainNav app={appSelector.selected?.id} />
+                <MainNav app={appSelector.selected?.id} closeNav={onClose} />
               </div>
             </nav>
           </div>
-          <SecondaryNav email={user.email} onLogout={onLogout} />
+          <SecondaryNav email={user.email} onLogout={onLogout} closeNav={onClose} />
           <Profile username={user.name} />
         </div>
       </div>
@@ -217,7 +220,7 @@ export const Sidebar: FC<Props> = ({
   );
 };
 
-const MainNav = ({app}: {app?: string}) => {
+const MainNav = ({app, closeNav}: {app?: string; closeNav: () => void}) => {
   const route = useCurrentRoute();
 
   return (
@@ -233,6 +236,7 @@ const MainNav = ({app}: {app?: string}) => {
             <UnstyledLink
               key={item.name}
               href={item.href}
+              onClick={closeNav}
               className={clsxm(
                 isActive
                   ? 'bg-gray-100 text-gray-900'
@@ -267,9 +271,11 @@ const MainNav = ({app}: {app?: string}) => {
 const SecondaryNav = ({
   email,
   onLogout,
+  closeNav,
 }: {
   email: string;
   onLogout: () => void;
+  closeNav: () => void;
 }) => {
   const route = useCurrentRoute();
 
@@ -284,6 +290,7 @@ const SecondaryNav = ({
           <UnstyledLink
             key={item.name}
             href={item.href}
+            onClick={closeNav}
             className={clsxm(
               item.href.tag === route.tag
                 ? 'bg-gray-100 text-gray-700'
@@ -305,7 +312,10 @@ const SecondaryNav = ({
         ) : (
           <button
             key={item.name}
-            onClick={item.action}
+            onClick={() => {
+              item.action();
+              closeNav();
+            }}
             className={clsxm(
               'text-gray-400 hover:bg-gray-50 hover:text-gray-700',
               'group flex w-full items-center rounded-md px-2 py-2 text-base font-medium',
