@@ -3,10 +3,7 @@ import {
   CloudUploadIcon,
   LockClosedIcon,
   MenuIcon,
-  RefreshIcon,
   RssIcon,
-  ServerIcon,
-  ShieldCheckIcon,
   XIcon,
 } from '@heroicons/react/outline';
 import {ChevronRightIcon} from '@heroicons/react/solid';
