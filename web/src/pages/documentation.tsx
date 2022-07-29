@@ -18,6 +18,7 @@ import {SelectedAppAtom} from '@/models/application';
 import {useSession} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
+import {external} from '@/lib/href';
 
 const Documentation: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
@@ -52,6 +53,18 @@ const Documentation: NextPageWithLayout = () => {
           ),
         )}
       </div>
+
+      <Alert variant="success">
+        <p className="text-lg">
+          Find examples and the full API documentation on{' '}
+          <PrimaryLink
+            href={external('https://github.com/therssproject/documentation')}
+          >
+            github.com/therssproject/documentation
+          </PrimaryLink>
+          .
+        </p>
+      </Alert>
 
       <Alert variant="warning">
         <div className="flex">

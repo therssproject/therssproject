@@ -79,61 +79,38 @@ const features = [
 
 const blogPosts = [
   {
-    id: 1,
-    title: 'Boost your conversion rate',
-    href: '#',
-    date: 'Mar 16, 2020',
-    datetime: '2020-03-16',
-    category: {name: 'Article', href: '#'},
-    imageUrl:
-      'https://images.unsplash.com/photo-1496128858413-b36217c2ce36?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1679&q=80',
-    preview:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.',
+    title: 'therssproject API Documentation',
+    href: external('https://github.com/therssproject/documentation'),
+    date: 'Jul 25, 2022',
+    datetime: '2022-07-25',
+    category: 'Documentation',
+    imageUrl: '/images/documentation.png',
+    preview: 'How to use therssproject API',
     author: {
-      name: 'Roel Aufderehar',
-      imageUrl:
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      href: '#',
-    },
-    readingLength: '6 min',
-  },
-  {
-    id: 2,
-    title: 'How to use search engine optimization to drive sales',
-    href: '#',
-    date: 'Mar 10, 2020',
-    datetime: '2020-03-10',
-    category: {name: 'Video', href: '#'},
-    imageUrl:
-      'https://images.unsplash.com/photo-1547586696-ea22b4d4235d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1679&q=80',
-    preview:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit facilis asperiores porro quaerat doloribus, eveniet dolore. Adipisci tempora aut inventore optio animi., tempore temporibus quo laudantium.',
-    author: {
-      name: 'Brenna Goyette',
-      imageUrl:
-        'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      href: '#',
+      name: 'Nicolas del Valle',
+      imageUrl: 'https://avatars.githubusercontent.com/u/6719053?v=4',
+      href: 'https://github.com/ndelvalle',
     },
     readingLength: '4 min',
   },
   {
-    id: 3,
-    title: 'Improve your customer experience',
-    href: '#',
-    date: 'Feb 12, 2020',
-    datetime: '2020-02-12',
-    category: {name: 'Case Study', href: '#'},
+    title: 'Send messages to Discord on new feed entries',
+    href: external(
+      'https://github.com/therssproject/documentation/tree/main/examples/discord-webhook',
+    ),
+    date: 'Jul 28, 2022',
+    datetime: '2022-07-28',
+    category: 'Example',
     imageUrl:
-      'https://images.unsplash.com/photo-1492724441997-5dc865305da7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1679&q=80',
+      'https://github.com/therssproject/documentation/blob/main/examples/discord-webhook/assets/discord-webhook-integration.png?raw=true',
     preview:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint harum rerum voluptatem quo recusandae magni placeat saepe molestiae, sed excepturi cumque corporis perferendis hic.',
+      'Send messages to a channel on a Discord server using the Discord Webhook Integration when an RSS feed receives new entries.',
     author: {
-      name: 'Daniela Metz',
-      imageUrl:
-        'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      href: '#',
+      name: 'Christian Gill',
+      imageUrl: 'https://avatars.githubusercontent.com/u/8309423?v=4',
+      href: 'https://gillchristian.xyz',
     },
-    readingLength: '11 min',
+    readingLength: '5 min',
   },
 ];
 
@@ -541,20 +518,19 @@ const HomePage: NextPageWithLayout = () => {
                   Helpful Resources
                 </p>
                 <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
-                  Phasellus lorem quam molestie id quisque diam aenean nulla in.
-                  Accumsan in quis quis nunc, ullamcorper malesuada. Eleifend
-                  condimentum id viverra nulla.
+                  Guides and examples on how to quickly get started with
+                  therssproject UI and API.
                 </p>
               </div>
               <div className="mx-auto mt-12 grid max-w-md gap-8 px-4 sm:max-w-lg sm:px-6 lg:max-w-7xl lg:grid-cols-3 lg:px-8">
                 {blogPosts.map((post) => (
                   <div
-                    key={post.id}
+                    key={post.title}
                     className="flex flex-col overflow-hidden rounded-lg shadow-lg"
                   >
                     <div className="flex-shrink-0">
                       <img
-                        className="h-48 w-full object-cover"
+                        className="h-48 w-full object-cover object-center"
                         src={post.imageUrl}
                         alt=""
                       />
@@ -562,21 +538,16 @@ const HomePage: NextPageWithLayout = () => {
                     <div className="flex flex-1 flex-col justify-between bg-white p-6">
                       <div className="flex-1">
                         <p className="text-sm font-medium text-cyan-600">
-                          <a
-                            href={post.category.href}
-                            className="hover:underline"
-                          >
-                            {post.category.name}
-                          </a>
+                          {post.category}
                         </p>
-                        <a href={post.href} className="mt-2 block">
+                        <UnstyledLink href={post.href} className="mt-2 block">
                           <p className="text-xl font-semibold text-gray-900">
                             {post.title}
                           </p>
                           <p className="mt-3 text-base text-gray-500">
                             {post.preview}
                           </p>
-                        </a>
+                        </UnstyledLink>
                       </div>
                       <div className="mt-6 flex items-center">
                         <div className="flex-shrink-0">
