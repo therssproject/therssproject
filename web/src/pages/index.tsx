@@ -1,10 +1,10 @@
 import {Popover, Transition} from '@headlessui/react';
 import {
   CloudUploadIcon,
-  CogIcon,
   LockClosedIcon,
   MenuIcon,
   RefreshIcon,
+  RssIcon,
   ServerIcon,
   ShieldCheckIcon,
   XIcon,
@@ -40,37 +40,34 @@ const navigation: NavLink[] = [
 
 const features = [
   {
-    name: 'Push to Deploy',
-    description:
-      'Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi vitae lobortis.',
+    name: 'Simple API',
+    description: 'Much simple. Such wow. Very API.',
     icon: CloudUploadIcon,
   },
   {
-    name: 'SSL Certificates',
-    description:
-      'Qui aut temporibus nesciunt vitae dicta repellat sit dolores pariatur. Temporibus qui illum aut.',
+    name: 'Safe',
+    description: 'Our API is safe ...',
     icon: LockClosedIcon,
   },
   {
-    name: 'Simple Queues',
+    name: 'RSS, Atom & JSON',
+    description: 'All types of feeds supported',
+    icon: RssIcon,
+  },
+  {
+    name: '...',
     description:
       'Rerum quas incidunt deleniti quaerat suscipit mollitia. Amet repellendus ut odit dolores qui.',
     icon: RefreshIcon,
   },
   {
-    name: 'Advanced Security',
+    name: '...',
     description:
       'Ullam laboriosam est voluptatem maxime ut mollitia commodi. Et dignissimos suscipit perspiciatis.',
     icon: ShieldCheckIcon,
   },
   {
-    name: 'Powerful API',
-    description:
-      'Ab a facere voluptatem in quia corrupti veritatis aliquam. Veritatis labore quaerat ipsum quaerat id.',
-    icon: CogIcon,
-  },
-  {
-    name: 'Database Backups',
+    name: '...',
     description:
       'Quia qui et est officia cupiditate qui consectetur. Ratione similique et impedit ea ipsum et.',
     icon: ServerIcon,
@@ -389,7 +386,7 @@ const HomePage: NextPageWithLayout = () => {
                 </h2>
               )}
               <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-                Everything you need to deploy your app
+                Everything you need to consume feeds
               </p>
               <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
                 Phasellus lorem quam molestie id quisque diam aenean nulla in.
