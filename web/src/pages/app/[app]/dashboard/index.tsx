@@ -149,7 +149,7 @@ const TopCardsStats = () => {
                   key={`soon-${i}`}
                   className="flex items-center justify-center px-4 py-5 sm:p-6"
                 >
-                  <div className="text-gray-600 py-5">More stats soon ...</div>
+                  <div className="py-5 text-gray-600">More stats soon ...</div>
                 </div>
               ),
             )}

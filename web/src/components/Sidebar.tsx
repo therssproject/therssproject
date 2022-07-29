@@ -212,7 +212,11 @@ export const Sidebar: FC<Props> = ({
               </div>
             </nav>
           </div>
-          <SecondaryNav email={user.email} onLogout={onLogout} closeNav={onClose} />
+          <SecondaryNav
+            email={user.email}
+            onLogout={onLogout}
+            closeNav={onClose}
+          />
           <Profile username={user.name} />
         </div>
       </div>

@@ -2,6 +2,7 @@ import {BeakerIcon} from '@heroicons/react/outline';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 
+import {external} from '@/lib/href';
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
 
@@ -18,7 +19,6 @@ import {SelectedAppAtom} from '@/models/application';
 import {useSession} from '@/models/user';
 
 import {NextPageWithLayout} from './_app';
-import {external} from '@/lib/href';
 
 const Documentation: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
