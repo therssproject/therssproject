@@ -19,7 +19,6 @@ export const Subscription = te.sparseType({
   id: t.string,
   application: t.string,
   url: t.string,
-  feed: t.string,
   endpoint: t.string,
   // TODO: add codec for Json type
   // metadata: Json,
