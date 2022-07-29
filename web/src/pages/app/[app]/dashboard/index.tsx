@@ -54,14 +54,14 @@ const TopCardsStats = () => {
     O.map(
       ({logs, subs}): Array<Stat | undefined> => [
         {
-          name: 'Subscriptions',
+          name: 'Active subscriptions',
           stat: subs.cur.toString(),
           previousStat: subs.prev.toString(),
           change: `${subs.change}%`,
           changeType: subs.trend,
         },
         {
-          name: 'Events',
+          name: 'Webhook events sent',
           stat: logs.cur.toString(),
           previousStat: logs.prev.toString(),
           change: `${logs.change}%`,
@@ -149,7 +149,7 @@ const TopCardsStats = () => {
                   key={`soon-${i}`}
                   className="flex items-center justify-center px-4 py-5 sm:p-6"
                 >
-                  <div className="text-gray-600">More stats soon ...</div>
+                  <div className="text-gray-600 py-5">More stats soon ...</div>
                 </div>
               ),
             )}
