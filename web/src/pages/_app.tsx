@@ -5,10 +5,9 @@ import dynamic from 'next/dynamic';
 import {ReactElement, ReactNode} from 'react';
 import {Toaster} from 'react-hot-toast';
 
+import '@/styles/globals.css';
 
 import {useSessionGuard} from '@/lib/routing';
-
-import '@/styles/globals.css';
 
 const CripsNoSSR = dynamic(() => import('@/components/Crisp'), {ssr: false});
 
