@@ -1,4 +1,8 @@
+import * as Eq from 'fp-ts/Eq';
+import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
+import {Eq as eqString} from 'fp-ts/string';
+import {useStableEffect} from 'fp-ts-react-stable-hooks';
 import * as t from 'io-ts';
 import * as tt from 'io-ts-types';
 import {useSetAtom} from 'jotai';
@@ -49,6 +53,12 @@ export const register = (payload: {
   password: string;
 }) => http.post<PublicUser>('/users', payload, PublicUser);
 
+const eqSession = pipe(
+  eqString,
+  Eq.contramap((s: AuthResponse) => s.user.id),
+  O.getEq,
+);
+
 export const useSession = () => {
   const [session, setSession] = useAtom(SessionAtom);
   const setApps = useSetAtom(AppsAtom);
@@ -64,20 +74,38 @@ export const useSession = () => {
     setSubscriptions({});
     setLogs({});
     setEndpoints({});
-
-    crisp.clearEmail();
-    analytics.identify('*');
   };
 
   const login = (session: AuthResponse) => {
     setSession(O.some(session));
-    crisp.setEmail(session.user.email);
-
-    analytics.identify(session.user.id, {
-      name: session.user.name,
-      email: session.user.email,
-    });
   };
 
   return {session, login, logOut};
+};
+
+export const useTrackUser = () => {
+  const {session} = useSession();
+
+  useStableEffect(
+    () =>
+      pipe(
+        session,
+        O.match(
+          () => {
+            crisp.clearEmail();
+            analytics.identify('*');
+          },
+          ({user}) => {
+            crisp.setEmail(user.email);
+
+            analytics.identify(user.id, {
+              name: user.name,
+              email: user.email,
+            });
+          },
+        ),
+      ),
+    [session],
+    Eq.tuple(eqSession),
+  );
 };

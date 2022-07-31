@@ -9,6 +9,8 @@ import '@/styles/globals.css';
 
 import {useSessionGuard} from '@/lib/routing';
 
+import {useTrackUser} from '@/models/user';
+
 const CripsNoSSR = dynamic(() => import('@/components/Crisp'), {ssr: false});
 
 export type NextPageWithLayout = NextPage & {
@@ -25,6 +27,7 @@ function MyApp({Component, pageProps}: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? identity;
 
   useSessionGuard();
+  useTrackUser();
 
   return (
     <>

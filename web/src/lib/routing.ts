@@ -1,4 +1,3 @@
-import {tuple} from 'fp-ts/Eq';
 import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -109,7 +108,7 @@ export const useSessionGuard = () => {
       );
     },
     [session, router.asPath],
-    tuple(eqSession, eqString),
+    Eq.tuple(eqSession, eqString),
   );
 };
 
