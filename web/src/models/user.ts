@@ -5,10 +5,10 @@ import {useSetAtom} from 'jotai';
 import {atomWithStorage} from 'jotai/utils';
 import * as RD from 'remote-data-ts';
 
+import * as analytics from '@/lib/analytics';
 import * as crisp from '@/lib/crisp';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
-import * as analytics from '@/lib/analytics';
 
 import {AppsAtom, SelectedAppAtom} from './application';
 import {EndpointsAtom} from './endpoint';

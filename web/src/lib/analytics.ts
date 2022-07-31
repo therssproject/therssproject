@@ -1,5 +1,5 @@
-import Analytics from 'analytics';
 import mixpanelPlugin from '@analytics/mixpanel';
+import Analytics from 'analytics';
 
 import {MixPanelToken} from '../config';
 
