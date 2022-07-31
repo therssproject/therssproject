@@ -74,10 +74,14 @@ export const useSession = () => {
     setSubscriptions({});
     setLogs({});
     setEndpoints({});
+    // TODO: move to `useTrackUser` when dependency on CripsNoSSR is fiexed
+    crisp.clearEmail();
   };
 
   const login = (session: AuthResponse) => {
     setSession(O.some(session));
+    // TODO: move to `useTrackUser` when dependency on CripsNoSSR is fiexed
+    crisp.setEmail(session.user.email);
   };
 
   return {session, login, logOut};
@@ -92,12 +96,9 @@ export const useTrackUser = () => {
         session,
         O.match(
           () => {
-            crisp.clearEmail();
             analytics.identify('*');
           },
           ({user}) => {
-            crisp.setEmail(user.email);
-
             analytics.identify(user.id, {
               name: user.name,
               email: user.email,
