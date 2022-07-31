@@ -6,6 +6,8 @@ import {Eq as eqString} from 'fp-ts/string';
 import {useStableEffect} from 'fp-ts-react-stable-hooks';
 import {useRouter} from 'next/router';
 
+import * as analytics from '@/lib/analytics';
+
 import {AuthResponse, useSession} from '@/models/user';
 
 import {noOp} from './effect';
@@ -94,6 +96,8 @@ export const useSessionGuard = () => {
 
   useStableEffect(
     () => {
+      analytics.pageView();
+
       const route = parse(router.asPath);
 
       pipe(
