@@ -1,8 +1,6 @@
 import {ReactNode} from 'react';
 import {match} from 'ts-pattern';
 
-import {useSessionGuard} from '@/lib/routing';
-
 import {Props as SeoProps, Seo} from '@/components/Seo';
 
 import {Applications} from './Applications';
@@ -29,8 +27,6 @@ type Props =
     };
 
 export const Layout = (props: Props) => {
-  useSessionGuard();
-
   return match(props)
     .with({variant: 'dashboard'}, (props) => <Dashboard {...props} />)
     .with({variant: 'applications'}, (props) => <Applications {...props} />)
