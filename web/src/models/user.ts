@@ -8,6 +8,7 @@ import * as RD from 'remote-data-ts';
 import * as crisp from '@/lib/crisp';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
+import * as analytics from '@/lib/analytics';
 
 import {AppsAtom, SelectedAppAtom} from './application';
 import {EndpointsAtom} from './endpoint';
@@ -65,11 +66,17 @@ export const useSession = () => {
     setEndpoints({});
 
     crisp.clearEmail();
+    analytics.identify('*');
   };
 
   const login = (session: AuthResponse) => {
     setSession(O.some(session));
     crisp.setEmail(session.user.email);
+
+    analytics.identify(session.user.id, {
+      name: session.user.name,
+      email: session.user.email,
+    });
   };
 
   return {session, login, logOut};

@@ -5,6 +5,9 @@ import dynamic from 'next/dynamic';
 import {ReactElement, ReactNode} from 'react';
 import {Toaster} from 'react-hot-toast';
 
+
+import {useSessionGuard} from '@/lib/routing';
+
 import '@/styles/globals.css';
 
 const CripsNoSSR = dynamic(() => import('@/components/Crisp'), {ssr: false});
@@ -21,6 +24,8 @@ function MyApp({Component, pageProps}: AppPropsWithLayout) {
   // Although all pages should have `getLayout`, Next also renders other pages
   // (like the 500 one) which do not have it.
   const getLayout = Component.getLayout ?? identity;
+
+  useSessionGuard();
 
   return (
     <>

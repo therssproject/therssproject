@@ -12,7 +12,7 @@ import {noOp} from './effect';
 import {format, match, parse, parseO, Route, RouteTag} from './routes';
 
 // Navigates to login route on logged IN only pages
-const loggedOutGuard = (push: (path: string) => void) => (route: Route) => {
+const publicRoutes = (push: (path: string) => void) => (route: Route) => {
   const onPrivate = (route: Route) =>
     pipe(
       // Don't include home in the url since it's the default page to return
@@ -52,7 +52,7 @@ const loggedOutGuard = (push: (path: string) => void) => (route: Route) => {
 };
 
 // Navigates to home (or the `returnTo`) route on logged OUT only pages
-const loggedInGuard = (push: (path: string) => void) => (route: Route) => {
+const privateRoutes = (push: (path: string) => void) => (route: Route) => {
   pipe(
     route,
     match({
@@ -99,13 +99,13 @@ export const useSessionGuard = () => {
       pipe(
         session,
         O.match(
-          () => loggedOutGuard(router.push)(route),
-          () => loggedInGuard(router.push)(route),
+          () => publicRoutes(router.push)(route),
+          () => privateRoutes(router.push)(route),
         ),
       );
     },
-    [session],
-    tuple(eqSession),
+    [session, router.asPath],
+    tuple(eqSession, eqString),
   );
 };
 
