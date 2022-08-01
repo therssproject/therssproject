@@ -1,15 +1,10 @@
-import * as Eq from 'fp-ts/Eq';
-import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
-import {Eq as eqString} from 'fp-ts/string';
-import {useStableEffect} from 'fp-ts-react-stable-hooks';
 import * as t from 'io-ts';
 import * as tt from 'io-ts-types';
 import {useSetAtom} from 'jotai';
 import {atomWithStorage} from 'jotai/utils';
 import * as RD from 'remote-data-ts';
 
-import * as analytics from '@/lib/analytics';
 import * as crisp from '@/lib/crisp';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
@@ -53,12 +48,6 @@ export const register = (payload: {
   password: string;
 }) => http.post<PublicUser>('/users', payload, PublicUser);
 
-const eqSession = pipe(
-  eqString,
-  Eq.contramap((s: AuthResponse) => s.user.id),
-  O.getEq,
-);
-
 export const useSession = () => {
   const [session, setSession] = useAtom(SessionAtom);
   const setApps = useSetAtom(AppsAtom);
@@ -74,39 +63,19 @@ export const useSession = () => {
     setSubscriptions({});
     setLogs({});
     setEndpoints({});
-    // TODO: move to `useTrackUser` when dependency on CripsNoSSR is fiexed
+
+    // TODO: fix the "race condition" with CripsNoSRR component loading
+    // `window.$crisp` after the
     crisp.clearEmail();
   };
 
   const login = (session: AuthResponse) => {
     setSession(O.some(session));
-    // TODO: move to `useTrackUser` when dependency on CripsNoSSR is fiexed
+
+    // TODO: fix the "race condition" with CripsNoSRR component loading
+    // `window.$crisp` after the
     crisp.setEmail(session.user.email);
   };
 
   return {session, login, logOut};
-};
-
-export const useTrackUser = () => {
-  const {session} = useSession();
-
-  useStableEffect(
-    () =>
-      pipe(
-        session,
-        O.match(
-          () => {
-            analytics.identify('*');
-          },
-          ({user}) => {
-            analytics.identify(user.id, {
-              name: user.name,
-              email: user.email,
-            });
-          },
-        ),
-      ),
-    [session],
-    Eq.tuple(eqSession),
-  );
 };

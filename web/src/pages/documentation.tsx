@@ -97,7 +97,7 @@ const Documentation: NextPageWithLayout = () => {
       <section className="space-y-4">
         <h3 className="text-xl font-medium text-gray-600">Register endpoint</h3>
 
-        <Terminal>{SNIPPETS.registerEndpoint}</Terminal>
+        <Terminal id="registerEndpoint" snippet={SNIPPETS.registerEndpoint} />
       </section>
 
       <section className="space-y-4">
@@ -105,13 +105,16 @@ const Documentation: NextPageWithLayout = () => {
           Subscribe to an RSS feed
         </h3>
 
-        <Terminal>{SNIPPETS.createSubscription}</Terminal>
+        <Terminal
+          id="createSubscription"
+          snippet={SNIPPETS.createSubscription}
+        />
       </section>
 
       <section className="space-y-4">
         <h3 className="text-xl font-medium text-gray-600">Parse an RSS feed</h3>
 
-        <Terminal>{SNIPPETS.parseFeed}</Terminal>
+        <Terminal id="parseFeed" snippet={SNIPPETS.parseFeed} />
       </section>
     </div>
   );

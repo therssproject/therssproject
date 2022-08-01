@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/outline';
 import {ComponentType, FC, Fragment} from 'react';
 
+import * as track from '@/lib/analytics/track';
 import {clsxm} from '@/lib/clsxm';
 import * as crisp from '@/lib/crisp';
 import {Route, RouteTag} from '@/lib/routes';
@@ -62,7 +63,7 @@ const navigation = (app: string): NavLink[] => [
 ];
 
 type SecondaryNavItem =
-  | ({type: 'link'} & NavLink)
+  | ({type: 'link'; onClick?: () => void} & NavLink)
   | {
       type: 'action';
       name: string;
@@ -79,6 +80,7 @@ const secondaryNavigation = (
     name: 'Documentation',
     icon: DocumentTextIcon,
     href: Route.documentation,
+    onClick: track.openDocs,
     group: [],
   },
   {
@@ -294,7 +296,12 @@ const SecondaryNav = ({
           <UnstyledLink
             key={item.name}
             href={item.href}
-            onClick={closeNav}
+            onClick={() => {
+              closeNav();
+              if (item.onClick) {
+                item.onClick();
+              }
+            }}
             className={clsxm(
               item.href.tag === route.tag
                 ? 'bg-gray-100 text-gray-700'
