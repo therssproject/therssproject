@@ -11,6 +11,7 @@ import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import {Fragment, useState} from 'react';
 
+import * as track from '@/lib/analytics/track';
 import {external} from '@/lib/href';
 import {Route} from '@/lib/routes';
 
@@ -65,7 +66,7 @@ const blogPosts = [
     author: {
       name: 'Nicolas del Valle',
       imageUrl: 'https://avatars.githubusercontent.com/u/6719053?v=4',
-      href: 'https://github.com/ndelvalle',
+      href: external('https://github.com/ndelvalle'),
     },
     readingLength: '5 min',
   },
@@ -84,7 +85,7 @@ const blogPosts = [
     author: {
       name: 'Christian Gill',
       imageUrl: 'https://avatars.githubusercontent.com/u/8309423?v=4',
-      href: 'https://gillchristian.xyz',
+      href: external('https://gillchristian.xyz'),
     },
     readingLength: '5 min',
   },
@@ -134,14 +135,16 @@ const HomePage: NextPageWithLayout = () => {
                     () => (
                       <>
                         <UnstyledLink
-                          href={Route.login()}
                           className="text-base font-medium text-white hover:text-gray-300"
+                          href={Route.login()}
+                          onClick={track.landingLogin}
                         >
                           Log in
                         </UnstyledLink>
                         <UnstyledLink
-                          href={Route.register()}
                           className="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-base font-medium text-white hover:bg-gray-700"
+                          href={Route.register(email)}
+                          onClick={track.landingRegister}
                         >
                           Start free trial
                         </UnstyledLink>
@@ -220,8 +223,9 @@ const HomePage: NextPageWithLayout = () => {
                         <>
                           <div className="mt-6 px-5">
                             <UnstyledLink
-                              href={Route.register()}
                               className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 py-3 px-4 text-center font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700"
+                              href={Route.register(email)}
+                              onClick={track.landingRegister}
                             >
                               Start free trial
                             </UnstyledLink>
@@ -230,8 +234,9 @@ const HomePage: NextPageWithLayout = () => {
                             <p className="text-center text-base font-medium text-gray-500">
                               Existing customer?{' '}
                               <UnstyledLink
-                                href={Route.login()}
                                 className="text-gray-900 hover:underline"
+                                href={Route.login()}
+                                onClick={track.landingLogin}
                               >
                                 Login
                               </UnstyledLink>
@@ -326,6 +331,7 @@ const HomePage: NextPageWithLayout = () => {
                                     type="submit"
                                     className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 py-3 px-4 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
                                     href={Route.register(email)}
+                                    onClick={() => track.freeTrial(email)}
                                   >
                                     Start free trial
                                   </UnstyledLink>
@@ -516,7 +522,12 @@ const HomePage: NextPageWithLayout = () => {
                         <p className="text-sm font-medium text-cyan-600">
                           {post.category}
                         </p>
-                        <UnstyledLink href={post.href} className="mt-2 block">
+                        <UnstyledLink
+                          href={post.href}
+                          onClick={() => track.landingResource(post.title)}
+                          noTrack // track resources differently
+                          className="mt-2 block"
+                        >
                           <p className="text-xl font-semibold text-gray-900">
                             {post.title}
                           </p>
@@ -527,22 +538,22 @@ const HomePage: NextPageWithLayout = () => {
                       </div>
                       <div className="mt-6 flex items-center">
                         <div className="flex-shrink-0">
-                          <a href={post.author.href}>
+                          <UnstyledLink href={post.author.href}>
                             <img
                               className="h-10 w-10 rounded-full"
                               src={post.author.imageUrl}
                               alt={post.author.name}
                             />
-                          </a>
+                          </UnstyledLink>
                         </div>
                         <div className="ml-3">
                           <p className="text-sm font-medium text-gray-900">
-                            <a
+                            <UnstyledLink
                               href={post.author.href}
                               className="hover:underline"
                             >
                               {post.author.name}
-                            </a>
+                            </UnstyledLink>
                           </p>
                           <div className="flex space-x-1 text-sm text-gray-500">
                             <time dateTime={post.datetime}>{post.date}</time>

@@ -8,6 +8,7 @@ import * as O from 'fp-ts/Option';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
+import * as track from '@/lib/analytics/track';
 import {useCopyToClipboard} from '@/lib/clipboard';
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
@@ -51,7 +52,10 @@ export const SubscriptionItem = ({subscription, onDelete}: Props) => {
           <button
             type="button"
             className="flex items-center space-x-2 text-gray-500"
-            onClick={() => clipboard.id.copy(subscription.id)}
+            onClick={() => {
+              clipboard.id.copy(subscription.id);
+              track.copyId('sub');
+            }}
           >
             <span className="text-md font-bold">ID:</span>
             <p className="text-md">{subscription.id}</p>

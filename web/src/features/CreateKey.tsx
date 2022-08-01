@@ -11,6 +11,7 @@ import {useRef, useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
+import * as track from '@/lib/analytics/track';
 import {useCopyToClipboard} from '@/lib/clipboard';
 
 import {Alert} from '@/components/Alert';
@@ -47,7 +48,7 @@ const generating: Status = {tag: 'generating'};
 const confirm = (key: GeneratedKey): Status => ({tag: 'confirm', key});
 
 export const Generate = ({open, app, onClose}: Props) => {
-  const {copy, didCopy} = useCopyToClipboard();
+  const clipboard = useCopyToClipboard();
   const toast = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const setNewKey = useSetNewKey();
@@ -94,6 +95,8 @@ export const Generate = ({open, app, onClose}: Props) => {
   const safeClose = () => {
     if (status.tag === 'generate') {
       doClose();
+    } else {
+      track.tryCloseKeyGenerated();
     }
   };
 
@@ -127,8 +130,13 @@ export const Generate = ({open, app, onClose}: Props) => {
                     variant: 'success',
                     value: status.key.key,
                     iconAfter: {
-                      onClick: () => copy(status.key.key),
-                      component: didCopy ? ClipboardCheckIcon : ClipboardIcon,
+                      onClick: () => {
+                        clipboard.copy(status.key.key);
+                        track.copyId('key');
+                      },
+                      component: clipboard.didCopy
+                        ? ClipboardCheckIcon
+                        : ClipboardIcon,
                     },
                   }}
                 />
@@ -186,7 +194,7 @@ export const Generate = ({open, app, onClose}: Props) => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={doClose}
+                onClick={safeClose}
                 disabled={status.tag === 'generating'}
               >
                 Cancel

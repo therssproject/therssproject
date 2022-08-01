@@ -9,6 +9,7 @@ import {ReactNode, useEffect, useState} from 'react';
 import * as RD from 'remote-data-ts';
 import {match} from 'ts-pattern';
 
+import * as track from '@/lib/analytics/track';
 import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
@@ -49,7 +50,7 @@ export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
         router.push(formatRoute(Route.appDashboard(app.id)));
         setCurrentApp(O.some(app as Application));
       })
-      .otherwise(noOp);
+      .otherwise(() => track.selectComingSoon());
   };
 
   useEffect(

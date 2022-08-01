@@ -7,9 +7,8 @@ import {Toaster} from 'react-hot-toast';
 
 import '@/styles/globals.css';
 
+import {useTrackUser} from '@/lib/analytics';
 import {useSessionGuard} from '@/lib/routing';
-
-import {useTrackUser} from '@/models/user';
 
 const CripsNoSSR = dynamic(() => import('@/components/Crisp'), {ssr: false});
 

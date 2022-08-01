@@ -165,7 +165,10 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
               Or using the API
             </h3>
 
-            <Terminal>{SNIPPETS.createSubscription}</Terminal>
+            <Terminal
+              id="createSubscription"
+              snippet={SNIPPETS.createSubscription}
+            />
 
             <p className="text-sm text-gray-600">
               Go to{' '}

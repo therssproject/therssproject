@@ -10,6 +10,7 @@ import {ReactNode, useEffect, useState} from 'react';
 import * as RD from 'remote-data-ts';
 import {match} from 'ts-pattern';
 
+import * as track from '@/lib/analytics/track';
 import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
@@ -67,7 +68,7 @@ export const Applications = ({title, children, seo}: Props) => {
       .with([{type: 'app'}, true], ([app]: [AppOption, boolean]) => {
         setCurrentApp(O.some(app as Application));
       })
-      .otherwise(noOp);
+      .otherwise(() => track.selectComingSoon());
   };
 
   // TODO: clean this up

@@ -1,11 +1,8 @@
 import {ClipboardIcon, TerminalIcon} from '@heroicons/react/outline';
 import {useMemo} from 'react';
 
+import * as track from '@/lib/analytics/track';
 import {useCopyToClipboard} from '@/lib/clipboard';
-
-type Props = {
-  children: string;
-};
 
 const lineContinuation = (acc: string, line: string, isLast: boolean) =>
   isLast
@@ -25,10 +22,15 @@ const formatCode = (code: string) => {
   );
 };
 
-export const Terminal = ({children}: Props) => {
+type Props = {
+  id: string;
+  snippet: string;
+};
+
+export const Terminal = ({id, snippet}: Props) => {
   const {copy, didCopy} = useCopyToClipboard();
 
-  const code = useMemo(() => formatCode(children), [children]);
+  const code = useMemo(() => formatCode(snippet), [snippet]);
 
   return (
     <div className="h-full w-full rounded-lg bg-gray-50">
@@ -42,7 +44,10 @@ export const Terminal = ({children}: Props) => {
             <button
               type="button"
               className="w-full text-left text-gray-900 "
-              onClick={() => copy(children ?? '')}
+              onClick={() => {
+                copy(snippet);
+                track.copySnippet(id);
+              }}
             >
               <ClipboardIcon className="mr-2 inline-flex h-4 w-4 self-center" />{' '}
               {didCopy ? 'Copied!' : 'Copy'}

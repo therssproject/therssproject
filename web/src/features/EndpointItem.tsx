@@ -7,6 +7,7 @@ import {pipe} from 'fp-ts/function';
 import {useState} from 'react';
 import * as RD from 'remote-data-ts';
 
+import * as track from '@/lib/analytics/track';
 import {useCopyToClipboard} from '@/lib/clipboard';
 import {useAtom} from '@/lib/jotai';
 
@@ -60,7 +61,10 @@ export const EndpointItem = ({endpoint, onDelete, onEdit}: Props) => {
           <button
             type="button"
             className="flex items-center space-x-2 text-gray-500"
-            onClick={() => clipboard.id.copy(endpoint.id)}
+            onClick={() => {
+              clipboard.id.copy(endpoint.id);
+              track.copyId('endpoint');
+            }}
           >
             <span className="text-md font-bold">ID:</span>
             <p className="text-md">{endpoint.id}</p>
