@@ -25,9 +25,10 @@ const formatCode = (code: string) => {
 type Props = {
   id: string;
   snippet: string;
+  from: 'docs' | 'landing' | 'create_form';
 };
 
-export const Terminal = ({id, snippet}: Props) => {
+export const Terminal = ({id, snippet, from}: Props) => {
   const {copy, didCopy} = useCopyToClipboard();
 
   const code = useMemo(() => formatCode(snippet), [snippet]);
@@ -46,7 +47,7 @@ export const Terminal = ({id, snippet}: Props) => {
               className="w-full text-left text-gray-900 "
               onClick={() => {
                 copy(snippet);
-                track.copySnippet(id);
+                track.copySnippet(id, from);
               }}
             >
               <ClipboardIcon className="mr-2 inline-flex h-4 w-4 self-center" />{' '}
@@ -55,7 +56,7 @@ export const Terminal = ({id, snippet}: Props) => {
           </div>
         </div>
       </div>
-      <pre className="text-md overflow-x-auto whitespace-pre px-4 pt-4 pb-6 font-mono text-gray-900">
+      <pre className="text-md overflow-x-auto whitespace-pre px-4 pt-4 pb-6 text-left font-mono text-gray-900">
         {code}
       </pre>
     </div>

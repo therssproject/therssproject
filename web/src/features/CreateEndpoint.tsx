@@ -172,7 +172,11 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
             Or using the API
           </h3>
 
-          <Terminal id="registerEndpoint" snippet={SNIPPETS.registerEndpoint} />
+          <Terminal
+            id="registerEndpoint"
+            snippet={SNIPPETS.registerEndpoint}
+            from="create_form"
+          />
 
           <p className="text-sm text-gray-600">
             Go to{' '}

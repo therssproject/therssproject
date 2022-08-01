@@ -168,6 +168,7 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
             <Terminal
               id="createSubscription"
               snippet={SNIPPETS.createSubscription}
+              from="create_form"
             />
 
             <p className="text-sm text-gray-600">
