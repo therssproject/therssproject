@@ -1,4 +1,4 @@
-import {KeyIcon, UserGroupIcon} from '@heroicons/react/outline';
+import {CogIcon, KeyIcon, UserGroupIcon} from '@heroicons/react/outline';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -13,6 +13,12 @@ import {useCurrentRoute} from '@/lib/routing';
 import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 const getTabs = (app: string) => [
+  {
+    name: 'General',
+    Icon: CogIcon,
+    href: Route.appSettingsGeneral(app),
+    disabled: false,
+  },
   {
     name: 'Keys',
     Icon: KeyIcon,

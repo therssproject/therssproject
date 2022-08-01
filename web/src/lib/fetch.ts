@@ -79,7 +79,7 @@ const handleResponse =
           E.mapLeft(reporter.report),
           E.mapLeft(decoding),
           TE.fromEither,
-          TE.map((data) => ({data, headers: res.headers})),
+          TE.map((data) => ({data, headers: res.headers} as Res<T>)),
         ),
       ),
     );
@@ -177,8 +177,54 @@ const reqWithBody =
       TE.chain(handleResponse(codec)),
     );
 
+const reqWithBodySkipResponse =
+  (method: 'POST' | 'PUT' | 'PATCH') =>
+  (
+    url: string,
+    body: unknown,
+    opts?: RequestInit,
+  ): TE.TaskEither<FetchError, Res<void>> =>
+    pipe(
+      grabSession,
+      TE.chain((session) =>
+        pipe(
+          TE.tryCatch(() => Promise.resolve(JSON.stringify(body)), encoding),
+          TE.map((encodedBody) => ({session, encodedBody})),
+        ),
+      ),
+      TE.chain(({encodedBody, session}) =>
+        TE.tryCatch(
+          () =>
+            fetch(addBaseUrl(url), {
+              ...opts,
+              method,
+              body: encodedBody,
+              headers: mkHeaders(session, opts?.headers),
+            }),
+          unknown,
+        ),
+      ),
+      TE.chain((res) =>
+        pipe(
+          TE.of({
+            ok: res.ok,
+            status: res.status,
+            statusText: res.statusText,
+          }),
+          TE.filterOrElse(
+            ({ok}) => ok,
+            ({status, statusText}) => fetch_(status, statusText),
+          ),
+          TE.map(() => ({data: undefined, headers: res.headers})),
+        ),
+      ),
+    );
+
 export const get = req('GET');
 export const del = req('DELETE');
+
 export const post = reqWithBody('POST');
+export const post_ = reqWithBodySkipResponse('POST');
+
 export const put = reqWithBody('PUT');
 export const patch = reqWithBody('PATCH');
