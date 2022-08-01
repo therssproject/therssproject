@@ -28,8 +28,8 @@ export const selectComingSoon = () => {
   analytics.event('select_coming_soon_app');
 };
 
-export const copySnippet = (snippet: string) => {
-  analytics.event('copy_snippet', {snippet});
+export const copySnippet = (snippet: string, from: string) => {
+  analytics.event('copy_snippet', {snippet, from});
 };
 
 export const copyId = (type: 'sub' | 'endpoint' | 'key') => {
