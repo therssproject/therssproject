@@ -48,6 +48,7 @@ const publicRoutes = (push: (path: string) => void) => (route: Route) => {
       AppLogs: onPrivate,
       AppSettingsKeys: onPrivate,
       AppSettingsMembers: onPrivate,
+      AppSettingsGeneral: onPrivate,
     }),
   );
 };
@@ -79,6 +80,7 @@ const privateRoutes = (push: (path: string) => void) => (route: Route) => {
       AppLogs: noOp,
       AppSettingsKeys: noOp,
       AppSettingsMembers: noOp,
+      AppSettingsGeneral: noOp,
     }),
   );
 };

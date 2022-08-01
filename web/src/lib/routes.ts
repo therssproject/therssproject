@@ -24,6 +24,7 @@ type AppSubs = {tag: 'AppSubs'; app: string};
 type AppLogs = {tag: 'AppLogs'; app: string};
 type AppSettingsKeys = {tag: 'AppSettingsKeys'; app: string};
 type AppSettingsMembers = {tag: 'AppSettingsMembers'; app: string};
+type AppSettingsGeneral = {tag: 'AppSettingsGeneral'; app: string};
 
 export type Route =
   | NotFound
@@ -44,7 +45,8 @@ export type Route =
   | AppSubs
   | AppLogs
   | AppSettingsKeys
-  | AppSettingsMembers;
+  | AppSettingsMembers
+  | AppSettingsGeneral;
 
 export type RouteTag = Route['tag'];
 
@@ -71,6 +73,7 @@ type RouteMatcher<R> = {
   AppLogs: (r: AppLogs) => R;
   AppSettingsKeys: (r: AppSettingsKeys) => R;
   AppSettingsMembers: (r: AppSettingsMembers) => R;
+  AppSettingsGeneral: (r: AppSettingsGeneral) => R;
 };
 
 export const match =
@@ -115,6 +118,8 @@ export const match =
         return matcher.AppSettingsKeys(route);
       case 'AppSettingsMembers':
         return matcher.AppSettingsMembers(route);
+      case 'AppSettingsGeneral':
+        return matcher.AppSettingsGeneral(route);
     }
   };
 
@@ -160,6 +165,8 @@ export const matchP =
         return (matcher.AppSettingsKeys ?? matcher.__)(route);
       case 'AppSettingsMembers':
         return (matcher.AppSettingsMembers ?? matcher.__)(route);
+      case 'AppSettingsGeneral':
+        return (matcher.AppSettingsGeneral ?? matcher.__)(route);
     }
   };
 
@@ -195,6 +202,10 @@ const appSettingsMembers = (app: string): Route => ({
   tag: 'AppSettingsMembers',
   app,
 });
+const appSettingsGeneral = (app: string): Route => ({
+  tag: 'AppSettingsGeneral',
+  app,
+});
 
 export const Route = {
   notFound,
@@ -219,6 +230,7 @@ export const Route = {
   appLogs,
   appSettingsKeys,
   appSettingsMembers,
+  appSettingsGeneral,
 };
 
 const _404Match = Routing.lit('404').then(Routing.end);
@@ -276,6 +288,11 @@ const appSettingsMembersMatch = Routing.lit('app')
   .then(Routing.lit('settings'))
   .then(Routing.lit('members'))
   .then(Routing.end);
+const appSettingsGeneralMatch = Routing.lit('app')
+  .then(Routing.str('app'))
+  .then(Routing.lit('settings'))
+  .then(Routing.lit('general'))
+  .then(Routing.end);
 
 export const Match = {
   _404: _404Match,
@@ -299,6 +316,7 @@ export const Match = {
   appLogs: appLogsMatch,
   appSettingsKeys: appSettingsKeysMatch,
   appSettingsMembers: appSettingsMembersMatch,
+  appSettingsGeneral: appSettingsGeneralMatch,
 };
 
 const parseBackTo =
@@ -351,6 +369,11 @@ const router = Routing.zero<Route>()
       Route.appSettingsMembers(app),
     ),
   )
+  .alt(
+    Match.appSettingsGeneral.parser.map(({app}) =>
+      Route.appSettingsGeneral(app),
+    ),
+  )
 
   // Misc
   .alt(Match._404.parser.map(() => Route.notFound));
@@ -367,7 +390,7 @@ export const format = (route: Route): string =>
     match<string>({
       NotFound: () => Routing.format(Match._404.formatter, {}),
 
-      // Public
+      // Publichttps://github.com/gcanti/fp-ts-routing
       Index: () => Routing.format(Match.index.formatter, {}),
       Documentation: () => Routing.format(Match.documentation.formatter, {}),
       Feedback: () => Routing.format(Match.feedback.formatter, {}),
@@ -401,5 +424,7 @@ export const format = (route: Route): string =>
         Routing.format(Match.appSettingsKeys.formatter, {app}),
       AppSettingsMembers: ({app}) =>
         Routing.format(Match.appSettingsMembers.formatter, {app}),
+      AppSettingsGeneral: ({app}) =>
+        Routing.format(Match.appSettingsGeneral.formatter, {app}),
     }),
   );

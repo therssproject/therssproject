@@ -9,7 +9,7 @@ import * as crisp from '@/lib/crisp';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 
-import {AppsAtom, SelectedAppAtom} from './application';
+import {AppsAtom, SelectedAppAtom, StatsAtom} from './application';
 import {EndpointsAtom} from './endpoint';
 import {LogsAtom} from './log';
 import {SubscriptionsAtom} from './subscription';
@@ -55,6 +55,7 @@ export const useSession = () => {
   const setSubscriptions = useSetAtom(SubscriptionsAtom);
   const setLogs = useSetAtom(LogsAtom);
   const setEndpoints = useSetAtom(EndpointsAtom);
+  const setStats = useSetAtom(StatsAtom);
 
   const logOut = () => {
     setSession(O.none);
@@ -63,6 +64,7 @@ export const useSession = () => {
     setSubscriptions({});
     setLogs({});
     setEndpoints({});
+    setStats(O.none);
 
     // TODO: fix the "race condition" with CripsNoSRR component loading
     // `window.$crisp` after the

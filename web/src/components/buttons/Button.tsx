@@ -3,7 +3,13 @@ import {ImSpinner2} from 'react-icons/im';
 
 import {clsxm} from '@/lib/clsxm';
 
-export type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'light' | 'dark';
+export type ButtonVariant =
+  | 'primary'
+  | 'outline'
+  | 'ghost'
+  | 'light'
+  | 'dark'
+  | 'danger';
 
 type Props = {
   isLoading?: boolean;
@@ -40,6 +46,13 @@ export const buttonClsxm = ({
         'hover:bg-cyan-600 hover:text-white',
         'active:bg-cyan-500',
         'disabled:bg-cyan-400 disabled:hover:bg-cyan-400',
+      ],
+      variant === 'danger' && [
+        'bg-red-500 text-white',
+        'focus-visible:ring-red-500',
+        'hover:bg-red-600 hover:text-white',
+        'active:bg-red-500',
+        'disabled:bg-red-300 disabled:hover:bg-red-200',
       ],
       variant === 'outline' && [
         'text-cyan-500',

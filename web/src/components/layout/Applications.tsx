@@ -193,12 +193,15 @@ const getPages = (app: Application, current: Route): Breadcrumb[] =>
       ],
       AppSubs: () => [{name: 'Subscriptions', href: Route.appSubs(app.id)}],
       AppLogs: () => [{name: 'Logs', href: Route.appLogs(app.id)}],
+      AppSettingsGeneral: () => [
+        {name: 'Settings', href: Route.appSettingsGeneral(app.id)},
+      ],
       AppSettingsKeys: () => [
-        {name: 'Settings'},
+        {name: 'Settings', href: Route.appSettingsGeneral(app.id)},
         {name: 'Keys', href: Route.appSettingsKeys(app.id)},
       ],
       AppSettingsMembers: () => [
-        {name: 'Settings'},
+        {name: 'Settings', href: Route.appSettingsGeneral(app.id)},
         {name: 'Members', href: Route.appLogs(app.id)},
       ],
     }),

@@ -3,13 +3,14 @@ import * as A from 'fp-ts/Array';
 import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
 import {fold} from 'fp-ts/Monoid';
+import {Eq as eqNumber} from 'fp-ts/number';
 import * as O from 'fp-ts/Option';
 import {Eq as eqString} from 'fp-ts/string';
 import * as TE from 'fp-ts/TaskEither';
 import {useStableEffect} from 'fp-ts-react-stable-hooks';
 import * as t from 'io-ts';
 import * as te from 'io-ts-extra';
-import {atom} from 'jotai';
+import {atom, useSetAtom} from 'jotai';
 import * as RD from 'remote-data-ts';
 
 import {noOp} from '@/lib/effect';
@@ -74,12 +75,26 @@ export const useAppIdFromPath = () =>
       useRouteOfType('AppLogs'),
       useRouteOfType('AppSettingsKeys'),
       useRouteOfType('AppSettingsMembers'),
+      useRouteOfType('AppSettingsGeneral'),
     ],
     fold(O.getFirstMonoid()),
     O.map(({app}) => app),
   );
 
+export const resetApp = (app: string) =>
+  http.post_(`/applications/${app}/reset`, null);
+
 export const SelectedAppAtom = atom<O.Option<Application>>(O.none);
+
+// TODO: better approach!!! xD
+// This is a hack to get the app atoms to refetch
+const RefetchAppDataAtom = atom(0);
+
+export const useRefetchAppData = () => {
+  const setRefetch = useSetAtom(RefetchAppDataAtom);
+
+  return {refetchAppData: () => setRefetch((n) => n + 1)};
+};
 
 export const useFetchOnAppChange = <Data>(
   fetch: (app: Application) => TE.TaskEither<string, Data>,
@@ -87,6 +102,8 @@ export const useFetchOnAppChange = <Data>(
   currentData: RD.RemoteData<string, Data>,
   setData: (data: RD.RemoteData<string, Data>) => void,
 ) => {
+  const [flag, _setFlag] = useAtom(RefetchAppDataAtom);
+
   useStableEffect(
     () => {
       const app = O.toUndefined(currentApp);
@@ -109,8 +126,8 @@ export const useFetchOnAppChange = <Data>(
 
       run();
     },
-    [currentApp],
-    Eq.tuple(O.getEq(eqApplication)),
+    [currentApp, flag],
+    Eq.tuple(O.getEq(eqApplication), eqNumber),
   );
 };
 
@@ -171,6 +188,7 @@ const fetchStats = (app: string) =>
 
 const useFetchAppStats = (currentApp: O.Option<Application>) => {
   const [_stats, setStats] = useAtom(StatsAtom);
+  const [flag, _setFlag] = useAtom(RefetchAppDataAtom);
 
   useStableEffect(
     () => {
@@ -189,8 +207,8 @@ const useFetchAppStats = (currentApp: O.Option<Application>) => {
 
       run();
     },
-    [currentApp],
-    Eq.tuple(O.getEq(eqApplication)),
+    [currentApp, flag],
+    Eq.tuple(O.getEq(eqApplication), eqNumber),
   );
 };
 
