@@ -1,11 +1,11 @@
 import {Popover, Transition} from '@headlessui/react';
 import {
   CloudUploadIcon,
-  LockClosedIcon,
   MenuIcon,
   RssIcon,
   XIcon,
 } from '@heroicons/react/outline';
+import {LightningBoltIcon} from '@heroicons/react/solid';
 import {ChevronRightIcon} from '@heroicons/react/solid';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -38,19 +38,22 @@ const navigation: NavLink[] = [
 
 const features = [
   {
+    name: 'RSS, Atom & JSON',
+    description:
+      "Don't worry about the feed format. We take care of that for you.",
+    icon: RssIcon,
+  },
+  {
     name: 'Simple API',
-    description: 'Much simple. Such wow. Very API.',
+    description:
+      'Register endpoints, subscribe and parse feeds all through the API. Or use the UI if you prefer that.',
     icon: CloudUploadIcon,
   },
   {
-    name: 'Safe',
-    description: 'Our API is safe ...',
-    icon: LockClosedIcon,
-  },
-  {
-    name: 'RSS, Atom & JSON',
-    description: 'All types of feeds supported',
-    icon: RssIcon,
+    name: 'Almost real time',
+    description:
+      'Get webhook events almost real time on your feed subscriptions.',
+    icon: LightningBoltIcon,
   },
 ];
 
@@ -106,7 +109,7 @@ const HomePage: NextPageWithLayout = () => {
             >
               <div className="flex flex-1 items-center">
                 <div className="flex w-full items-center justify-between md:w-auto">
-                  <Logo />
+                  <Logo style="light" />
                   <div className="-mr-2 flex items-center md:hidden">
                     <Popover.Button className="focus-ring-inset inline-flex items-center justify-center rounded-md bg-gray-900 p-2 text-gray-400 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-white">
                       <span className="sr-only">Open main menu</span>
@@ -303,8 +306,9 @@ const HomePage: NextPageWithLayout = () => {
                       </span>
                     </h1>
                     <p className="text-base text-gray-300 sm:text-xl lg:text-lg xl:text-xl">
-                      Programmatically subscribe and consume to RSS, Atom, and
-                      JSON feeds.
+                      Programmatically subscribe and consume
+                      <br />
+                      RSS, Atom, and JSON feeds.
                     </p>
                     {pipe(
                       session,
