@@ -76,6 +76,7 @@ export const useAppIdFromPath = () =>
       useRouteOfType('AppSettingsKeys'),
       useRouteOfType('AppSettingsMembers'),
       useRouteOfType('AppSettingsGeneral'),
+      useRouteOfType('AppSettingsBilling'),
     ],
     fold(O.getFirstMonoid()),
     O.map(({app}) => app),
