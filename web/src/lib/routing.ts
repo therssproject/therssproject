@@ -49,6 +49,7 @@ const publicRoutes = (push: (path: string) => void) => (route: Route) => {
       AppSettingsKeys: onPrivate,
       AppSettingsMembers: onPrivate,
       AppSettingsGeneral: onPrivate,
+      AppSettingsBilling: onPrivate,
     }),
   );
 };
@@ -81,6 +82,7 @@ const privateRoutes = (push: (path: string) => void) => (route: Route) => {
       AppSettingsKeys: noOp,
       AppSettingsMembers: noOp,
       AppSettingsGeneral: noOp,
+      AppSettingsBilling: noOp,
     }),
   );
 };
