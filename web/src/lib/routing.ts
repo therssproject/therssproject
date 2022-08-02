@@ -42,6 +42,8 @@ const publicRoutes = (push: (path: string) => void) => (route: Route) => {
 
       // Private
       Dashboard: onPrivate,
+      SettingsAccount: onPrivate,
+
       AppDashboard: onPrivate,
       AppEndpoints: onPrivate,
       AppSubs: onPrivate,
@@ -75,6 +77,8 @@ const privateRoutes = (push: (path: string) => void) => (route: Route) => {
 
       // Private
       Dashboard: noOp,
+      SettingsAccount: noOp,
+
       AppDashboard: noOp,
       AppEndpoints: noOp,
       AppSubs: noOp,

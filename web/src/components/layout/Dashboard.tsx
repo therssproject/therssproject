@@ -7,13 +7,14 @@ import * as t from 'io-ts';
 import {useRouter} from 'next/router';
 import {ReactNode, useEffect, useState} from 'react';
 import * as RD from 'remote-data-ts';
-import {match} from 'ts-pattern';
+import {match, P} from 'ts-pattern';
 
 import * as track from '@/lib/analytics/track';
 import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
 import {format as formatRoute, Route} from '@/lib/routes';
+import {useCurrentRoute} from '@/lib/routing';
 
 import {Select} from '@/components/Select';
 import {Props as SeoProps, Seo} from '@/components/Seo';
@@ -39,15 +40,20 @@ type Props = {
 export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
+  const currentRoute = useCurrentRoute();
 
   const {session, logOut} = useSession();
   const [apps, setApps] = useAtom(AppsAtom);
   const [currentApp, setCurrentApp] = useAtom(SelectedAppAtom);
 
   const onSelect = (opt?: AppOption) => {
-    match(opt)
-      .with({type: 'app'}, (app) => {
-        router.push(formatRoute(Route.appDashboard(app.id)));
+    match([opt, currentRoute])
+      // Only the Dashboard page redirects to the selected application dashboard
+      .with([{type: 'app'}, {tag: 'Dashboard'}], ([app]) => {
+        router.push(formatRoute(Route.appDashboard((app as Application).id)));
+        setCurrentApp(O.some(app as Application));
+      })
+      .with([{type: 'app'}, P._], ([app]) => {
         setCurrentApp(O.some(app as Application));
       })
       .otherwise(() => track.selectComingSoon());
