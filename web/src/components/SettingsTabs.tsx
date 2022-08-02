@@ -1,4 +1,4 @@
-import {CogIcon, KeyIcon, UserGroupIcon} from '@heroicons/react/outline';
+import {CogIcon, KeyIcon, UserGroupIcon, CashIcon} from '@heroicons/react/outline';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -29,6 +29,12 @@ const getTabs = (app: string) => [
     name: 'Members',
     Icon: UserGroupIcon,
     href: Route.appSettingsMembers(app),
+    disabled: true,
+  },
+  {
+    name: 'Billing',
+    Icon: CashIcon,
+    href: Route.appSettingsBilling(app),
     disabled: true,
   },
 ];

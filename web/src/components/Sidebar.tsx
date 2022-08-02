@@ -58,7 +58,12 @@ const navigation = (app: string): NavLink[] => [
     name: 'Settings',
     icon: CogIcon,
     href: Route.appSettingsGeneral(app),
-    group: ['AppSettingsGeneral', 'AppSettingsKeys', 'AppSettingsMembers'],
+    group: [
+      'AppSettingsGeneral',
+      'AppSettingsKeys',
+      'AppSettingsMembers',
+      'AppSettingsBilling',
+    ],
   },
 ];
 

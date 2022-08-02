@@ -202,7 +202,11 @@ const getPages = (app: Application, current: Route): Breadcrumb[] =>
       ],
       AppSettingsMembers: () => [
         {name: 'Settings', href: Route.appSettingsGeneral(app.id)},
-        {name: 'Members', href: Route.appLogs(app.id)},
+        {name: 'Members', href: Route.appSettingsMembers(app.id)},
+      ],
+      AppSettingsBilling: () => [
+        {name: 'Settings', href: Route.appSettingsGeneral(app.id)},
+        {name: 'Billing', href: Route.appSettingsBilling(app.id)},
       ],
     }),
     A.cons<Breadcrumb>({name: app.name, href: Route.appDashboard(app.id)}),
