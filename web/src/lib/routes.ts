@@ -18,6 +18,8 @@ type ResetPasswordConfirm = {tag: 'ResetPasswordConfirm'; token: string};
 
 // Private (logged-in only)
 type Dashboard = {tag: 'Dashboard'};
+type SettingsAccount = {tag: 'SettingsAccount'};
+
 type AppDashboard = {tag: 'AppDashboard'; app: string};
 type AppEndpoints = {tag: 'AppEndpoints'; app: string};
 type AppSubs = {tag: 'AppSubs'; app: string};
@@ -41,6 +43,7 @@ export type Route =
   | ResetPasswordConfirm
   // Private (logged-in only)
   | Dashboard
+  | SettingsAccount
   | AppDashboard
   | AppEndpoints
   | AppSubs
@@ -69,6 +72,7 @@ type RouteMatcher<R> = {
 
   // Private
   Dashboard: (r: Dashboard) => R;
+  SettingsAccount: (r: SettingsAccount) => R;
   AppDashboard: (r: AppDashboard) => R;
   AppEndpoints: (r: AppEndpoints) => R;
   AppSubs: (r: AppSubs) => R;
@@ -109,6 +113,9 @@ export const match =
       // Private
       case 'Dashboard':
         return matcher.Dashboard(route);
+      case 'SettingsAccount':
+        return matcher.SettingsAccount(route);
+
       case 'AppDashboard':
         return matcher.AppDashboard(route);
       case 'AppEndpoints':
@@ -158,6 +165,9 @@ export const matchP =
       // Private
       case 'Dashboard':
         return (matcher.Dashboard ?? matcher.__)(route);
+      case 'SettingsAccount':
+        return (matcher.SettingsAccount ?? matcher.__)(route);
+
       case 'AppDashboard':
         return (matcher.AppDashboard ?? matcher.__)(route);
       case 'AppEndpoints':
@@ -200,6 +210,8 @@ const resetPasswordConfirm = (token: string): Route => ({
 
 // Private
 const dashboard: Route = {tag: 'Dashboard'};
+const settingsAccount: Route = {tag: 'SettingsAccount'};
+
 const appDashboard = (app: string): Route => ({tag: 'AppDashboard', app});
 const appEndpoints = (app: string): Route => ({tag: 'AppEndpoints', app});
 const appSubs = (app: string): Route => ({tag: 'AppSubs', app});
@@ -235,6 +247,8 @@ export const Route = {
 
   // Private
   dashboard,
+  settingsAccount,
+
   appDashboard,
   appEndpoints,
   appSubs,
@@ -274,6 +288,10 @@ const resetPasswordConfirmMatch = Routing.lit('reset-password')
 
 // Private
 const dashboardMatch = Routing.lit('dashboard').then(Routing.end);
+const settingsAccountMatch = Routing.lit('settings')
+  .then(Routing.lit('account'))
+  .then(Routing.end);
+
 const appDashboardMatch = Routing.lit('app')
   .then(Routing.str('app'))
   .then(Routing.lit('dashboard'))
@@ -327,6 +345,8 @@ export const Match = {
 
   // Private
   dashboard: dashboardMatch,
+  settingsAccount: settingsAccountMatch,
+
   appDashboard: appDashboardMatch,
   appEndpoints: appEndpointsMatch,
   appSubs: appSubsMatch,
@@ -377,6 +397,8 @@ const router = Routing.zero<Route>()
 
   // Private
   .alt(Match.dashboard.parser.map(() => Route.dashboard))
+  .alt(Match.settingsAccount.parser.map(() => Route.settingsAccount))
+
   .alt(Match.appDashboard.parser.map(({app}) => Route.appDashboard(app)))
   .alt(Match.appEndpoints.parser.map(({app}) => Route.appEndpoints(app)))
   .alt(Match.appSubs.parser.map(({app}) => Route.appSubs(app)))
@@ -437,6 +459,9 @@ export const format = (route: Route): string =>
 
       // Private
       Dashboard: () => Routing.format(Match.dashboard.formatter, {}),
+      SettingsAccount: () =>
+        Routing.format(Match.settingsAccount.formatter, {}),
+
       AppDashboard: ({app}) =>
         Routing.format(Match.appDashboard.formatter, {app}),
       AppEndpoints: ({app}) =>

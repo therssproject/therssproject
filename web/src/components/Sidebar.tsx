@@ -356,7 +356,7 @@ const Profile = ({username, avatar}: {username: string; avatar?: string}) => (
   <div className="mt-4 flex flex-shrink-0 border-t border-gray-200 p-4">
     {/* TODO: profile route */}
     <UnstyledLink
-      href={Route.notFound}
+      href={Route.settingsAccount}
       className="group block w-full flex-shrink-0"
     >
       <div className="flex items-center">
@@ -381,7 +381,7 @@ const Profile = ({username, avatar}: {username: string; avatar?: string}) => (
             {username}
           </p>
           <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-            View profile
+            View account
           </p>
         </div>
       </div>
