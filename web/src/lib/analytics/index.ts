@@ -14,7 +14,14 @@ import {AuthResponse, useSession} from '@/models/user';
 
 const analytics = Analytics({
   app: 'therssproject',
-  plugins: [mixpanelPlugin({token: MixPanelToken})],
+  plugins: [
+    mixpanelPlugin({
+      token: MixPanelToken,
+      pageEvent: 'visit_page',
+      // TODO: setup custom script
+      // customScriptSrc:
+    }),
+  ],
 });
 
 export const pageView = () => analytics.page();
