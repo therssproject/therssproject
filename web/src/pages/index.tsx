@@ -1,8 +1,10 @@
 import {Popover, Transition} from '@headlessui/react';
 import {
   CloudUploadIcon,
+  CodeIcon,
   MenuIcon,
   RssIcon,
+  ViewListIcon,
   XIcon,
 } from '@heroicons/react/outline';
 import {LightningBoltIcon} from '@heroicons/react/solid';
@@ -44,7 +46,7 @@ const navigation: NavLink[] = [
 const blogPosts = [
   {
     title: 'therssproject API Documentation',
-    href: external('https://github.com/therssproject/documentation'),
+    href: external('https://docs.therssproject.com'),
     date: 'Jul 25, 2022',
     datetime: '2022-07-25',
     category: 'Documentation',
@@ -165,7 +167,7 @@ const Navigation = () => {
                 () => (
                   <>
                     <UnstyledLink
-                      href={Route.documentation}
+                      href={external('https://docs.therssproject.com')}
                       className="text-base font-medium text-white hover:text-gray-300"
                     >
                       Documentation
@@ -269,7 +271,7 @@ const Navigation = () => {
                       <div className="mt-6 px-5">
                         <p className="text-center text-base font-medium text-gray-500">
                           <UnstyledLink
-                            href={Route.documentation}
+                            href={external('https://docs.therssproject.com')}
                             className="text-gray-900 hover:underline"
                           >
                             Documentation
@@ -427,21 +429,38 @@ export const ByDevs = () => (
 const features = [
   {
     name: 'RSS, Atom & JSON',
+    soon: false,
     description:
       "Don't worry about the feed format. We take care of that for you.",
     icon: RssIcon,
   },
   {
-    name: 'Simple API',
-    description:
-      'Register endpoints, subscribe and parse feeds all through the API. Or use the UI if you prefer that.',
-    icon: CloudUploadIcon,
-  },
-  {
     name: 'Almost real time',
+    soon: false,
     description:
       'Get webhook events almost real time on your feed subscriptions.',
     icon: LightningBoltIcon,
+  },
+  {
+    name: 'Tracking Webhook Events',
+    soon: false,
+    description:
+      'We keep a record of all the webhook envents sent you your endpoints. Access them at any time through the UI.',
+    icon: ViewListIcon,
+  },
+  {
+    name: 'UI & API',
+    soon: false,
+    description:
+      'Register endpoints, subscribe and parse feeds all through our simple API or from the UI, whichever works better for your.',
+    icon: CloudUploadIcon,
+  },
+  {
+    name: 'Transformers',
+    soon: true,
+    description:
+      'Apply transforms to the webhook event body to match the payload that your endpoint expects.',
+    icon: CodeIcon,
   },
 ];
 
@@ -465,9 +484,9 @@ const Features = () => (
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
             <div key={feature.name} className="pt-6">
-              <div className="flow-root rounded-lg bg-gray-50 px-6 pb-8">
+              <div className="flow-root h-full rounded-lg bg-white px-6 pb-8">
                 <div className="-mt-6">
-                  <div>
+                  <div className="mb-8">
                     <span className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 p-3 shadow-lg">
                       <feature.icon
                         className="h-6 w-6 text-white"
@@ -475,9 +494,16 @@ const Features = () => (
                       />
                     </span>
                   </div>
-                  <h3 className="mt-8 text-lg font-medium tracking-tight text-gray-900">
-                    {feature.name}
-                  </h3>
+                  <div className="relative inline-block">
+                    <h3 className=" text-lg font-medium tracking-tight text-gray-900">
+                      {feature.name}
+                    </h3>
+                    {feature.soon && (
+                      <div className="absolute -top-3 -right-6 text-xs font-semibold text-cyan-600">
+                        SOON
+                      </div>
+                    )}
+                  </div>
                   <p className="mt-5 text-base text-gray-500">
                     {feature.description}
                   </p>

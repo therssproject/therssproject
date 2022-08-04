@@ -15,6 +15,7 @@ import {ComponentType, FC, Fragment} from 'react';
 import * as track from '@/lib/analytics/track';
 import {clsxm} from '@/lib/clsxm';
 import * as crisp from '@/lib/crisp';
+import {external, SafeHref} from '@/lib/href';
 import {Route, RouteTag} from '@/lib/routes';
 import {useCurrentRoute} from '@/lib/routing';
 
@@ -29,7 +30,7 @@ import {Logo} from './Logo';
 
 type NavLink = {
   name: string;
-  href: Route;
+  href: SafeHref;
   group: RouteTag[];
   icon: ComponentType<{className: string}>;
 };
@@ -84,7 +85,7 @@ const secondaryNavigation = (
     type: 'link',
     name: 'Documentation',
     icon: DocumentTextIcon,
-    href: Route.documentation,
+    href: external('https://docs.therssproject.com'),
     onClick: track.openDocs,
     group: [],
   },
