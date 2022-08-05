@@ -1,4 +1,5 @@
 use axum::extract::{Extension, Path};
+use axum::http::StatusCode;
 use axum::routing::{delete, get, post, put};
 use axum::Json;
 use axum::Router;
@@ -9,6 +10,7 @@ use tracing::debug;
 
 use crate::errors::Error;
 use crate::errors::NotFound;
+use crate::lib::custom_response::{CustomResponse, CustomResponseBuilder};
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::lib::to_object_id::to_object_id;
@@ -27,14 +29,19 @@ pub fn create_router() -> Router {
 async fn create_endpoint(
   Json(payload): Json<CreateEndpoint>,
   Extension(application): Extension<Application>,
-) -> Result<Json<PublicEndpoint>, Error> {
+) -> Result<CustomResponse<PublicEndpoint>, Error> {
   let application_id = application.id.unwrap();
 
   let endpoint = Endpoint::new(application_id, payload.url, payload.title);
   let endpoint = Endpoint::create(endpoint).await?;
   let res = PublicEndpoint::from(endpoint);
 
-  Ok(Json(res))
+  let res = CustomResponseBuilder::new()
+    .body(res)
+    .status_code(StatusCode::CREATED)
+    .build();
+
+  Ok(res)
 }
 
 async fn query_endpoint(
@@ -83,7 +90,7 @@ async fn update_endpoint_by_id(
   Path(params): Path<HashMap<String, String>>,
   Json(payload): Json<CreateEndpoint>,
   Extension(application): Extension<Application>,
-) -> Result<Json<()>, Error> {
+) -> Result<CustomResponse<()>, Error> {
   let application_id = application.id.unwrap();
 
   let endpoint_id = params.get("id").unwrap().to_owned();
@@ -104,13 +111,17 @@ async fn update_endpoint_by_id(
     return Err(Error::NotFound(NotFound::new("endpoint")));
   }
 
-  Ok(Json(()))
+  let res = CustomResponseBuilder::new()
+    .status_code(StatusCode::NO_CONTENT)
+    .build();
+
+  Ok(res)
 }
 
 async fn remove_endpoint_by_id(
   Path(params): Path<HashMap<String, String>>,
   Extension(application): Extension<Application>,
-) -> Result<(), Error> {
+) -> Result<CustomResponse<()>, Error> {
   let application_id = application.id.unwrap();
 
   let endpoint_id = params.get("id").unwrap().to_owned();
@@ -124,7 +135,11 @@ async fn remove_endpoint_by_id(
     return Err(Error::NotFound(NotFound::new("endpoint")));
   }
 
-  Ok(())
+  let res = CustomResponseBuilder::new()
+    .status_code(StatusCode::NO_CONTENT)
+    .build();
+
+  Ok(res)
 }
 
 #[derive(Deserialize)]

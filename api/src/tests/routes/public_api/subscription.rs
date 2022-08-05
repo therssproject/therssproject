@@ -113,7 +113,7 @@ fn post_subscriptions_with_valid_authentication_header() {
     // Status code:
     let status_code = res.status();
     let actual = status_code;
-    let expected = StatusCode::OK;
+    let expected = StatusCode::CREATED;
     assert_eq!(actual, expected);
 
     // Body:

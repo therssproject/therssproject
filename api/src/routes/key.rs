@@ -1,4 +1,5 @@
 use axum::extract::{Extension, Path};
+use axum::http::StatusCode;
 use axum::routing::{delete, get, post};
 use axum::Json;
 use axum::Router;
@@ -11,6 +12,7 @@ use wither::bson::{doc, oid::ObjectId};
 
 use crate::errors::Error;
 use crate::errors::NotFound;
+use crate::lib::custom_response::{CustomResponse, CustomResponseBuilder};
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::Date;
 use crate::lib::serde::bson_datetime_option_as_rfc3339_string;
@@ -30,7 +32,7 @@ async fn create_key(
   Json(payload): Json<CreateKey>,
   Extension(application): Extension<Application>,
   Extension(user): Extension<UserFromToken>,
-) -> Result<Json<CreateKeyResponse>, Error> {
+) -> Result<CustomResponse<CreateKeyResponse>, Error> {
   let application_id = application.id.unwrap();
 
   let created_by = user.id;
@@ -39,7 +41,12 @@ async fn create_key(
   let key = PublicKey::from(key);
   let res = CreateKeyResponse::from_public_key(key, unhashed_key);
 
-  Ok(Json(res))
+  let res = CustomResponseBuilder::new()
+    .body(res)
+    .status_code(StatusCode::CREATED)
+    .build();
+
+  Ok(res)
 }
 
 async fn query_key(
@@ -60,7 +67,7 @@ async fn query_key(
 async fn remove_key_by_id(
   Path(params): Path<HashMap<String, String>>,
   Extension(application): Extension<Application>,
-) -> Result<(), Error> {
+) -> Result<CustomResponse<()>, Error> {
   let application_id = application.id.unwrap();
 
   let key_id = params.get("id").unwrap().to_owned();
@@ -74,7 +81,11 @@ async fn remove_key_by_id(
     return Err(Error::NotFound(NotFound::new("key")));
   }
 
-  Ok(())
+  let res = CustomResponseBuilder::new()
+    .status_code(StatusCode::NO_CONTENT)
+    .build();
+
+  Ok(res)
 }
 
 #[derive(Deserialize)]

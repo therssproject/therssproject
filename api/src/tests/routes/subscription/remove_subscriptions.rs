@@ -135,7 +135,7 @@ fn remove_subscription_with_valid_authentication_header() {
     // Status code:
     let status_code = res.status();
     let actual = status_code;
-    let expected = StatusCode::OK;
+    let expected = StatusCode::NO_CONTENT;
     assert_eq!(actual, expected);
 
     // Feed from database:

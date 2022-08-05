@@ -1,3 +1,4 @@
+use axum::http::StatusCode;
 use axum::{
   extract::{Extension, Path, Query},
   routing::{delete, get, post},
@@ -13,6 +14,7 @@ use wither::mongodb::options::FindOptions;
 use crate::errors::BadRequest;
 use crate::errors::Error;
 use crate::errors::NotFound;
+use crate::lib::custom_response::{CustomResponse, CustomResponseBuilder};
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::from_iso;
 use crate::lib::paginated_response::PaginatedJson;
@@ -33,7 +35,7 @@ pub fn create_router() -> Router {
 async fn create_subscription(
   Json(payload): Json<CreateSubscription>,
   Extension(application): Extension<Application>,
-) -> Result<Json<PublicSubscription>, Error> {
+) -> Result<CustomResponse<PublicSubscription>, Error> {
   let endpoint_id = to_object_id(payload.endpoint)?;
   let application_id = application.id.unwrap();
 
@@ -64,7 +66,12 @@ async fn create_subscription(
   let subscription = Subscription::create(subscription).await?;
   let res = PublicSubscription::from(subscription);
 
-  Ok(Json(res))
+  let res = CustomResponseBuilder::new()
+    .body(res)
+    .status_code(StatusCode::CREATED)
+    .build();
+
+  Ok(res)
 }
 
 async fn query_subscriptions(
@@ -133,7 +140,7 @@ async fn get_subscription_by_id(
 async fn remove_subscription_by_id(
   Extension(application): Extension<Application>,
   Path(params): Path<HashMap<String, String>>,
-) -> Result<(), Error> {
+) -> Result<CustomResponse<()>, Error> {
   let application_id = application.id.unwrap();
   let subscription_id = params.get("id").unwrap().to_owned();
   let subscription_id = to_object_id(subscription_id)?;
@@ -157,7 +164,11 @@ async fn remove_subscription_by_id(
 
   subscription.remove().await?;
 
-  Ok(())
+  let res = CustomResponseBuilder::new()
+    .status_code(StatusCode::NO_CONTENT)
+    .build();
+
+  Ok(res)
 }
 
 #[derive(Deserialize)]
