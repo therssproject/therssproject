@@ -4,7 +4,6 @@ use axum::{
   Json, Router,
 };
 use bson::doc;
-use serde::Deserialize;
 use tracing::debug;
 
 use crate::errors::Error;
@@ -16,21 +15,9 @@ use crate::models::application::{Application, PublicApplication};
 
 pub fn create_router() -> Router {
   Router::new()
-    .route("/", post(create_application))
     .route("/", get(query_application))
     .route("/:application_id", get(get_application_by_id))
     .route("/:application_id/reset", post(reset_application_by_id))
-}
-
-async fn create_application(
-  Extension(user): Extension<UserFromToken>,
-  Json(payload): Json<CreateApplication>,
-) -> Result<Json<PublicApplication>, Error> {
-  let application = Application::new(user.id, payload.name, payload.description);
-  let application = Application::create(application).await?;
-  let res = PublicApplication::from(application);
-
-  Ok(Json(res))
 }
 
 async fn query_application(
@@ -82,10 +69,4 @@ async fn reset_application_by_id(
   Application::reset(&application_id).await?;
 
   Ok(())
-}
-
-#[derive(Deserialize)]
-struct CreateApplication {
-  name: String,
-  description: Option<String>,
 }

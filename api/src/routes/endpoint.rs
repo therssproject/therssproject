@@ -107,7 +107,7 @@ async fn update_endpoint_by_id(
   .await?;
 
   if result.modified_count == 0 {
-    debug!("endpoint not found, returning 404 status code");
+    debug!("Endpoint not found, returning 404 status code");
     return Err(Error::NotFound(NotFound::new("endpoint")));
   }
 
