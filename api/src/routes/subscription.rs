@@ -14,10 +14,9 @@ use wither::mongodb::options::FindOptions;
 use crate::errors::BadRequest;
 use crate::errors::Error;
 use crate::errors::NotFound;
-use crate::lib::custom_response::{CustomResponse, CustomResponseBuilder};
+use crate::lib::custom_response::{CustomResponse, CustomResponseBuilder, Pagination};
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::from_iso;
-use crate::lib::paginated_response::PaginatedJson;
 use crate::lib::to_object_id::to_object_id;
 use crate::models::application::Application;
 use crate::models::endpoint::Endpoint;
@@ -77,7 +76,7 @@ async fn create_subscription(
 async fn query_subscriptions(
   Extension(application): Extension<Application>,
   Query(query): Query<RequestQuery>,
-) -> Result<PaginatedJson<Vec<PublicSubscription>>, Error> {
+) -> Result<CustomResponse<Vec<PublicSubscription>>, Error> {
   let application_id = application.id.unwrap();
   let from = query.from;
 
@@ -98,14 +97,16 @@ async fn query_subscriptions(
     .map(Into::into)
     .collect::<Vec<PublicSubscription>>();
 
-  debug!("Returning subscriptions");
-  let res = PaginatedJson {
-    body: subscriptions,
-    count,
-    offset: 0,
-    limit: 50,
-  };
+  let res = CustomResponseBuilder::new()
+    .body(subscriptions)
+    .pagination(Pagination {
+      count,
+      offset: 0,
+      limit: 50,
+    })
+    .build();
 
+  debug!("Returning subscriptions");
   Ok(res)
 }
 
