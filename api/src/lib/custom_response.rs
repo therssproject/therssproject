@@ -1,5 +1,5 @@
 use axum::{
-  http::header::{self, HeaderValue},
+  http::header::{self, HeaderName, HeaderValue},
   http::StatusCode,
   response::{IntoResponse, Response},
 };
@@ -8,11 +8,20 @@ use serde::Serialize;
 pub struct CustomResponse<T: Serialize> {
   pub body: Option<T>,
   pub status_code: StatusCode,
+  pub pagination: Option<Pagination>,
 }
 
 pub struct CustomResponseBuilder<T: Serialize> {
   pub body: Option<T>,
   pub status_code: StatusCode,
+  pub pagination: Option<Pagination>,
+}
+
+#[derive(Serialize)]
+pub struct Pagination {
+  pub count: u64,
+  pub offset: u64,
+  pub limit: u64,
 }
 
 impl<T> Default for CustomResponseBuilder<T>
@@ -23,6 +32,7 @@ where
     Self {
       body: None,
       status_code: StatusCode::OK,
+      pagination: None,
     }
   }
 }
@@ -45,10 +55,16 @@ where
     self
   }
 
+  pub fn pagination(mut self, pagination: Pagination) -> Self {
+    self.pagination = Some(pagination);
+    self
+  }
+
   pub fn build(self) -> CustomResponse<T> {
     CustomResponse {
       body: self.body,
       status_code: self.status_code,
+      pagination: self.pagination,
     }
   }
 }
@@ -76,15 +92,44 @@ where
       }
     };
 
-    // If there is a body, we assume that the content type is application/json.
-    (
-      self.status_code,
-      [(
+    create_response(self.status_code, self.pagination, bytes)
+  }
+}
+
+fn create_response(code: StatusCode, pagination: Option<Pagination>, bytes: Vec<u8>) -> Response {
+  match pagination {
+    Some(pagination) => {
+      let count = pagination.count.to_string();
+      let offset = pagination.offset.to_string();
+      let limit = pagination.limit.to_string();
+      let headers = [
+        (
+          header::CONTENT_TYPE,
+          HeaderValue::from_static(mime::APPLICATION_JSON.as_ref()),
+        ),
+        (
+          HeaderName::from_static("x-pagination-count"),
+          HeaderValue::from_str(&count).unwrap(),
+        ),
+        (
+          HeaderName::from_static("x-pagination-offset"),
+          HeaderValue::from_str(&offset).unwrap(),
+        ),
+        (
+          HeaderName::from_static("x-pagination-limit"),
+          HeaderValue::from_str(&limit).unwrap(),
+        ),
+      ];
+
+      (code, headers, bytes).into_response()
+    }
+    None => {
+      let headers = [(
         header::CONTENT_TYPE,
         HeaderValue::from_static(mime::APPLICATION_JSON.as_ref()),
-      )],
-      bytes,
-    )
-      .into_response()
+      )];
+
+      (code, headers, bytes).into_response()
+    }
   }
 }
