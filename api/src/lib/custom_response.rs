@@ -74,12 +74,6 @@ where
   T: Serialize,
 {
   fn into_response(self) -> Response {
-    let has_body = self.body.is_some();
-
-    if !has_body {
-      return (self.status_code).into_response();
-    }
-
     let body = match self.body {
       Some(body) => serde_json::to_vec(&body),
       None => return (self.status_code).into_response(),
@@ -92,44 +86,40 @@ where
       }
     };
 
-    create_response(self.status_code, self.pagination, bytes)
-  }
-}
+    match self.pagination {
+      Some(pagination) => {
+        let count = pagination.count.to_string();
+        let offset = pagination.offset.to_string();
+        let limit = pagination.limit.to_string();
+        let headers = [
+          (
+            header::CONTENT_TYPE,
+            HeaderValue::from_static(mime::APPLICATION_JSON.as_ref()),
+          ),
+          (
+            HeaderName::from_static("x-pagination-count"),
+            HeaderValue::from_str(&count).unwrap(),
+          ),
+          (
+            HeaderName::from_static("x-pagination-offset"),
+            HeaderValue::from_str(&offset).unwrap(),
+          ),
+          (
+            HeaderName::from_static("x-pagination-limit"),
+            HeaderValue::from_str(&limit).unwrap(),
+          ),
+        ];
 
-fn create_response(code: StatusCode, pagination: Option<Pagination>, bytes: Vec<u8>) -> Response {
-  match pagination {
-    Some(pagination) => {
-      let count = pagination.count.to_string();
-      let offset = pagination.offset.to_string();
-      let limit = pagination.limit.to_string();
-      let headers = [
-        (
+        (self.status_code, headers, bytes).into_response()
+      }
+      None => {
+        let headers = [(
           header::CONTENT_TYPE,
           HeaderValue::from_static(mime::APPLICATION_JSON.as_ref()),
-        ),
-        (
-          HeaderName::from_static("x-pagination-count"),
-          HeaderValue::from_str(&count).unwrap(),
-        ),
-        (
-          HeaderName::from_static("x-pagination-offset"),
-          HeaderValue::from_str(&offset).unwrap(),
-        ),
-        (
-          HeaderName::from_static("x-pagination-limit"),
-          HeaderValue::from_str(&limit).unwrap(),
-        ),
-      ];
+        )];
 
-      (code, headers, bytes).into_response()
-    }
-    None => {
-      let headers = [(
-        header::CONTENT_TYPE,
-        HeaderValue::from_static(mime::APPLICATION_JSON.as_ref()),
-      )];
-
-      (code, headers, bytes).into_response()
+        (self.status_code, headers, bytes).into_response()
+      }
     }
   }
 }
