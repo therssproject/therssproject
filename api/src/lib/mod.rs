@@ -1,3 +1,4 @@
+pub mod create_random_string;
 pub mod custom_response;
 pub mod database_model;
 pub mod date;

@@ -1,11 +1,11 @@
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
+use crate::lib::create_random_string::create_random_string;
 use crate::lib::database_model::ModelExt;
 use crate::lib::date::{now, Date};
 use crate::lib::hash::sha256;
@@ -37,7 +37,7 @@ impl Key {
     created_by: &ObjectId,
   ) -> (Self, String) {
     let now = now();
-    let key = Uuid::new_v4().to_string();
+    let key = create_random_string(40);
     let hash = sha256(&key);
 
     let this = Self {
