@@ -64,13 +64,13 @@ const AppEndpoints: NextPageWithLayout = () => {
 
     const run = pipe(
       deleteEndpoint(toDelete.application, toDelete.id),
-      TE.match(noOp, () => {
+      TE.match(() => {
         pipe(
           appEndpoints,
           RD.map((rest) => A.snoc(rest, toDelete)),
           setEndpoints,
         );
-      }),
+      }, noOp),
     );
 
     run();

@@ -146,6 +146,38 @@ const req =
       TE.chain(handleResponse(codec)),
     );
 
+const reqSkipResponse =
+  (method: 'GET' | 'DELETE') =>
+  (url: string, opts?: RequestInit): TE.TaskEither<FetchError, Res<void>> =>
+    pipe(
+      grabSession,
+      TE.chain((session) =>
+        TE.tryCatch(
+          () =>
+            fetch(addBaseUrl(url), {
+              ...opts,
+              method,
+              headers: mkHeaders(session, opts?.headers),
+            }),
+          unknown,
+        ),
+      ),
+      TE.chain((res) =>
+        pipe(
+          TE.of({
+            ok: res.ok,
+            status: res.status,
+            statusText: res.statusText,
+          }),
+          TE.filterOrElse(
+            ({ok}) => ok,
+            ({status, statusText}) => fetch_(status, statusText),
+          ),
+          TE.map(() => ({data: undefined, headers: res.headers})),
+        ),
+      ),
+    );
+
 const reqWithBody =
   (method: 'POST' | 'PUT' | 'PATCH') =>
   <T>(
@@ -221,10 +253,16 @@ const reqWithBodySkipResponse =
     );
 
 export const get = req('GET');
+export const get_ = reqSkipResponse('GET');
+
 export const del = req('DELETE');
+export const del_ = reqSkipResponse('DELETE');
 
 export const post = reqWithBody('POST');
 export const post_ = reqWithBodySkipResponse('POST');
 
 export const put = reqWithBody('PUT');
+export const put_ = reqWithBodySkipResponse('PUT');
+
 export const patch = reqWithBody('PATCH');
+export const patch_ = reqWithBodySkipResponse('PATCH');

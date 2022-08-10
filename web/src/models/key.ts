@@ -48,7 +48,7 @@ export const generateKey = (app: string, body: GenerateKey) =>
   http.post(`/applications/${app}/keys`, body, GeneratedKey);
 
 export const deleteKey = (app: string, key: string) =>
-  http.del(`/applications/${app}/keys/${key}`, t.void);
+  http.del_(`/applications/${app}/keys/${key}`);
 
 export const AppKeysAtom = atom(
   (get) =>

@@ -57,13 +57,13 @@ const AppSettingsKeys: NextPageWithLayout = () => {
 
     const run = pipe(
       deleteKey(toDelete.application, toDelete.id),
-      TE.match(noOp, () => {
+      TE.match(() => {
         pipe(
           keys,
           RD.map((rest) => A.snoc(rest, toDelete)),
           setKeys,
         );
-      }),
+      }, noOp),
     );
 
     run();
