@@ -1,6 +1,6 @@
 use axum::extract::{Extension, Path};
 use axum::http::StatusCode;
-use axum::routing::{delete, get, post, put};
+use axum::routing::{delete, get, patch, post};
 use axum::Json;
 use axum::Router;
 use bson::doc;
@@ -22,7 +22,7 @@ pub fn create_router() -> Router {
     .route("/endpoints", post(create_endpoint))
     .route("/endpoints", get(query_endpoint))
     .route("/endpoints/:id", get(get_endpoint_by_id))
-    .route("/endpoints/:id", put(update_endpoint_by_id))
+    .route("/endpoints/:id", patch(update_endpoint_by_id))
     .route("/endpoints/:id", delete(remove_endpoint_by_id))
 }
 
@@ -106,8 +106,9 @@ async fn update_endpoint_by_id(
   )
   .await?;
 
-  if result.modified_count == 0 {
-    debug!("endpoint not found, returning 404 status code");
+  let was_found = result.matched_count == 1;
+  if !was_found {
+    debug!("Endpoint not found, returning 404 status code");
     return Err(Error::NotFound(NotFound::new("endpoint")));
   }
 

@@ -53,7 +53,7 @@ export const createSubscription = (app: string, body: CreateSubscription) =>
   http.post(`/applications/${app}/subscriptions`, body, Subscription);
 
 export const deleteSubscription = (app: string, subscription: string) =>
-  http.del(`/applications/${app}/subscriptions/${subscription}`, t.void);
+  http.del_(`/applications/${app}/subscriptions/${subscription}`);
 
 export const AppSubscriptionsAtom = atom(
   (get) =>

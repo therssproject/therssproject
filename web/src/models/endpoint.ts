@@ -49,13 +49,12 @@ export const updateEndpoint = (
   body: RegisterEndpoint,
 ) =>
   pipe(
-    // TODO: should be `t.void` instead but the library tries to parse the response body
-    http.put(`/applications/${app}/endpoints/${endpoint.id}`, body, t.unknown),
-    TE.map(() => ({...endpoint, ...body})),
+    http.patch_(`/applications/${app}/endpoints/${endpoint.id}`, body),
+    TE.map((): Endpoint => ({...endpoint, ...body})),
   );
 
 export const deleteEndpoint = (app: string, endpoint: string) =>
-  http.del(`/applications/${app}/endpoints/${endpoint}`, t.void);
+  http.del_(`/applications/${app}/endpoints/${endpoint}`);
 
 export const AppEndpointsAtom = atom(
   (get) =>

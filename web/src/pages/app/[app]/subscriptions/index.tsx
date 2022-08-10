@@ -53,13 +53,13 @@ const AppSubs: NextPageWithLayout = () => {
 
     const run = pipe(
       deleteSubscription(toDelete.application, toDelete.id),
-      TE.match(noOp, () => {
+      TE.match(() => {
         pipe(
           appSubscriptions,
           RD.map((rest) => A.snoc(rest, toDelete)),
           setSubscriptions,
         );
-      }),
+      }, noOp),
     );
 
     run();
