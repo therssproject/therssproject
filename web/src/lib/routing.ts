@@ -30,7 +30,6 @@ const publicRoutes = (push: (path: string) => void) => (route: Route) => {
 
       // Public
       Index: noOp,
-      Documentation: noOp,
       Feedback: noOp,
       Components: noOp,
 
@@ -65,7 +64,6 @@ const privateRoutes = (push: (path: string) => void) => (route: Route) => {
 
       // Public
       Index: noOp,
-      Documentation: noOp,
       Feedback: noOp,
       Components: noOp,
 

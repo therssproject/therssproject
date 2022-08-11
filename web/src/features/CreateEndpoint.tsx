@@ -23,6 +23,7 @@ import {
   useSetNewEndpoint,
   useUpdateEndpoint,
 } from '@/models/endpoint';
+import {external} from '@/lib/href';
 
 type RegisterProps = {
   app: string;
@@ -162,7 +163,13 @@ const Form = ({endpoint, app, onClose, onSave, doSave}: Props) => {
         <div className="p-6 md:hidden">
           <p className="text-sm text-gray-600">
             Want to register endpoints using the API instead?{' '}
-            <PrimaryLink href={Route.documentation}>Check the docs</PrimaryLink>{' '}
+            <PrimaryLink
+              href={external(
+                'https://docs.therssproject.com/get-started/endpoints',
+              )}
+            >
+              Check the docs
+            </PrimaryLink>{' '}
           </p>
         </div>
 

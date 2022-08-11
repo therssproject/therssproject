@@ -15,36 +15,35 @@ export type FetchError =
   | {tag: 'encoding'; message: string}
   | {tag: 'decoding'; messages: string[]};
 
-const unknown = (error: unknown): FetchError => ({
-  tag: 'unknown',
-  message:
-    error instanceof Error
-      ? error.message
-      : typeof error === 'string'
-      ? error
-      : 'Failed to fetch',
-});
-
-const decoding = (messages: string[]): FetchError => ({
-  tag: 'decoding',
-  messages,
-});
-
-const encoding = (error: unknown): FetchError => ({
-  tag: 'encoding',
-  message:
-    error instanceof Error
-      ? error.message
-      : typeof error === 'string'
-      ? error
-      : 'Failed to fetch',
-});
-
-const fetch_ = (code: number, message: string): FetchError => ({
-  tag: 'fetch',
-  code,
-  message,
-});
+const FetchError = {
+  unknown: (error: unknown): FetchError => ({
+    tag: 'unknown',
+    message:
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+        ? error
+        : 'Failed to fetch',
+  }),
+  decoding: (messages: string[]): FetchError => ({
+    tag: 'decoding',
+    messages,
+  }),
+  encoding: (error: unknown): FetchError => ({
+    tag: 'encoding',
+    message:
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+        ? error
+        : 'Failed to fetch',
+  }),
+  fetch: (code: number, message: string): FetchError => ({
+    tag: 'fetch',
+    code,
+    message,
+  }),
+};
 
 export const isOfStatus =
   (status: number | Predicate<number>) => (error: FetchError) =>
@@ -55,38 +54,43 @@ export const is4xx = isOfStatus((code) => code >= 400 && code < 500);
 
 export const is5xx = isOfStatus((code) => code >= 500);
 
-export type Res<T> = {headers: Headers; data: T};
+export type Res<T> = {headers: Headers; data: T; status: number};
 
-const handleResponse =
+const handleResponseWithBody =
   <T>(codec: t.Decoder<unknown, T>) =>
   (res: Response): TE.TaskEither<FetchError, Res<T>> =>
     pipe(
-      TE.tryCatch(() => res.json(), unknown),
-      TE.map((body) => ({
-        body,
-        ok: res.ok,
-        status: res.status,
-        statusText: res.statusText,
-      })),
-      TE.filterOrElse(
-        ({ok}) => ok,
-        ({status, statusText}) => fetch_(status, statusText),
+      res,
+      TE.fromPredicate(
+        () => res.ok,
+        () => FetchError.fetch(res.status, res.statusText),
       ),
-      TE.chain(({body}) =>
+      TE.chain(() => TE.tryCatch(() => res.json(), FetchError.unknown)),
+      TE.chain((body) =>
         pipe(
           codec.decode(body),
           E.mapLeft(E.left),
           E.mapLeft(reporter.report),
-          E.mapLeft(decoding),
+          E.mapLeft(FetchError.decoding),
+          E.map((data) => ({data, headers: res.headers, status: res.status})),
           TE.fromEither,
-          TE.map((data) => ({data, headers: res.headers} as Res<T>)),
         ),
       ),
     );
-const addBaseUrl = (url: string) =>
-  url.startsWith('/') ? `${CONFIG.baseUrl}${url}` : url;
 
-// TODO: use IOOption & TaskOption
+const handleResponse = (res: Response): TE.TaskEither<FetchError, Res<void>> =>
+  pipe(
+    res,
+    TE.fromPredicate(
+      () => res.ok,
+      () => FetchError.fetch(res.status, res.statusText),
+    ),
+    TE.map(() => ({data: undefined, headers: res.headers, status: res.status})),
+  );
+
+const addBaseUrl = (url: string) =>
+  url.startsWith('/') ? `${CONFIG.API_URL}${url}` : url;
+
 const grabSession = pipe(
   IOE.tryCatch(
     () => JSON.parse(localStorage.getItem(SESSION_KEY) ?? ''),
@@ -123,6 +127,26 @@ const mkHeaders = (session: Session, headers: RequestInit['headers']) => ({
   ...headers,
 });
 
+const mkReq_ = (
+  method: 'GET' | 'DELETE',
+  url: string,
+  opts?: RequestInit,
+): TE.TaskEither<FetchError, Response> =>
+  pipe(
+    grabSession,
+    TE.chain((session) =>
+      TE.tryCatch(
+        () =>
+          fetch(addBaseUrl(url), {
+            ...opts,
+            method,
+            headers: mkHeaders(session, opts?.headers),
+          }),
+        FetchError.unknown,
+      ),
+    ),
+  );
+
 const req =
   (method: 'GET' | 'DELETE') =>
   <T>(
@@ -130,53 +154,43 @@ const req =
     codec: t.Decoder<unknown, T>,
     opts?: RequestInit,
   ): TE.TaskEither<FetchError, Res<T>> =>
-    pipe(
-      grabSession,
-      TE.chain((session) =>
-        TE.tryCatch(
-          () =>
-            fetch(addBaseUrl(url), {
-              ...opts,
-              method,
-              headers: mkHeaders(session, opts?.headers),
-            }),
-          unknown,
-        ),
-      ),
-      TE.chain(handleResponse(codec)),
-    );
+    pipe(mkReq_(method, url, opts), TE.chain(handleResponseWithBody(codec)));
 
-const reqSkipResponse =
+const req_ =
   (method: 'GET' | 'DELETE') =>
   (url: string, opts?: RequestInit): TE.TaskEither<FetchError, Res<void>> =>
-    pipe(
-      grabSession,
-      TE.chain((session) =>
+    pipe(mkReq_(method, url, opts), TE.chain(handleResponse));
+
+const mkReq = (
+  method: 'POST' | 'PUT' | 'PATCH',
+  url: string,
+  body: unknown,
+  opts?: RequestInit,
+): TE.TaskEither<FetchError, Response> =>
+  pipe(
+    grabSession,
+    TE.chain((session) =>
+      pipe(
         TE.tryCatch(
-          () =>
-            fetch(addBaseUrl(url), {
-              ...opts,
-              method,
-              headers: mkHeaders(session, opts?.headers),
-            }),
-          unknown,
+          () => Promise.resolve(JSON.stringify(body)),
+          FetchError.encoding,
         ),
+        TE.map((encodedBody) => ({session, encodedBody})),
       ),
-      TE.chain((res) =>
-        pipe(
-          TE.of({
-            ok: res.ok,
-            status: res.status,
-            statusText: res.statusText,
+    ),
+    TE.chain(({encodedBody, session}) =>
+      TE.tryCatch(
+        () =>
+          fetch(addBaseUrl(url), {
+            ...opts,
+            method,
+            body: encodedBody,
+            headers: mkHeaders(session, opts?.headers),
           }),
-          TE.filterOrElse(
-            ({ok}) => ok,
-            ({status, statusText}) => fetch_(status, statusText),
-          ),
-          TE.map(() => ({data: undefined, headers: res.headers})),
-        ),
+        FetchError.unknown,
       ),
-    );
+    ),
+  );
 
 const reqWithBody =
   (method: 'POST' | 'PUT' | 'PATCH') =>
@@ -187,82 +201,30 @@ const reqWithBody =
     opts?: RequestInit,
   ): TE.TaskEither<FetchError, Res<T>> =>
     pipe(
-      grabSession,
-      TE.chain((session) =>
-        pipe(
-          TE.tryCatch(() => Promise.resolve(JSON.stringify(body)), encoding),
-          TE.map((encodedBody) => ({session, encodedBody})),
-        ),
-      ),
-      TE.chain(({encodedBody, session}) =>
-        TE.tryCatch(
-          () =>
-            fetch(addBaseUrl(url), {
-              ...opts,
-              method,
-              body: encodedBody,
-              headers: mkHeaders(session, opts?.headers),
-            }),
-          unknown,
-        ),
-      ),
-      TE.chain(handleResponse(codec)),
+      mkReq(method, url, body, opts),
+      TE.chain(handleResponseWithBody(codec)),
     );
 
-const reqWithBodySkipResponse =
+const reqWithBody_ =
   (method: 'POST' | 'PUT' | 'PATCH') =>
   (
     url: string,
     body: unknown,
     opts?: RequestInit,
   ): TE.TaskEither<FetchError, Res<void>> =>
-    pipe(
-      grabSession,
-      TE.chain((session) =>
-        pipe(
-          TE.tryCatch(() => Promise.resolve(JSON.stringify(body)), encoding),
-          TE.map((encodedBody) => ({session, encodedBody})),
-        ),
-      ),
-      TE.chain(({encodedBody, session}) =>
-        TE.tryCatch(
-          () =>
-            fetch(addBaseUrl(url), {
-              ...opts,
-              method,
-              body: encodedBody,
-              headers: mkHeaders(session, opts?.headers),
-            }),
-          unknown,
-        ),
-      ),
-      TE.chain((res) =>
-        pipe(
-          TE.of({
-            ok: res.ok,
-            status: res.status,
-            statusText: res.statusText,
-          }),
-          TE.filterOrElse(
-            ({ok}) => ok,
-            ({status, statusText}) => fetch_(status, statusText),
-          ),
-          TE.map(() => ({data: undefined, headers: res.headers})),
-        ),
-      ),
-    );
+    pipe(mkReq(method, url, body, opts), TE.chain(handleResponse));
 
 export const get = req('GET');
-export const get_ = reqSkipResponse('GET');
+export const get_ = req_('GET');
 
 export const del = req('DELETE');
-export const del_ = reqSkipResponse('DELETE');
+export const del_ = req_('DELETE');
 
 export const post = reqWithBody('POST');
-export const post_ = reqWithBodySkipResponse('POST');
+export const post_ = reqWithBody_('POST');
 
 export const put = reqWithBody('PUT');
-export const put_ = reqWithBodySkipResponse('PUT');
+export const put_ = reqWithBody_('PUT');
 
 export const patch = reqWithBody('PATCH');
-export const patch_ = reqWithBodySkipResponse('PATCH');
+export const patch_ = reqWithBody_('PATCH');

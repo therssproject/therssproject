@@ -9,7 +9,6 @@ import * as RD from 'remote-data-ts';
 import * as crisp from '@/lib/crisp';
 import {noOp} from '@/lib/effect';
 import {useAtom} from '@/lib/jotai';
-import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
 import {Layout} from '@/components/layout/Layout';
@@ -22,6 +21,7 @@ import {KeyItem} from '@/features/KeyItem';
 import {SelectedAppAtom, useFetchOnAppChange} from '@/models/application';
 import {AppKeysAtom, deleteKey, fetchKeys, Key} from '@/models/key';
 import {NextPageWithLayout} from '@/pages/_app';
+import {external} from '@/lib/href';
 
 const AppSettingsKeys: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
@@ -88,7 +88,11 @@ const AppSettingsKeys: NextPageWithLayout = () => {
                     These keys can be used to interact with the with the{' '}
                     <code>therssproject</code> API on behalf of this
                     application. See the{' '}
-                    <PrimaryLink href={Route.documentation}>
+                    <PrimaryLink
+                      href={external(
+                        'https://docs.therssproject.com/get-started/authorization',
+                      )}
+                    >
                       documentation
                     </PrimaryLink>{' '}
                     for more information.
