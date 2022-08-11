@@ -53,9 +53,8 @@
 - [x] Create
   - [x] Endpoints
   - [x] Subscriptions
-- [ ] Update
+- [x] Update
   - [x] Endpoints
-  - [ ] Subscriptions => not supported
 - [ ] Item styles
   - [ ] Endpoints
   - [ ] Subscriptions
@@ -65,11 +64,10 @@
   - [ ] Subscriptions
   - [ ] Logs (ie. webhook events)
 
-### From Scarf
+### Refactor
 
 - [ ] `useSessionCheck` (from `models/user`)
 - [ ] Toast and other components
-- [ ] Change styles to NOT match Scarf xD
 - [ ] Move to a library ? => For Tsearch as well
 
 ------
@@ -78,7 +76,6 @@
 
 - [ ] Pricing section
 - [ ] Analytics => Setup proxy (`https://developer.mixpanel.com/docs/collection-via-a-proxy` / `https://dev.to/rain2o/using-mixpanel-via-proxy-with-nextjs-rewrites-130e`)
-- [ ] Footer "content" doesn't match Documentation "content"
 - [ ] Stats => week and month range picker
 - [ ] Add `metadata` field to Subscription form
 - [ ] Cleanup duplication between `layout/Applications` and `layout/Dashboard`
@@ -88,5 +85,6 @@
 - [ ] Input / Field styles
 - [ ] Show button to create new and "Comming soon" modal? Or disable the select?
 - [ ] Avatar on user profiles
+- [ ] Deploy my own OG images service
 - [x] RSS providers might rate limit our backend => Mentioned to Nico already xD
 - [x] Reset application

@@ -26,6 +26,7 @@ import {
   createSubscription,
   useSetNewSubscription,
 } from '@/models/subscription';
+import {external} from '@/lib/href';
 
 const CreateSubscription_ = yup.object({
   url: yup.string().url().required(),
@@ -153,7 +154,12 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
           <div className="p-6 md:hidden">
             <p className="text-sm text-gray-600">
               Want to register endpoints using the API instead?{' '}
-              <PrimaryLink href={Route.documentation}>
+              <PrimaryLink
+
+              href={external(
+                'https://docs.therssproject.com/get-started/subscriptions',
+              )}
+              >
                 Check the docs
               </PrimaryLink>{' '}
             </p>

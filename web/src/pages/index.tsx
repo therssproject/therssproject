@@ -111,6 +111,7 @@ export default HomePage;
 
 const Navigation = () => {
   const {session} = useSession();
+
   return (
     <Popover as="header" className="relative">
       <div className="bg-gray-900 pt-6">
@@ -149,6 +150,7 @@ const Navigation = () => {
                 () => (
                   <>
                     <UnstyledLink
+                      key="login"
                       className="text-base font-medium text-white hover:text-gray-300"
                       href={Route.login()}
                       onClick={track.landingLogin}
@@ -156,6 +158,7 @@ const Navigation = () => {
                       Log in
                     </UnstyledLink>
                     <UnstyledLink
+                      key="register"
                       className="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-base font-medium text-white hover:bg-gray-700"
                       href={Route.register()}
                       onClick={track.landingRegister}
@@ -167,12 +170,14 @@ const Navigation = () => {
                 () => (
                   <>
                     <UnstyledLink
-                      href={external('https://docs.therssproject.com')}
+                      key="documentation"
                       className="text-base font-medium text-white hover:text-gray-300"
+                      href={external('https://docs.therssproject.com')}
                     >
                       Documentation
                     </UnstyledLink>
                     <UnstyledLink
+                      key="dashboard"
                       href={Route.dashboard}
                       className="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-base font-medium text-white hover:bg-gray-700"
                     >
@@ -201,13 +206,7 @@ const Navigation = () => {
         >
           <div className="overflow-hidden rounded-lg bg-white shadow-md ring-1 ring-black ring-opacity-5">
             <div className="flex items-center justify-between px-5 pt-4">
-              <div>
-                <img
-                  className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/workflow-mark-teal-500-cyan-600.svg"
-                  alt=""
-                />
-              </div>
+              <Logo style="dark" />
               <div className="-mr-2">
                 <Popover.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-600">
                   <span className="sr-only">Close menu</span>
@@ -235,7 +234,7 @@ const Navigation = () => {
                 O.match(
                   () => (
                     <>
-                      <div className="mt-6 px-5">
+                      <div key="register" className="mt-6 px-5">
                         <UnstyledLink
                           className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 py-3 px-4 text-center font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700"
                           href={Route.register()}
@@ -244,7 +243,7 @@ const Navigation = () => {
                           Start free trial
                         </UnstyledLink>
                       </div>
-                      <div className="mt-6 px-5">
+                      <div key="login" className="mt-6 px-5">
                         <p className="text-center text-base font-medium text-gray-500">
                           Existing customer?{' '}
                           <UnstyledLink
@@ -260,7 +259,7 @@ const Navigation = () => {
                   ),
                   () => (
                     <>
-                      <div className="mt-6 px-5">
+                      <div key="dashboard" className="mt-6 px-5">
                         <UnstyledLink
                           href={Route.dashboard}
                           className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 py-3 px-4 text-center font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700"
@@ -268,7 +267,7 @@ const Navigation = () => {
                           Dashboard
                         </UnstyledLink>
                       </div>
-                      <div className="mt-6 px-5">
+                      <div key="documentation" className="mt-6 px-5">
                         <p className="text-center text-base font-medium text-gray-500">
                           <UnstyledLink
                             href={external('https://docs.therssproject.com')}
