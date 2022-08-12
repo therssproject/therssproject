@@ -37,6 +37,7 @@ again = "0.1.2"
 sha2 = "0.10.2"
 mime = "0.3.16"
 rand = "0.8.5"
+bytes = "1.2.1"
 
 [dev-dependencies]
 assert-json-diff = "2.0.1"
