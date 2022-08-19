@@ -155,10 +155,9 @@ export const Create = ({app, endpoints, open, onClose}: Props) => {
             <p className="text-sm text-gray-600">
               Want to register endpoints using the API instead?{' '}
               <PrimaryLink
-
-              href={external(
-                'https://docs.therssproject.com/get-started/subscriptions',
-              )}
+                href={external(
+                  'https://docs.therssproject.com/get-started/subscriptions',
+                )}
               >
                 Check the docs
               </PrimaryLink>{' '}
