@@ -1,4 +1,4 @@
-use axum::extract::{Extension, Path};
+use axum::extract::{Extension, Path, Query};
 use axum::http::StatusCode;
 use axum::routing::{delete, get, patch, post};
 use axum::Json;
@@ -7,12 +7,17 @@ use bson::doc;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tracing::debug;
+use wither::mongodb::options::FindOptions;
 
+use crate::errors::BadRequest;
 use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::custom_response::{CustomResponse, CustomResponseBuilder};
 use crate::lib::database_model::ModelExt;
+use crate::lib::date::from_iso;
 use crate::lib::date::{now, Date};
+use crate::lib::pagination::PaginationBuilder;
+use crate::lib::request_query::RequestQuery;
 use crate::lib::to_object_id::to_object_id;
 use crate::models::application::Application;
 use crate::models::endpoint::{Endpoint, PublicEndpoint};
@@ -46,17 +51,36 @@ async fn create_endpoint(
 
 async fn query_endpoint(
   Extension(application): Extension<Application>,
-) -> Result<Json<Vec<PublicEndpoint>>, Error> {
+  Query(query): Query<RequestQuery>,
+) -> Result<CustomResponse<Vec<PublicEndpoint>>, Error> {
   let application_id = application.id.unwrap();
+  let from = query.from.clone();
+  let pagination = PaginationBuilder::from_request_query(query);
 
-  let endpoints = Endpoint::find(doc! { "application": application_id }, None)
-    .await?
+  let options = FindOptions::builder()
+    .sort(doc! { "created_at": -1_i32 })
+    .skip(pagination.offset)
+    .limit(pagination.limit as i64)
+    .build();
+
+  let mut query = doc! { "application": application_id };
+  if let Some(from) = from {
+    query.insert("created_at", doc! { "$gte": to_date(from)? });
+  }
+
+  let (endpoints, count) = Endpoint::find_and_count(query, options).await?;
+  let endpoints = endpoints
     .into_iter()
     .map(Into::into)
     .collect::<Vec<PublicEndpoint>>();
 
+  let res = CustomResponseBuilder::new()
+    .body(endpoints)
+    .pagination(pagination.count(count).build())
+    .build();
+
   debug!("Returning endpoints");
-  Ok(Json(endpoints))
+  Ok(res)
 }
 
 async fn get_endpoint_by_id(
@@ -167,4 +191,11 @@ impl UpdateEndpoint {
       updated_at: now(),
     }
   }
+}
+
+fn to_date<A>(iso: A) -> Result<chrono::DateTime<chrono::Utc>, BadRequest>
+where
+  A: AsRef<str>,
+{
+  from_iso(iso.as_ref()).map_err(|_e| BadRequest::new("from", "Invalid ISO string date"))
 }

@@ -1,4 +1,4 @@
-use axum::extract::{Extension, Path};
+use axum::extract::{Extension, Path, Query};
 use axum::http::StatusCode;
 use axum::routing::{delete, get, post};
 use axum::Json;
@@ -9,12 +9,17 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tracing::debug;
 use wither::bson::{doc, oid::ObjectId};
+use wither::mongodb::options::FindOptions;
 
+use crate::errors::BadRequest;
 use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::custom_response::{CustomResponse, CustomResponseBuilder};
 use crate::lib::database_model::ModelExt;
+use crate::lib::date::from_iso;
 use crate::lib::date::Date;
+use crate::lib::pagination::PaginationBuilder;
+use crate::lib::request_query::RequestQuery;
 use crate::lib::serde::bson_datetime_option_as_rfc3339_string;
 use crate::lib::to_object_id::to_object_id;
 use crate::lib::token::UserFromToken;
@@ -51,17 +56,33 @@ async fn create_key(
 
 async fn query_key(
   Extension(application): Extension<Application>,
-) -> Result<Json<Vec<PublicKey>>, Error> {
+  Query(query): Query<RequestQuery>,
+) -> Result<CustomResponse<Vec<PublicKey>>, Error> {
   let application_id = application.id.unwrap();
+  let from = query.from.clone();
+  let pagination = PaginationBuilder::from_request_query(query);
 
-  let keys = Key::find(doc! { "application": application_id }, None)
-    .await?
-    .into_iter()
-    .map(Into::into)
-    .collect::<Vec<PublicKey>>();
+  let options = FindOptions::builder()
+    .sort(doc! { "created_at": -1_i32 })
+    .skip(pagination.offset)
+    .limit(pagination.limit as i64)
+    .build();
+
+  let mut query = doc! { "application": application_id };
+  if let Some(from) = from {
+    query.insert("created_at", doc! { "$gte": to_date(from)? });
+  }
+
+  let (keys, count) = Key::find_and_count(query, Some(options)).await?;
+  let keys = keys.into_iter().map(Into::into).collect::<Vec<PublicKey>>();
+
+  let res = CustomResponseBuilder::new()
+    .body(keys)
+    .pagination(pagination.count(count).build())
+    .build();
 
   debug!("Returning keys");
-  Ok(Json(keys))
+  Ok(res)
 }
 
 async fn remove_key_by_id(
@@ -121,4 +142,11 @@ impl CreateKeyResponse {
       created_by: key.created_by,
     }
   }
+}
+
+fn to_date<A>(iso: A) -> Result<chrono::DateTime<chrono::Utc>, BadRequest>
+where
+  A: AsRef<str>,
+{
+  from_iso(iso.as_ref()).map_err(|_e| BadRequest::new("from", "Invalid ISO string date"))
 }
