@@ -8,6 +8,7 @@ import * as RD from 'remote-data-ts';
 
 import * as crisp from '@/lib/crisp';
 import {noOp} from '@/lib/effect';
+import {external} from '@/lib/href';
 import {useAtom} from '@/lib/jotai';
 
 import {Button} from '@/components/buttons/Button';
@@ -21,7 +22,6 @@ import {KeyItem} from '@/features/KeyItem';
 import {SelectedAppAtom, useFetchOnAppChange} from '@/models/application';
 import {AppKeysAtom, deleteKey, fetchKeys, Key} from '@/models/key';
 import {NextPageWithLayout} from '@/pages/_app';
-import {external} from '@/lib/href';
 
 const AppSettingsKeys: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
