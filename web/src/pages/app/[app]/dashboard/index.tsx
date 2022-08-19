@@ -21,11 +21,11 @@ const AppDashboard: NextPageWithLayout = () => {
       (_app) => (
         <div className="space-y-8">
           <TopCardsStats />
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <Skeleton className="h-24 w-full rounded-lg" />
             <Skeleton className="h-64 w-full rounded-lg" />
             <Skeleton className="h-48 w-full rounded-lg" />
-          </div>
+          </div> */}
         </div>
       ),
     ),
@@ -54,7 +54,7 @@ const TopCardsStats = () => {
     O.map(
       ({logs, subs}): Array<Stat | undefined> => [
         {
-          name: 'Active subscriptions',
+          name: 'Subscriptions created',
           stat: subs.cur.toString(),
           previousStat: subs.prev.toString(),
           change: `${subs.change}%`,
