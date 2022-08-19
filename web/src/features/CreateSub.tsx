@@ -11,6 +11,7 @@ import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
 import {clsxm} from '@/lib/clsxm';
+import {external} from '@/lib/href';
 import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
@@ -26,7 +27,6 @@ import {
   createSubscription,
   useSetNewSubscription,
 } from '@/models/subscription';
-import {external} from '@/lib/href';
 
 const CreateSubscription_ = yup.object({
   url: yup.string().url().required(),
