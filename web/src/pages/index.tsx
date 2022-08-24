@@ -89,8 +89,8 @@ const HomePage: NextPageWithLayout = () => {
         <main>
           <Hero />
           <Features />
-          <GetStarted />
           <UsefulResources />
+          <GetStarted />
           <ByDevs />
           {
             // <HighlightedFeature />
@@ -150,12 +150,19 @@ const Navigation = () => {
                 () => (
                   <>
                     <UnstyledLink
+                      key="documentation"
+                      className="text-base font-medium text-white hover:text-gray-300"
+                      href={external('https://docs.therssproject.com')}
+                    >
+                      Documentation
+                    </UnstyledLink>
+                    <UnstyledLink
                       key="login"
                       className="text-base font-medium text-white hover:text-gray-300"
                       href={Route.login()}
                       onClick={track.landingLogin}
                     >
-                      Log in
+                      Login
                     </UnstyledLink>
                     <UnstyledLink
                       key="register"
@@ -176,13 +183,20 @@ const Navigation = () => {
                     >
                       Documentation
                     </UnstyledLink>
-                    <UnstyledLink
-                      key="dashboard"
-                      href={Route.dashboard}
-                      className="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-base font-medium text-white hover:bg-gray-700"
-                    >
-                      Dashboard
-                    </UnstyledLink>
+                    {
+                      // NOTE: this <div /> is important to fix a bug, without
+                      // it, React renders the link with href to /register (from
+                      // the non-logged-in branch)
+                    }
+                    <div>
+                      <UnstyledLink
+                        key="dashboard"
+                        href={Route.dashboard}
+                        className="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-base font-medium text-white hover:bg-gray-700"
+                      >
+                        Dashboard
+                      </UnstyledLink>
+                    </div>
                   </>
                 ),
               ),
@@ -228,13 +242,21 @@ const Navigation = () => {
                   ))}
                 </div>
               )}
+              <div className="space-y-1 px-2">
+                <UnstyledLink
+                  href={external('https://docs.therssproject.com')}
+                  className="block rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-gray-50"
+                >
+                  Documentation
+                </UnstyledLink>
+              </div>
 
               {pipe(
                 session,
                 O.match(
                   () => (
                     <>
-                      <div key="register" className="mt-6 px-5">
+                      <div key="register" className="mt-6 space-y-4 px-5">
                         <UnstyledLink
                           className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 py-3 px-4 text-center font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700"
                           href={Route.register()}
@@ -245,7 +267,7 @@ const Navigation = () => {
                       </div>
                       <div key="login" className="mt-6 px-5">
                         <p className="text-center text-base font-medium text-gray-500">
-                          Existing customer?{' '}
+                          Already have an account?{' '}
                           <UnstyledLink
                             className="text-gray-900 hover:underline"
                             href={Route.login()}
@@ -464,7 +486,7 @@ const features = [
 ];
 
 const Features = () => (
-  <section className="relative bg-gray-50 py-16 sm:py-24 lg:py-32">
+  <section className="relative bg-white py-16 sm:py-24 lg:py-32">
     <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
       {false && (
         <h2 className="text-base font-semibold uppercase tracking-wider text-cyan-600">
@@ -475,15 +497,14 @@ const Features = () => (
         Everything you need to consume feeds
       </p>
       <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
-        Phasellus lorem quam molestie id quisque diam aenean nulla in. Accumsan
-        in quis quis nunc, ullamcorper malesuada. Eleifend condimentum id
-        viverra nulla.
+        Don't worry about all the infrastructure for consuming RSS feeds, we
+        take care of that for you.
       </p>
       <div className="mt-12">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
             <div key={feature.name} className="pt-6">
-              <div className="flow-root h-full rounded-lg bg-white px-6 pb-8">
+              <div className="flow-root h-full rounded-lg bg-gray-50 px-6 pb-8 shadow-md">
                 <div className="-mt-6">
                   <div className="mb-8">
                     <span className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-teal-500 to-cyan-600 p-3 shadow-lg">
@@ -526,9 +547,8 @@ const GetStarted = () => {
           Easy to get started
         </p>
         <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
-          Phasellus lorem quam molestie id quisque diam aenean nulla in.
-          Accumsan in quis quis nunc, ullamcorper malesuada. Eleifend
-          condimentum id viverra nulla.
+          Three simple steps to start receiving webhook events to your
+          application's endpoint on RSS feeds new entries.
         </p>
 
         <div className="mt-12 space-y-12">
