@@ -3,6 +3,8 @@
 ### MVP IH
 
 - [ ] Logs => pagination
+- [x] Refetch data when navigating between pages
+- [x] Do not track localhost/development activity (at least opt-out)
 - [x] Profile WIP instead of 404
 - [x] Billing on application settings
 - [x] Logo & footer layout => Documentation, Not Found

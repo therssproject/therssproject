@@ -22,6 +22,7 @@ module.exports = {
 
     'react/display-name': 'off',
     'react/no-children-prop': 'off',
+    'react/no-unescaped-entities': 'off',
     'react/jsx-curly-brace-presence': [
       'warn',
       {props: 'never', children: 'never'},
