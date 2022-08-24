@@ -3,7 +3,7 @@ import {sequenceT} from 'fp-ts/Apply';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
-import React from 'react';
+import React, {useEffect} from 'react';
 import * as RD from 'remote-data-ts';
 
 import {useAtom} from '@/lib/jotai';
@@ -14,13 +14,35 @@ import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {Skeleton} from '@/components/Skeleton';
 
 import {LogItem} from '@/features/LogItem';
-import {Application, SelectedAppAtom} from '@/models/application';
+import {
+  Application,
+  SelectedAppAtom,
+  useRefetchAppData,
+} from '@/models/application';
 import {AppLogsAtom} from '@/models/log';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppLogs: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
   const [appLogs, _setLogs] = useAtom(AppLogsAtom);
+  const {refetchAppData} = useRefetchAppData();
+
+  useEffect(
+    () => {
+      refetchAppData();
+
+      // TODO: only trigger the logs re-fetch on the interval (useSWR?)
+      const i = setInterval(() => {
+        refetchAppData();
+      }, 5000);
+
+      return () => {
+        clearInterval(i);
+      };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const rdApp = pipe(
     currentApp,
