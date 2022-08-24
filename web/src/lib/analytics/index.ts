@@ -30,13 +30,32 @@ type Json = null | number | string | Array<Json> | {[key: string]: Json};
 
 type Payload = {[key: string]: Json};
 
-export const event = (event: string, payload?: Payload) =>
-  analytics.track(event, payload);
+export const event = (event: string, payload?: Payload) => {
+  if (window.location.host.startsWith('localhost')) {
+    // eslint-disable-next-line no-console
+    console.log('[analytics] track', event, payload);
+  } else {
+    analytics.track(event, payload);
+  }
+};
 
-export const identify = (id: string, payload?: Payload) =>
-  analytics.identify(id, payload);
+export const identify = (id: string, payload?: Payload) => {
+  if (window.location.host.startsWith('localhost')) {
+    // eslint-disable-next-line no-console
+    console.log('[analytics] identify', id, payload);
+  } else {
+    analytics.identify(id, payload);
+  }
+};
 
-export const reset = () => analytics.reset();
+export const reset = () => {
+  if (window.location.host.startsWith('localhost')) {
+    // eslint-disable-next-line no-console
+    console.log('[analytics] reset');
+  } else {
+    analytics.reset();
+  }
+};
 
 const eqSession = pipe(
   eqString,
