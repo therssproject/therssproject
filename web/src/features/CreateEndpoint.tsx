@@ -6,6 +6,7 @@ import {SubmitHandler, useForm} from 'react-hook-form';
 import * as yup from 'yup';
 
 import {FetchError} from '@/lib/fetch';
+import {external} from '@/lib/href';
 import {Route} from '@/lib/routes';
 
 import {Button} from '@/components/buttons/Button';
@@ -23,7 +24,6 @@ import {
   useSetNewEndpoint,
   useUpdateEndpoint,
 } from '@/models/endpoint';
-import {external} from '@/lib/href';
 
 type RegisterProps = {
   app: string;
