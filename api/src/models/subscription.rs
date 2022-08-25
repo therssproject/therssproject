@@ -106,7 +106,7 @@ impl Subscription {
     let mut update = doc! {
       "$set": {
         "last_notified_entry": last_entry_id,
-        "notified_at": webhook.sent_at,
+        "notified_at": webhook.created_at,
       },
     };
 

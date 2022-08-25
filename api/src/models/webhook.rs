@@ -21,8 +21,8 @@ impl ModelExt for Webhook {
 
 // TODO: Add response status to the webhook model.
 #[derive(Debug, Clone, Serialize, Deserialize, WitherModel, Validate)]
-#[model(index(keys = r#"doc!{ "application": 1, "sent_at": 1 }"#))]
-#[model(index(keys = r#"doc!{ "application": 1, "subscription": 1, "sent_at": 1 }"#))]
+#[model(index(keys = r#"doc!{ "application": 1, "created_at": 1 }"#))]
+#[model(index(keys = r#"doc!{ "application": 1, "subscription": 1, "created_at": 1 }"#))]
 pub struct Webhook {
   #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
   pub id: Option<ObjectId>,
@@ -37,7 +37,6 @@ pub struct Webhook {
   pub endpoint_url: String,
   pub feed_url: String,
   pub feed_title: Option<String>,
-  pub sent_at: Date,
   pub created_at: Date,
 }
 
@@ -66,8 +65,6 @@ pub struct PublicWebhook {
   pub feed_title: Option<String>,
   #[serde(with = "bson_datetime_as_rfc3339_string")]
   pub created_at: Date,
-  #[serde(with = "bson_datetime_as_rfc3339_string")]
-  pub sent_at: Date,
 }
 
 impl From<Webhook> for PublicWebhook {
@@ -83,7 +80,6 @@ impl From<Webhook> for PublicWebhook {
       feed_url: webhook.feed_url,
       feed_title: webhook.feed_title,
       created_at: webhook.created_at,
-      sent_at: webhook.sent_at,
     }
   }
 }
