@@ -51,7 +51,6 @@ fn get_webhooks_with_no_authentication_header() {
       endpoint_url: endpoint.url.clone(),
       feed_url: subscription_url.to_string(),
       feed_title: Some("Rust".to_owned()),
-      sent_at: date::now(),
       created_at: date::now(),
     };
     Webhook::create(webhook).await.unwrap();
@@ -107,7 +106,6 @@ fn get_webhooks_with_invalid_authentication_header() {
       endpoint_url: endpoint.url.clone(),
       feed_url: subscription_url.to_string(),
       feed_title: Some("Rust".to_owned()),
-      sent_at: date::now(),
       created_at: date::now(),
     };
     Webhook::create(webhook).await.unwrap();
@@ -167,7 +165,6 @@ fn get_webhooks_with_valid_authentication_header() {
       endpoint_url: endpoint.url.clone(),
       feed_url: subscription_url.to_string(),
       feed_title: Some("Rust".to_owned()),
-      sent_at: date::now(),
       created_at: date::now(),
     };
     let webhook = Webhook::create(webhook).await.unwrap();
@@ -245,7 +242,6 @@ fn get_webhooks_with_from_querystring_when_range_includes_only_one_webhook() {
       endpoint_url: endpoint.url.clone(),
       feed_url: subscription_url.to_string(),
       feed_title: Some("Rust".to_owned()),
-      sent_at: last_week,
       created_at: last_week,
     };
     Webhook::create(first_webhook).await.unwrap();
@@ -261,7 +257,6 @@ fn get_webhooks_with_from_querystring_when_range_includes_only_one_webhook() {
       endpoint_url: endpoint.url.clone(),
       feed_url: subscription_url.to_string(),
       feed_title: Some("Rust".to_owned()),
-      sent_at: date::now(),
       created_at: date::now(),
     };
     let second_webhook = Webhook::create(second_webhook).await.unwrap();
@@ -342,7 +337,6 @@ fn get_webhooks_with_from_querystring_when_range_includes_two_webhook() {
       endpoint_url: endpoint.url.clone(),
       feed_url: subscription_url.to_string(),
       feed_title: Some("Rust".to_owned()),
-      sent_at: last_week,
       created_at: last_week,
     };
     let first_webhook = Webhook::create(first_webhook).await.unwrap();
@@ -359,7 +353,6 @@ fn get_webhooks_with_from_querystring_when_range_includes_two_webhook() {
       endpoint_url: endpoint.url.clone(),
       feed_url: subscription_url.to_string(),
       feed_title: Some("Rust".to_owned()),
-      sent_at: date::now(),
       created_at: date::now(),
     };
     let second_webhook = Webhook::create(second_webhook).await.unwrap();

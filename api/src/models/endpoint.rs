@@ -14,7 +14,6 @@ use wither::Model as WitherModel;
 use crate::errors::Error;
 use crate::errors::NotFound;
 use crate::lib::database_model::ModelExt;
-use crate::lib::date;
 use crate::lib::date::{now, Date};
 use crate::models::entry::Entry;
 use crate::models::feed::Feed;
@@ -113,8 +112,6 @@ impl Endpoint {
       metadata,
     };
 
-    // TODO: Update sent_at in case the webhook is retried. Also store the retry
-    // count.
     let sent_at = now();
     let policy = RetryPolicy::exponential(Duration::from_millis(200))
       .with_max_retries(3)
@@ -142,8 +139,7 @@ impl Endpoint {
       endpoint_url,
       feed_url: feed.url,
       feed_title: feed.title,
-      sent_at,
-      created_at: date::now(),
+      created_at: sent_at,
     };
 
     let webhook = Webhook::create(webhook).await?;
