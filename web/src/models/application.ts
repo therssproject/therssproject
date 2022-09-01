@@ -173,10 +173,12 @@ const fetchStats = (app: string) =>
       twoWeeksAgo: addDays(now, -14).toISOString(),
     }),
     ({lastWeek, twoWeeksAgo}) => [
-      fetchSubscriptions(app, {limit: 0, from: lastWeek}),
-      fetchSubscriptions(app, {limit: 0, from: twoWeeksAgo}),
-      fetchLogs(app, {limit: 0, from: lastWeek}),
-      fetchLogs(app, {limit: 0, from: twoWeeksAgo}),
+      // Fetch subscriptions and logs should use a limit of 0 but the backend
+      // doesn't support this yet, so as a workaround we use 1.
+      fetchSubscriptions(app, {limit: 1, from: lastWeek}),
+      fetchSubscriptions(app, {limit: 1, from: twoWeeksAgo}),
+      fetchLogs(app, {limit: 1, from: lastWeek}),
+      fetchLogs(app, {limit: 1, from: twoWeeksAgo}),
     ],
     A.map(TE.map(grabCount)),
     TE.sequenceArray,
