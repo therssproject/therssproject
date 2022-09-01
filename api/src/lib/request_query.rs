@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct RequestQuery {
   pub from: Option<String>,
   pub offset: Option<u64>,

@@ -9,6 +9,7 @@ use tracing::error;
 
 use crate::lib::pagination::Pagination;
 
+#[derive(Debug)]
 pub struct CustomResponse<T: Serialize> {
   pub body: Option<T>,
   pub status_code: StatusCode,
