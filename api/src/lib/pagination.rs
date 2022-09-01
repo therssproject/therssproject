@@ -5,7 +5,7 @@ use crate::lib::request_query::RequestQuery;
 const LIMIT: u64 = 50;
 const OFFSET: u64 = 0;
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct Pagination {
   pub count: u64,
   pub offset: u64,
