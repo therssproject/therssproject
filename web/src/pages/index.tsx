@@ -452,28 +452,28 @@ const features = [
     name: 'RSS, Atom & JSON',
     soon: false,
     description:
-      "Don't worry about the feed format. We take care of that for you.",
+      'We support most feed formats. Atom, JSON and all RSS variants.',
     icon: RssIcon,
   },
   {
     name: 'Almost real time',
     soon: false,
     description:
-      'Get webhook events almost real time on your feed subscriptions.',
+      'Get webhook events almost on real time on your feed subscriptions. (Premium users get faster updates)',
     icon: LightningBoltIcon,
   },
   {
     name: 'Tracking Webhook Events',
     soon: false,
     description:
-      'We keep a record of all the webhook envents sent you your endpoints. Access them at any time through the UI.',
+      'We keep a record of the webhook envents sent to your endpoints. Access them at any time through the UI.',
     icon: ViewListIcon,
   },
   {
-    name: 'UI & API',
+    name: 'Dashboard & API',
     soon: false,
     description:
-      'Register endpoints, subscribe and parse feeds all through our simple API or from the UI, whichever works better for your.',
+      'Register endpoints, subscribe and parse feeds all through our simple API or from the dashboard, whichever works better for your.',
     icon: CloudUploadIcon,
   },
   {
@@ -497,8 +497,8 @@ const Features = () => (
         Everything you need to consume feeds
       </p>
       <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
-        Don't worry about all the infrastructure for consuming RSS feeds, we
-        take care of that for you.
+        Don't worry about the infrastructure for consuming RSS feeds, we take
+        care of that for you.
       </p>
       <div className="mt-12">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
