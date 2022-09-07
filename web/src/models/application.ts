@@ -248,15 +248,15 @@ export const useFetchAppData = () => {
     setEndpoints,
   );
 
-  useFetchOnAppChange(
-    (app) =>
-      pipe(
-        fetchLogs(app.id),
-        TE.map((res) => res.data),
-        TE.mapLeft(() => 'Failed to fetch logs'),
-      ),
-    currentApp,
-    logs,
-    setLogs,
-  );
+  // useFetchOnAppChange(
+  //   (app) =>
+  //     pipe(
+  //       fetchLogs(app.id),
+  //       TE.map((res) => res.data),
+  //       TE.mapLeft(() => 'Failed to fetch logs'),
+  //     ),
+  //   currentApp,
+  //   logs,
+  //   setLogs,
+  // );
 };

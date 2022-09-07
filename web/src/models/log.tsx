@@ -23,7 +23,6 @@ export const Log = te.sparseType({
   feed_url: t.string,
   feed_title: te.optional(t.string),
   created_at: t.string,
-  sent_at: t.string,
 });
 
 export interface Log extends t.TypeOf<typeof Log> {}
