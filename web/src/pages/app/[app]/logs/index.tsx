@@ -1,47 +1,37 @@
+import * as TE from 'fp-ts/TaskEither';
 import {ViewListIcon} from '@heroicons/react/outline';
 import {sequenceT} from 'fp-ts/Apply';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
-import React, {useEffect} from 'react';
+import React from 'react';
 import * as RD from 'remote-data-ts';
 
 import {useAtom} from '@/lib/jotai';
 import {Route} from '@/lib/routes';
+import {useSWR} from '@/lib/swr';
 
 import {Layout} from '@/components/layout/Layout';
 import {PrimaryLink} from '@/components/links/PrimaryLink';
 import {Skeleton} from '@/components/Skeleton';
 
 import {LogItem} from '@/features/LogItem';
-import {
-  Application,
-  SelectedAppAtom,
-  useRefetchAppData,
-} from '@/models/application';
-import {AppLogsAtom} from '@/models/log';
+import {Application, SelectedAppAtom} from '@/models/application';
+import {AppLogsAtom, fetchLogs} from '@/models/log';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppLogs: NextPageWithLayout = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
-  const [appLogs, _setLogs] = useAtom(AppLogsAtom);
-  const {refetchAppData} = useRefetchAppData();
 
-  useEffect(
-    () => {
-      refetchAppData();
+  const appId = O.toUndefined(currentApp)?.id ?? '<loading>';
 
-      // TODO: only trigger the logs re-fetch on the interval (useSWR?)
-      const i = setInterval(() => {
-        refetchAppData();
-      }, 5000);
-
-      return () => {
-        clearInterval(i);
-      };
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+  const {data: appLogs} = useSWR(
+    `/${appId}/logs`,
+    pipe(
+      fetchLogs(appId),
+      TE.map((res) => res.data),
+      TE.mapLeft(() => 'Failed to fetch logs'),
+    ),
   );
 
   const rdApp = pipe(

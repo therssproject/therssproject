@@ -50,6 +50,7 @@
     "react-hot-toast": "^2.2.0",
     "react-icons": "^4.3.1",
     "remote-data-ts": "^3.0.1",
+    "swr": "^1.3.0",
     "tailwind-merge": "^1.2.0",
     "ts-pattern": "^4.0.1",
     "yup": "^0.32.11"

@@ -67,7 +67,7 @@ export const LogItem = ({log}: {log: Log}) => {
             )}{' '}
             <time
               className="text-gray-600"
-              dateTime={log.sent_at}
+              dateTime={log.created_at}
               title={date.format(sentAt, 'yyyy/MM/dd HH:MM:SS')}
             >
               {date.formatRelative(sentAt, Date.now())} (
