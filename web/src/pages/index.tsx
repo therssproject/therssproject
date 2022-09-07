@@ -459,7 +459,7 @@ const features = [
     name: 'Almost real time',
     soon: false,
     description:
-      'Get webhook events almost on real time on your feed subscriptions. (Premium users get faster updates)',
+      'Get webhook events almost on real time on your feed subscriptions. Premium users get even faster updates.',
     icon: LightningBoltIcon,
   },
   {
