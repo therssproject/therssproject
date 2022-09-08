@@ -19,6 +19,8 @@ jobs:
           -H "Authorization: $TOKEN" \
           -H "Content-Type: application/json" \
           -X POST "$WEBHOOK"
+
+        exit $?
       env:
         WEBHOOK: ${{ secrets.deploy_webhook }}
         TOKEN: ${{ secrets.DEPLOY_TOKEN }}
