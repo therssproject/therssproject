@@ -1,9 +1,9 @@
-import * as TE from 'fp-ts/TaskEither';
 import {ViewListIcon} from '@heroicons/react/outline';
 import {sequenceT} from 'fp-ts/Apply';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
+import * as TE from 'fp-ts/TaskEither';
 import React from 'react';
 import * as RD from 'remote-data-ts';
 
@@ -17,7 +17,7 @@ import {Skeleton} from '@/components/Skeleton';
 
 import {LogItem} from '@/features/LogItem';
 import {Application, SelectedAppAtom} from '@/models/application';
-import {AppLogsAtom, fetchLogs} from '@/models/log';
+import {fetchLogs} from '@/models/log';
 import {NextPageWithLayout} from '@/pages/_app';
 
 const AppLogs: NextPageWithLayout = () => {
@@ -32,6 +32,7 @@ const AppLogs: NextPageWithLayout = () => {
       TE.map((res) => res.data),
       TE.mapLeft(() => 'Failed to fetch logs'),
     ),
+    {refreshInterval: 5000},
   );
 
   const rdApp = pipe(
