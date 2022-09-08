@@ -19,7 +19,7 @@ import {useAtom} from '@/lib/jotai';
 import {useRouteOfType} from '@/lib/routing';
 
 import {AppEndpointsAtom, fetchEndpoints} from './endpoint';
-import {AppLogsAtom, fetchLogs} from './log';
+import {fetchLogs} from './log';
 import {AppSubscriptionsAtom, fetchSubscriptions} from './subscription';
 
 export const Application = te.sparseType({
@@ -220,7 +220,6 @@ export const useFetchAppData = () => {
 
   const [subscriptions, setSubscriptions] = useAtom(AppSubscriptionsAtom);
   const [endpoints, setEndpoints] = useAtom(AppEndpointsAtom);
-  const [logs, setLogs] = useAtom(AppLogsAtom);
 
   useFetchAppStats(currentApp);
 
@@ -247,16 +246,4 @@ export const useFetchAppData = () => {
     endpoints,
     setEndpoints,
   );
-
-  // useFetchOnAppChange(
-  //   (app) =>
-  //     pipe(
-  //       fetchLogs(app.id),
-  //       TE.map((res) => res.data),
-  //       TE.mapLeft(() => 'Failed to fetch logs'),
-  //     ),
-  //   currentApp,
-  //   logs,
-  //   setLogs,
-  // );
 };
