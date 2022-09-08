@@ -15,13 +15,12 @@ jobs:
     - name: Notify Subilo
       shell: bash
       run: |
-        curl -d '{ "name": "therssproject" }' \
-          -H "Authorization: $TOKEN" \
+        curl -v -d '{ "name": "therssproject" }' \
+          -H "Authorization: Bearer $TOKEN" \
           -H "Content-Type: application/json" \
           -X POST "$WEBHOOK"
-
         exit $?
       env:
         WEBHOOK: ${{ secrets.deploy_webhook }}
-        TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        TOKEN: ${{ secrets.deploy_token }}
         ACTIONS_ALLOW_UNSECURE_COMMANDS: true
