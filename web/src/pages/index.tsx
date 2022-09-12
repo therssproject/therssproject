@@ -446,7 +446,7 @@ export const ByDevs = () => (
           For developers, by developers
         </p>
         <p className="mt-3 text-lg text-gray-300">
-          We made <code>therssproject> to meet our own needs,
+          We made <code>therssproject</code> to meet our own needs,
           we are using it as a service in other projects. If you would
           like to see any specific feature added, please let us know.
           We hope you find it useful.
