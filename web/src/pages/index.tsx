@@ -89,8 +89,9 @@ const HomePage: NextPageWithLayout = () => {
         <main>
           <Hero />
           <Features />
-          <UsefulResources />
           <GetStarted />
+          <Embed />
+          <UsefulResources />
           <ByDevs />
           {
             // <HighlightedFeature />
@@ -405,6 +406,24 @@ const Hero = () => {
   );
 };
 
+const Embed = () => (
+  <section className="relative bg-white py-16 sm:py-24 lg:py-32">
+    <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-5xl lg:px-8">
+      <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+        See it in action
+      </p>
+      <iframe
+        className="aspect-video w-full mt-16"
+        src="https://www.youtube.com/embed/oA8RPjf9g-M"
+        title="Send messages to Discord on new RSS feed entries with therssproject API"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    </div>
+  </section>
+);
+
 export const ByDevs = () => (
   <section className="relative bg-gray-900">
     <div className="relative h-56 bg-indigo-600 sm:h-72 md:absolute md:left-0 md:h-full md:w-1/2">
@@ -541,7 +560,7 @@ const GetStarted = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
 
   return (
-    <section className="relative bg-white py-16 sm:py-24 lg:py-32">
+    <section className="relative bg-gray-50 py-16 sm:py-24 lg:py-32">
       <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-5xl lg:px-8">
         <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
           Easy to get started
