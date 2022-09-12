@@ -413,7 +413,7 @@ const Embed = () => (
         See it in action
       </p>
       <iframe
-        className="aspect-video w-full mt-16"
+        className="mt-16 aspect-video w-full"
         src="https://www.youtube.com/embed/oA8RPjf9g-M"
         title="Send messages to Discord on new RSS feed entries with therssproject API"
         frameBorder="0"
