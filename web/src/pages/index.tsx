@@ -427,10 +427,9 @@ export const ByDevs = () => (
           For developers, by developers
         </p>
         <p className="mt-3 text-lg text-gray-300">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Et, egestas
-          tempus tellus etiam sed. Quam a scelerisque amet ullamcorper eu enim
-          et fermentum, augue. Aliquet amet volutpat quisque ut interdum
-          tincidunt duis.
+          We made this project to solve our needs, our friends and we are using
+          it as a service to build our own products. If you require more features,
+          please let us know. We hope you find it useful.
         </p>
         <div className="mt-8">
           <div className="inline-flex rounded-md shadow">
