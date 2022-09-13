@@ -1,11 +1,12 @@
 use bson::serde_helpers::bson_datetime_as_rfc3339_string;
 use bson::serde_helpers::serialize_object_id_as_hex_string;
-use feed_rs;
+use feed_rs::model::Feed as RawFeed;
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
 use tracing::{debug, error};
 use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
+use wither::mongodb::options::FindOptions;
 use wither::Model as WitherModel;
 
 use crate::errors::Error;
@@ -87,6 +88,9 @@ impl Feed {
       }
     };
 
+    // TODO: Send a raw_feed copy.
+    let is_synced = feed.is_synced(&raw_feed).await?;
+
     let entries = raw_feed
       .entries
       .into_iter()
@@ -114,6 +118,36 @@ impl Feed {
     debug!("Finished syncing feed {} elapsed={:.0?}", &id, duration);
 
     Ok(())
+  }
+
+  async fn is_synced(&self, raw_feed: RawFeed) -> Result<bool, Error> {
+    let feed_id = self.id.clone().unwrap();
+    let their_entries_ids = raw_feed
+      .entries
+      .into_iter()
+      // If the first 3 items are the same, we consider the feed to be in
+      // synced. We assume good behavior, and we do not process a new inserted
+      // entry that is not at the top.
+      .take(3)
+      .map(|raw_entry| raw_entry.id)
+      .collect::<Vec<String>>();
+
+    let our_entries = <Entry as ModelExt>::find(
+      doc! { "feed": &feed_id },
+      FindOptions::builder()
+        .sort(doc! { "_id": -1_i32 })
+        .limit(3)
+        .build(),
+    )
+    .await?;
+
+    let our_entries_ids = our_entries.into_iter().map(|entry| entry.public_id);
+    let is_synced = their_entries_ids
+      .into_iter()
+      .zip(our_entries_ids)
+      .all(|(their_entry_id, our_entry_id)| their_entry_id == our_entry_id);
+
+    Ok(is_synced)
   }
 
   /// Remove this feed and all its entries from the database.
