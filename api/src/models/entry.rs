@@ -115,8 +115,9 @@ impl Entry {
     debug!("Removed {} outdated entries from feed {}", removed, feed);
     // If items were removed, it means new entries were added. We don't care if
     // entries were updated.
-    let was_synced = removed > 0;
-    Ok(was_synced)
+    // let was_synced = removed > 0;
+    // TODO: Update algorithm to check if entries were actually added.
+    Ok(true)
   }
 }
 
