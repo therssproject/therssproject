@@ -45,6 +45,34 @@ const navigation: NavLink[] = [
 
 const blogPosts = [
   {
+    title: 'Send messages to Discord on new feed entries',
+    href: external('https://www.youtube.com/watch?v=oA8RPjf9g-M'),
+    date: 'Jul 28, 2022',
+    datetime: '2022-07-28',
+    category: 'Video',
+    imageUrl: '/images/discord-video.png',
+    preview: (
+      <>
+        Send messages to a channel on a Discord server using the Discord Webhook
+        Integration when an RSS feed receives new entries.{' '}
+        <PrimaryLink
+          href={external(
+            'https://github.com/therssproject/documentation/tree/main/examples/discord-webhook',
+          )}
+        >
+          View code on GitHub
+        </PrimaryLink>
+        .
+      </>
+    ),
+    author: {
+      name: 'Christian Gill',
+      imageUrl: 'https://avatars.githubusercontent.com/u/8309423?v=4',
+      href: external('https://gillchristian.xyz'),
+    },
+    readingLength: '5 min',
+  },
+  {
     title: 'therssproject API Documentation',
     href: external('https://docs.therssproject.com'),
     date: 'Jul 25, 2022',
@@ -59,25 +87,6 @@ const blogPosts = [
     },
     readingLength: '5 min',
   },
-  {
-    title: 'Send messages to Discord on new feed entries',
-    href: external(
-      'https://github.com/therssproject/documentation/tree/main/examples/discord-webhook',
-    ),
-    date: 'Jul 28, 2022',
-    datetime: '2022-07-28',
-    category: 'Example',
-    imageUrl:
-      'https://github.com/therssproject/documentation/blob/main/examples/discord-webhook/assets/discord-webhook-integration.png?raw=true',
-    preview:
-      'Send messages to a channel on a Discord server using the Discord Webhook Integration when an RSS feed receives new entries.',
-    author: {
-      name: 'Christian Gill',
-      imageUrl: 'https://avatars.githubusercontent.com/u/8309423?v=4',
-      href: external('https://gillchristian.xyz'),
-    },
-    readingLength: '5 min',
-  },
 ];
 
 const HomePage: NextPageWithLayout = () => {
@@ -89,16 +98,8 @@ const HomePage: NextPageWithLayout = () => {
         <main>
           <Hero />
           <Features />
-          <GetStarted />
-          <Embed />
           <UsefulResources />
           <ByDevs />
-          {
-            // <HighlightedFeature />
-          }
-          {
-            // <Testimonial />
-          }
         </main>
         <Footer />
       </div>
@@ -406,7 +407,7 @@ const Hero = () => {
   );
 };
 
-const Embed = () => (
+const _Embed = () => (
   <section className="relative bg-white py-16 sm:py-24 lg:py-32">
     <div className="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-5xl lg:px-8">
       <p className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
@@ -446,10 +447,10 @@ export const ByDevs = () => (
           For developers, by developers
         </p>
         <p className="mt-3 text-lg text-gray-300">
-          We made <code>therssproject</code> to meet our own needs,
-          we are using it as a service in other projects. If you would
-          like to see any specific feature added, please let us know.
-          We hope you find it useful.
+          We made <code>therssproject</code> to meet our own needs, we are using
+          it as a service in other projects. If you would like to see any
+          specific feature added, please let us know. We hope you find it
+          useful.
         </p>
         <div className="mt-8">
           <div className="inline-flex rounded-md shadow">
@@ -556,7 +557,7 @@ const Features = () => (
   </section>
 );
 
-const GetStarted = () => {
+const _GetStarted = () => {
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
 
   return (
@@ -714,7 +715,10 @@ const UsefulResources = () => (
                   <div className="flex space-x-1 text-sm text-gray-500">
                     <time dateTime={post.datetime}>{post.date}</time>
                     <span aria-hidden="true">&middot;</span>
-                    <span>{post.readingLength} read</span>
+                    <span>
+                      {post.readingLength}
+                      {post.category === 'Video' ? '' : ' read'}
+                    </span>
                   </div>
                 </div>
               </div>
