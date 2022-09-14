@@ -63,11 +63,7 @@ impl Entry {
   /// Order is extremely important, entries should be sorted chronologically
   /// (From oldest to newest). The biggest MongoDB ID will end up being the most
   /// recent feed entry.
-  pub async fn sync(feed: &ObjectId, entries: Vec<Entry>) -> Result<bool, Error> {
-    if entries.is_empty() {
-      return Ok(false);
-    }
-
+  pub async fn sync(feed: &ObjectId, entries: Vec<Entry>) -> Result<(), Error> {
     let entries_count: u64 = entries
       .len()
       .try_into()
@@ -111,13 +107,9 @@ impl Entry {
         res.deleted_count
       }
     };
-
     debug!("Removed {} outdated entries from feed {}", removed, feed);
-    // If items were removed, it means new entries were added. We don't care if
-    // entries were updated.
-    // let was_synced = removed > 0;
-    // TODO: Update algorithm to check if entries were actually added.
-    Ok(true)
+
+    Ok(())
   }
 }
 
