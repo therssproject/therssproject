@@ -88,7 +88,7 @@ impl Feed {
       }
     };
 
-    let has_entries = raw_feed.entries.len() > 0;
+    let has_entries = !raw_feed.entries.is_empty();
     if !has_entries {
       debug!("Feed {} has no entries", &id);
       return Ok(());
@@ -147,7 +147,7 @@ impl Feed {
   /// and compare them with the last entries stored in the database. If the
   /// entries are the same, the feed is synced.
   async fn is_synced(&self, raw_feed: &RawFeed) -> Result<bool, Error> {
-    let feed_id = self.id.clone().unwrap();
+    let feed_id = self.id.unwrap();
     let their_entries_ids = raw_feed
       .entries
       .iter()
@@ -155,8 +155,7 @@ impl Feed {
       // synced. We assume good behavior, and we do not process a new inserted
       // entry that is not at the top.
       .take(3)
-      .map(|raw_entry| raw_entry.id.clone())
-      .collect::<Vec<String>>();
+      .map(|raw_entry| raw_entry.id.clone());
 
     let our_entries = <Entry as ModelExt>::find(
       doc! { "feed": &feed_id },
@@ -167,13 +166,12 @@ impl Feed {
     )
     .await?;
 
-    if our_entries.len() == 0 {
+    if our_entries.is_empty() {
       return Ok(false);
     }
 
     let our_entries_ids = our_entries.into_iter().map(|entry| entry.public_id);
     let is_synced = their_entries_ids
-      .into_iter()
       .zip(our_entries_ids)
       .all(|(their_entry_id, our_entry_id)| their_entry_id == our_entry_id);
 
