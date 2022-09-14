@@ -77,7 +77,7 @@ impl Feed {
       }
     };
 
-    let url = feed.url;
+    let url = feed.url.clone();
     let raw_feed = get_feed(url.clone()).await;
     let raw_feed = match raw_feed {
       Ok(raw_feed) => raw_feed,
@@ -88,8 +88,17 @@ impl Feed {
       }
     };
 
-    // TODO: Send a raw_feed copy.
+    let has_entries = raw_feed.entries.len() > 0;
+    if !has_entries {
+      debug!("Feed {} has no entries", &id);
+      return Ok(());
+    }
+
     let is_synced = feed.is_synced(&raw_feed).await?;
+    if is_synced {
+      debug!("Feed {} is synced", &id);
+      return Ok(());
+    }
 
     let entries = raw_feed
       .entries
@@ -100,19 +109,33 @@ impl Feed {
       .map(|raw_entry| Entry::from_raw_entry(id, raw_entry))
       .collect::<Vec<Entry>>();
 
-    let was_inserted = Entry::sync(&id, entries).await?;
+    Entry::sync(&id, entries).await?;
     let synced_at = now();
-    let mut update = doc! { "synced_at": &synced_at };
 
-    Self::update_one(doc! { "_id": &id }, doc! { "$set": &update }, None).await?;
+    Self::update_one(
+      doc! { "_id": &id },
+      doc! {
+        "$set": {
+          "synced_at": &synced_at
+        }
+      },
+      None,
+    )
+    .await?;
 
-    // Update subscriptions. If the feed has new entries, set the scheduled_at
-    // attribute so the subscription scheduler picks up this subscription to
-    // notify the user with the new entries.
-    if was_inserted {
-      update.insert("scheduled_at", synced_at);
-    }
-    Subscription::update_many(doc! { "feed": &id }, doc! { "$set": update}, None).await?;
+    // Set the scheduled_at attribute so the subscription scheduler picks up
+    // this subscription to notify the user with the new entries.
+    Subscription::update_many(
+      doc! { "feed": &id },
+      doc! {
+          "$set": {
+            "synced_at": &synced_at,
+            "scheduled_at": now()
+          }
+      },
+      None,
+    )
+    .await?;
 
     let duration = start.elapsed();
     debug!("Finished syncing feed {} elapsed={:.0?}", &id, duration);
@@ -120,16 +143,19 @@ impl Feed {
     Ok(())
   }
 
-  async fn is_synced(&self, raw_feed: RawFeed) -> Result<bool, Error> {
+  /// Check if the feed has new entries. We take the last entries from the feed
+  /// and compare them with the last entries stored in the database. If the
+  /// entries are the same, the feed is synced.
+  async fn is_synced(&self, raw_feed: &RawFeed) -> Result<bool, Error> {
     let feed_id = self.id.clone().unwrap();
     let their_entries_ids = raw_feed
       .entries
-      .into_iter()
+      .iter()
       // If the first 3 items are the same, we consider the feed to be in
       // synced. We assume good behavior, and we do not process a new inserted
       // entry that is not at the top.
       .take(3)
-      .map(|raw_entry| raw_entry.id)
+      .map(|raw_entry| raw_entry.id.clone())
       .collect::<Vec<String>>();
 
     let our_entries = <Entry as ModelExt>::find(
@@ -140,6 +166,10 @@ impl Feed {
         .build(),
     )
     .await?;
+
+    if our_entries.len() == 0 {
+      return Ok(false);
+    }
 
     let our_entries_ids = our_entries.into_iter().map(|entry| entry.public_id);
     let is_synced = their_entries_ids
