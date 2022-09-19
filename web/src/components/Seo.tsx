@@ -6,7 +6,10 @@ import {openGraph} from '@/lib/helper';
 const defaultMeta = {
   title: 'therssproject',
   siteName: 'therssproject',
-  description: 'Turn RSS feeds into webhook events',
+  description:
+    'Consume and subscribe to RSS, Atom, and JSON feeds programmatically',
+  keywords:
+    'rss api, webhook, atom, rss, json, feeds, subscribe, events, pubsub, api, programmatically',
   // IMPORTANT no additional '/' at the end
   url: 'https://therssproject.com',
   type: 'website',
@@ -43,6 +46,7 @@ export const Seo = (props: Props) => {
       <meta content={meta.description} name="description" />
       <meta property="og:url" content={`${meta.url}${router.asPath}`} />
       <link rel="canonical" href={`${meta.url}${router.asPath}`} />
+      <meta name="keywords" content={meta.keywords} />
       {/* Open Graph */}
       <meta property="og:type" content={meta.type} />
       <meta property="og:site_name" content={meta.siteName} />
