@@ -47,14 +47,14 @@ const blogPosts = [
   {
     title: 'Send messages to Discord on new feed entries',
     href: external('https://www.youtube.com/watch?v=oA8RPjf9g-M'),
-    date: 'Jul 28, 2022',
-    datetime: '2022-07-28',
+    date: 'Jul 29, 2022',
+    datetime: '2022-07-29',
     category: 'Video',
     imageUrl: '/images/discord-video.png',
     preview: (
       <>
-        Send messages to a channel on a Discord server using the Discord Webhook
-        Integration when an RSS feed receives new entries.{' '}
+        Use the Discord Webhook Integration to send messages to a Discord
+        channel when an RSS feed receives new entries.{' '}
         <PrimaryLink
           href={external(
             'https://github.com/therssproject/documentation/tree/main/examples/discord-webhook',
@@ -70,7 +70,25 @@ const blogPosts = [
       imageUrl: 'https://avatars.githubusercontent.com/u/8309423?v=4',
       href: external('https://gillchristian.xyz'),
     },
-    readingLength: '5 min',
+    readingLength: '4 min',
+  },
+  {
+    title: 'How to receive webhooks from public repositories events on Github',
+    href: external(
+      'https://medium.com/@ndelvalle/how-to-receive-webhooks-from-public-repositories-events-on-github-600bf5d56dc0',
+    ),
+    date: 'Sep 17, 2022',
+    datetime: '2022-09-17',
+    category: 'Blog post',
+    imageUrl: '/images/github-feeds.png',
+    preview:
+      'Github exposes Atom feeds of public repository releases, commits, tags, and other information. These feeds can be used to generate a webhook when new entries are added.',
+    author: {
+      name: 'Nicolas del Valle',
+      imageUrl: 'https://avatars.githubusercontent.com/u/6719053?v=4',
+      href: external('https://github.com/ndelvalle'),
+    },
+    readingLength: '2 min',
   },
   {
     title: 'therssproject API Documentation',
@@ -85,7 +103,7 @@ const blogPosts = [
       imageUrl: 'https://avatars.githubusercontent.com/u/6719053?v=4',
       href: external('https://github.com/ndelvalle'),
     },
-    readingLength: '5 min',
+    readingLength: '7 min',
   },
 ];
 
@@ -345,9 +363,9 @@ const Hero = () => {
                 </span>
               </h1>
               <p className="text-base text-gray-300 sm:text-xl lg:text-lg xl:text-xl">
-                Programmatically subscribe and consume
+                Consume and subscribe to
                 <br />
-                RSS, Atom, and JSON feeds.
+                RSS, Atom, and JSON feeds programmatically.
               </p>
               {pipe(
                 session,
@@ -447,10 +465,9 @@ export const ByDevs = () => (
           For developers, by developers
         </p>
         <p className="mt-3 text-lg text-gray-300">
-          We made <code>therssproject</code> to meet our own needs, we are using
-          it as a service in other projects. If you would like to see any
-          specific feature added, please let us know. We hope you find it
-          useful.
+          We created <code>therssproject</code> to meet our own requirements,
+          and use it as a service in other projects. Please let us know if you
+          would like to see a specific feature added. We hope you find useful.
         </p>
         <div className="mt-8">
           <div className="inline-flex rounded-md shadow">
@@ -479,28 +496,28 @@ const features = [
     name: 'Almost real time',
     soon: false,
     description:
-      'Get webhook events almost on real time on your feed subscriptions. Premium users get even faster updates.',
+      'Get webhook events almost in real time from your feed subscriptions. Premium subscribers receive even faster updates.',
     icon: LightningBoltIcon,
   },
   {
     name: 'Tracking Webhook Events',
     soon: false,
     description:
-      'We keep a record of the webhook envents sent to your endpoints. Access them at any time through the UI.',
+      'We keep track of the webhook events sent to your endpoints. You access them at any time from the UI.',
     icon: ViewListIcon,
   },
   {
     name: 'Dashboard & API',
     soon: false,
     description:
-      'Register endpoints, subscribe and parse feeds all through our simple API or from the dashboard, whichever works better for your.',
+      'Register endpoints, subscribe to and parse feeds using our API or the dashboard, whichever is more convenient for you.',
     icon: CloudUploadIcon,
   },
   {
     name: 'Transformers',
     soon: true,
     description:
-      'Apply transforms to the webhook event body to match the payload that your endpoint expects.',
+      'Transform the webhook event body to match the payload expected by your endpoint.',
     icon: CodeIcon,
   },
 ];
@@ -517,8 +534,9 @@ const Features = () => (
         Everything you need to consume feeds
       </p>
       <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
-        Don't worry about the infrastructure for consuming RSS feeds, we take
-        care of that for you.
+        We take care of the infrastructure required to consume RSS feeds,
+        <br />
+        so you don't have to.
       </p>
       <div className="mt-12">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -659,8 +677,7 @@ const UsefulResources = () => (
           Helpful Resources
         </p>
         <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
-          Guides and examples on how to quickly get started with therssproject
-          UI and API.
+          Guides and examples for getting started quickly with therssproject.
         </p>
       </div>
       <div className="mx-auto mt-12 grid max-w-md gap-8 px-4 sm:max-w-lg sm:px-6 lg:max-w-7xl lg:grid-cols-3 lg:px-8">
