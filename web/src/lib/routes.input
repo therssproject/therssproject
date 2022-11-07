@@ -1,0 +1,29 @@
+# Public
+/
+/components
+/feedback
+
+# Public Only
+/login?returnTo=./returnTo
+/register?email&returnTo=./returnTo
+
+/reset-password         ResetPasswordRequest
+/reset-password/[token] ResetPasswordConfirm
+
+# Private
+/dashboard
+/settings/account
+
+/app/[app]/dashboard     AppDashboard
+/app/[app]/endpoints     AppEndpoints
+/app/[app]/subscriptions AppSubs
+/app/[app]/logs          AppLogs
+
+/app/[app]/settings/keys     AppSettingsKeys
+/app/[app]/settings/members  AppSettingsMembers
+/app/[app]/settings/general  AppSettingsGeneral
+/app/[app]/settings/billing  AppSettingsBilling
+
+# Fallback
+
+/404 NotFound
