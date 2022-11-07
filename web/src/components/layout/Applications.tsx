@@ -14,11 +14,7 @@ import * as track from '@/lib/analytics/track';
 import {noOp} from '@/lib/effect';
 import * as http from '@/lib/fetch';
 import {useAtom} from '@/lib/jotai';
-import {
-  format as formatRoute,
-  matchP as matchRouteP,
-  Route,
-} from '@/lib/routes';
+import {format as formatRoute, match as matchRoute, Route} from '@/lib/routes';
 import {useCurrentRoute} from '@/lib/routing';
 
 import {UnstyledLink} from '@/components/links/UnstyledLink';
@@ -185,9 +181,8 @@ type Breadcrumb = {
 const getPages = (app: Application, current: Route): Breadcrumb[] =>
   pipe(
     current,
-    matchRouteP({
-      __: () => [],
-
+    matchRoute({
+      // Pages included
       AppEndpoints: () => [
         {name: 'Endpoints', href: Route.appEndpoints(app.id)},
       ],
@@ -208,6 +203,19 @@ const getPages = (app: Application, current: Route): Breadcrumb[] =>
         {name: 'Settings', href: Route.appSettingsGeneral(app.id)},
         {name: 'Billing', href: Route.appSettingsBilling(app.id)},
       ],
+
+      // Reset ...
+      AppDashboard: () => [],
+      Components: () => [],
+      Dashboard: () => [],
+      Feedback: () => [],
+      Index: () => [],
+      Login: () => [],
+      NotFound: () => [],
+      Register: () => [],
+      ResetPasswordConfirm: () => [],
+      ResetPasswordRequest: () => [],
+      SettingsAccount: () => [],
     }),
     A.cons<Breadcrumb>({name: app.name, href: Route.appDashboard(app.id)}),
   );
