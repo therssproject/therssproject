@@ -13,13 +13,13 @@ use wither::Model as WitherModel;
 
 use crate::errors::Error;
 use crate::errors::NotFound;
-use crate::lib::database_model::ModelExt;
-use crate::lib::date::{now, Date};
 use crate::models::entry::Entry;
 use crate::models::feed::Feed;
 use crate::models::webhook::Status;
 use crate::models::webhook::Webhook;
 use crate::models::webhook::WebhookSendPayload;
+use crate::utils::database_model::ModelExt;
+use crate::utils::date::{now, Date};
 
 lazy_static! {
   static ref CLIENT: reqwest::Client = reqwest::Client::builder()

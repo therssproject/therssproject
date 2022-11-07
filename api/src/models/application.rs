@@ -7,12 +7,12 @@ use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
 use crate::errors::Error;
-use crate::lib::database_model::ModelExt;
-use crate::lib::date::now;
-use crate::lib::date::Date;
 use crate::models::endpoint::Endpoint;
 use crate::models::key::Key;
 use crate::models::webhook::Webhook;
+use crate::utils::database_model::ModelExt;
+use crate::utils::date::now;
+use crate::utils::date::Date;
 
 use super::subscription::Subscription;
 

@@ -6,8 +6,8 @@ use axum::{
 
 use crate::errors::AuthenticateError;
 use crate::errors::Error;
-use crate::lib::token;
 use crate::settings::get_settings;
+use crate::utils::token;
 
 pub struct AuthenticateUser;
 

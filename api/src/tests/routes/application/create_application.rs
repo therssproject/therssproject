@@ -3,12 +3,12 @@ use reqwest;
 use reqwest::StatusCode;
 use serde_json::json;
 
-use crate::lib::database_model::ModelExt;
 use crate::models::application::Application;
 use crate::models::application::PublicApplication;
 use crate::tests::setup::with_app;
 use crate::tests::utils::create_user;
 use crate::tests::utils::create_user_token;
+use crate::utils::database_model::ModelExt;
 
 #[test]
 fn create_application_with_valid_authentication_header() {

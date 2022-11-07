@@ -9,11 +9,11 @@ use wither::mongodb::options::FindOptions;
 use wither::Model as WitherModel;
 
 use crate::errors::Error;
-use crate::lib::database_model::ModelExt;
-use crate::lib::date::{now, Date};
 use crate::models::endpoint::Endpoint;
 use crate::models::entry::Entry;
 use crate::models::feed::Feed;
+use crate::utils::database_model::ModelExt;
+use crate::utils::date::{now, Date};
 
 impl ModelExt for Subscription {
   type T = Subscription;

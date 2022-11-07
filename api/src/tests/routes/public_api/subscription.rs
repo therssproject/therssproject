@@ -6,13 +6,13 @@ use reqwest;
 use reqwest::StatusCode;
 use serde_json::json;
 
-use crate::lib::database_model::ModelExt;
 use crate::models::feed::Feed;
 use crate::models::subscription::PublicSubscription;
 use crate::models::subscription::Subscription;
 use crate::tests::setup::with_app;
 use crate::tests::utils::create_user;
 use crate::tests::utils::setup_application;
+use crate::utils::database_model::ModelExt;
 
 lazy_static! {
   static ref FIXTURE: &'static str = include_str!("../../fixture/reddit_atom.xml");

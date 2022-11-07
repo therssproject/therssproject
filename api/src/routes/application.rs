@@ -9,10 +9,10 @@ use tracing::debug;
 
 use crate::errors::Error;
 use crate::errors::NotFound;
-use crate::lib::database_model::ModelExt;
-use crate::lib::to_object_id::to_object_id;
-use crate::lib::token::UserFromToken;
 use crate::models::application::{Application, PublicApplication};
+use crate::utils::database_model::ModelExt;
+use crate::utils::to_object_id::to_object_id;
+use crate::utils::token::UserFromToken;
 
 pub fn create_router() -> Router {
   Router::new()

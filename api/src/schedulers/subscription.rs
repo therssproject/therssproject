@@ -10,8 +10,8 @@ use wither::ModelCursor as Cursor;
 use wither::WitherError;
 
 use crate::errors::Error;
-use crate::lib::database_model::ModelExt;
 use crate::models::subscription::Subscription;
+use crate::utils::database_model::ModelExt;
 
 pub fn start() {
   tokio::spawn(run_job());

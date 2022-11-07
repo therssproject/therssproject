@@ -14,16 +14,16 @@ use wither::mongodb::options::FindOptions;
 use crate::errors::BadRequest;
 use crate::errors::Error;
 use crate::errors::NotFound;
-use crate::lib::custom_response::{CustomResponse, CustomResponseBuilder};
-use crate::lib::database_model::ModelExt;
-use crate::lib::date::from_iso;
-use crate::lib::pagination::PaginationBuilder;
-use crate::lib::request_query::RequestQuery;
-use crate::lib::to_object_id::to_object_id;
 use crate::models::application::Application;
 use crate::models::endpoint::Endpoint;
 use crate::models::feed::Feed;
 use crate::models::subscription::{PublicSubscription, Subscription};
+use crate::utils::custom_response::{CustomResponse, CustomResponseBuilder};
+use crate::utils::database_model::ModelExt;
+use crate::utils::date::from_iso;
+use crate::utils::pagination::PaginationBuilder;
+use crate::utils::request_query::RequestQuery;
+use crate::utils::to_object_id::to_object_id;
 
 pub fn create_router() -> Router {
   Router::new()

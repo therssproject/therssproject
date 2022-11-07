@@ -8,7 +8,7 @@ pub mod user;
 pub mod webhook;
 
 use crate::errors::Error;
-use crate::lib::database_model::ModelExt;
+use crate::utils::database_model::ModelExt;
 
 pub async fn sync_indexes() -> Result<(), Error> {
   application::Application::sync_indexes().await?;

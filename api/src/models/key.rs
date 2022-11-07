@@ -5,11 +5,11 @@ use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
-use crate::lib::create_random_string::create_random_string;
-use crate::lib::database_model::ModelExt;
-use crate::lib::date::{now, Date};
-use crate::lib::hash::sha256;
-use crate::lib::serde::bson_datetime_option_as_rfc3339_string;
+use crate::utils::create_random_string::create_random_string;
+use crate::utils::database_model::ModelExt;
+use crate::utils::date::{now, Date};
+use crate::utils::hash::sha256;
+use crate::utils::serde::bson_datetime_option_as_rfc3339_string;
 
 impl ModelExt for Key {
   type T = Key;

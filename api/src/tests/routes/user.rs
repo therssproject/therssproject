@@ -3,13 +3,13 @@ use reqwest;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 
-use crate::lib::database_model::ModelExt;
 use crate::models::application::Application;
 use crate::models::user::PublicUser;
 use crate::models::user::User;
 use crate::routes::user::AuthenticateResponse;
 use crate::tests::setup::with_app;
 use crate::tests::utils::create_user;
+use crate::utils::database_model::ModelExt;
 
 #[test]
 fn post_user_route() {

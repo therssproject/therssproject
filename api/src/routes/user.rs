@@ -7,13 +7,13 @@ use tracing::debug;
 use crate::errors::BadRequest;
 use crate::errors::NotFound;
 use crate::errors::{AuthenticateError, Error};
-use crate::lib::custom_response::{CustomResponse, CustomResponseBuilder};
-use crate::lib::database_model::ModelExt;
-use crate::lib::token;
 use crate::models::application::Application;
 use crate::models::user;
 use crate::models::user::{PublicUser, User};
 use crate::settings::get_settings;
+use crate::utils::custom_response::{CustomResponse, CustomResponseBuilder};
+use crate::utils::database_model::ModelExt;
+use crate::utils::token;
 
 pub fn create_router() -> Router {
   Router::new()

@@ -10,10 +10,10 @@ use wither::Model as WitherModel;
 use wither::WitherError;
 
 use crate::errors::Error;
-use crate::lib::database_model::ModelExt;
-use crate::lib::date::now;
-use crate::lib::date::Date;
-use crate::lib::serde::bson_datetime_option_as_rfc3339_string;
+use crate::utils::database_model::ModelExt;
+use crate::utils::date::now;
+use crate::utils::date::Date;
+use crate::utils::serde::bson_datetime_option_as_rfc3339_string;
 
 lazy_static! {
   static ref SORT_DESC: FindOneOptions = FindOneOptions::builder().sort(doc! { "_id": -1 }).build();
