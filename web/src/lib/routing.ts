@@ -101,9 +101,9 @@ export const useSessionGuard = () => {
 
   useStableEffect(
     () => {
-      analytics.pageView();
-
       const route = parse(router.asPath);
+
+      analytics.pageView(route);
 
       pipe(
         session,

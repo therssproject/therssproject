@@ -12,6 +12,8 @@ import {useAtom} from '@/lib/jotai';
 import {MixPanelToken} from '@/config';
 import {AuthResponse, useSession} from '@/models/user';
 
+import {Route} from '../routes';
+
 const analytics = Analytics({
   app: 'therssproject',
   plugins: [
@@ -24,7 +26,7 @@ const analytics = Analytics({
   ],
 });
 
-export const pageView = () => analytics.page();
+export const pageView = (route?: Route) => analytics.page({route: route?.tag});
 
 type Json = null | number | string | Array<Json> | {[key: string]: Json};
 
