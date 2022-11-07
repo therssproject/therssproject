@@ -3,9 +3,9 @@ use bson::oid::ObjectId;
 use bson::Document;
 
 use crate::database::get_connection;
-use crate::lib::database_model::ModelExt;
 use crate::models::subscription::Subscription;
 use crate::tests::setup::with_app;
+use crate::utils::database_model::ModelExt;
 
 #[test]
 fn when_creating_a_subscription_scheduled_at_should_not_be_defined_on_the_database() {

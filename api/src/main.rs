@@ -11,12 +11,12 @@ use tracing::info;
 mod authentication;
 mod database;
 mod errors;
-mod lib;
 mod logger;
 mod models;
 mod routes;
 mod schedulers;
 mod settings;
+mod utils;
 
 #[cfg(test)]
 mod scripts;

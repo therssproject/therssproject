@@ -6,9 +6,9 @@ use validator::Validate;
 use wither::bson::{doc, oid::ObjectId};
 use wither::Model as WitherModel;
 
-use crate::lib::database_model::ModelExt;
-use crate::lib::date::Date;
 use crate::models::entry::PublicEntry;
+use crate::utils::database_model::ModelExt;
+use crate::utils::date::Date;
 
 // This model represents a request sent to the user's endpoint and its response
 // status. The webhook representation stored on the database is a reduced

@@ -6,10 +6,10 @@ use bson::doc;
 use http::header;
 use http::StatusCode;
 
-use crate::lib::database_model::ModelExt;
-use crate::lib::hash::sha256;
 use crate::models::application::Application;
 use crate::models::key::Key;
+use crate::utils::database_model::ModelExt;
+use crate::utils::hash::sha256;
 
 pub struct AuthenticateKey;
 

@@ -4,8 +4,6 @@ use reqwest;
 use reqwest::StatusCode;
 use serde_json::json;
 
-use crate::lib::database_model::ModelExt;
-use crate::lib::date;
 use crate::models::subscription::Subscription;
 use crate::models::webhook::PublicWebhook;
 use crate::models::webhook::Status;
@@ -15,6 +13,8 @@ use crate::tests::utils::create_feed;
 use crate::tests::utils::create_user;
 use crate::tests::utils::create_user_token;
 use crate::tests::utils::setup_application;
+use crate::utils::database_model::ModelExt;
+use crate::utils::date;
 
 pub type Date = bson::DateTime;
 

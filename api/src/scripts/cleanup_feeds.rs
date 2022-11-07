@@ -2,8 +2,8 @@ use bson::doc;
 use futures::StreamExt;
 use tracing::{error, info};
 
-use crate::lib::database_model::ModelExt;
 use crate::models::feed::Feed;
+use crate::utils::database_model::ModelExt;
 
 pub async fn run() {
   let feeds = Feed::cursor(doc! {}, None).await.unwrap();

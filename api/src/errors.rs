@@ -8,7 +8,7 @@ use wither::bson;
 use wither::mongodb::error::Error as MongoError;
 use wither::WitherError;
 
-use crate::lib::get_feed::Error as GetFeedError;
+use crate::utils::get_feed::Error as GetFeedError;
 
 #[derive(thiserror::Error, Debug)]
 #[error("...")]

@@ -14,17 +14,17 @@ use wither::mongodb::options::FindOptions;
 use crate::errors::BadRequest;
 use crate::errors::Error;
 use crate::errors::NotFound;
-use crate::lib::custom_response::{CustomResponse, CustomResponseBuilder};
-use crate::lib::database_model::ModelExt;
-use crate::lib::date::from_iso;
-use crate::lib::date::Date;
-use crate::lib::pagination::PaginationBuilder;
-use crate::lib::request_query::RequestQuery;
-use crate::lib::serde::bson_datetime_option_as_rfc3339_string;
-use crate::lib::to_object_id::to_object_id;
-use crate::lib::token::UserFromToken;
 use crate::models::application::Application;
 use crate::models::key::{Key, PublicKey};
+use crate::utils::custom_response::{CustomResponse, CustomResponseBuilder};
+use crate::utils::database_model::ModelExt;
+use crate::utils::date::from_iso;
+use crate::utils::date::Date;
+use crate::utils::pagination::PaginationBuilder;
+use crate::utils::request_query::RequestQuery;
+use crate::utils::serde::bson_datetime_option_as_rfc3339_string;
+use crate::utils::to_object_id::to_object_id;
+use crate::utils::token::UserFromToken;
 
 pub fn create_router() -> Router {
   Router::new()

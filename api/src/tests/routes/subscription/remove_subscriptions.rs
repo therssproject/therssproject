@@ -3,7 +3,6 @@ use reqwest;
 use reqwest::StatusCode;
 use serde_json::json;
 
-use crate::lib::database_model::ModelExt;
 use crate::models::feed::Feed;
 use crate::models::subscription::Subscription;
 use crate::tests::setup::with_app;
@@ -11,6 +10,7 @@ use crate::tests::utils::create_feed;
 use crate::tests::utils::create_user;
 use crate::tests::utils::create_user_token;
 use crate::tests::utils::setup_application;
+use crate::utils::database_model::ModelExt;
 
 #[test]
 fn remove_subscription_with_no_authentication_header() {

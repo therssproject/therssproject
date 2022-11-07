@@ -8,7 +8,6 @@ use tokio::time::sleep;
 use tokio::time::Duration;
 
 use crate::create_app;
-use crate::lib::database_model::ModelExt;
 use crate::models::application::Application;
 use crate::models::endpoint::Endpoint;
 use crate::models::entry::Entry;
@@ -18,6 +17,7 @@ use crate::models::subscription::Subscription;
 use crate::models::user::User;
 use crate::models::webhook::Webhook;
 use crate::settings::get_settings;
+use crate::utils::database_model::ModelExt;
 
 lazy_static! {
   static ref RUNTIME: Runtime = Runtime::new().expect("Failed to create Tokio runtime");

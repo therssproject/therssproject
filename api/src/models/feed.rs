@@ -11,11 +11,11 @@ use wither::Model as WitherModel;
 
 use crate::errors::Error;
 use crate::errors::NotFound;
-use crate::lib::database_model::ModelExt;
-use crate::lib::date::{now, Date};
-use crate::lib::get_feed::get_feed;
 use crate::models::entry::Entry;
 use crate::models::subscription::Subscription;
+use crate::utils::database_model::ModelExt;
+use crate::utils::date::{now, Date};
+use crate::utils::get_feed::get_feed;
 
 impl ModelExt for Feed {
   type T = Feed;

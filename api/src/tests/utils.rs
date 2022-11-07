@@ -1,9 +1,6 @@
 use wither::bson::oid::ObjectId;
 
 use crate::errors::Error;
-use crate::lib::database_model::ModelExt;
-use crate::lib::date;
-use crate::lib::token;
 use crate::models::application::Application;
 use crate::models::endpoint::Endpoint;
 use crate::models::feed::{Feed, FeedType};
@@ -11,6 +8,9 @@ use crate::models::key::Key;
 use crate::models::user::hash_password;
 use crate::models::user::User;
 use crate::settings::get_settings;
+use crate::utils::database_model::ModelExt;
+use crate::utils::date;
+use crate::utils::token;
 
 pub async fn create_user<T: AsRef<str>>(email: T) -> Result<User, Error> {
   let name = "John Doe";

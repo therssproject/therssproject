@@ -4,10 +4,10 @@ use serde::{Deserialize, Serialize};
 use tracing::debug;
 
 use crate::errors::Error;
-use crate::lib::get_feed::get_feed;
-use crate::lib::to_url::to_url;
 use crate::models::entry::PublicEntry;
 use crate::models::feed::FeedType;
+use crate::utils::get_feed::get_feed;
+use crate::utils::to_url::to_url;
 
 pub fn create_router() -> Router {
   Router::new().route("/feeds", get(get_feed_by_url))

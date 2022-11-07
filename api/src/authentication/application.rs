@@ -7,10 +7,10 @@ use http::StatusCode;
 use std::collections::HashMap;
 use tracing::error;
 
-use crate::lib::database_model::ModelExt;
-use crate::lib::to_object_id::to_object_id;
-use crate::lib::token::UserFromToken;
 use crate::models::application::Application;
+use crate::utils::database_model::ModelExt;
+use crate::utils::to_object_id::to_object_id;
+use crate::utils::token::UserFromToken;
 
 pub struct AuthenticateApplication;
 
