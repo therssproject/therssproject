@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+GITROOT=$(git rev-parse --show-toplevel)
+
+cd "$GITROOT/misc"
+
+defvalue='https://github.com/facebook/react/releases.atom'
+feed=${1:-$defvalue}
+
+curl "https://api.therssproject.com/v1/feeds?url=$feed" \
+  -H "Authorization: $(cat ./key.txt)"

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+GITROOT=$(git rev-parse --show-toplevel)
+
+cd "$GITROOT"
+
+ngrok http 9999

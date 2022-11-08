@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+GITROOT=$(git rev-parse --show-toplevel)
+
+cd "$GITROOT/misc"
+
+curl https://api.therssproject.com/v1/subscriptions \
+  -X POST \
+  -H "Authorization: $(cat ./key.txt)" \
+  -H "Content-Type: application/json" \
+  -d "{\"endpoint\": \"$1\",\"url\": \"https://www.reddit.com/r/Dotat2/.rss\", \"metadata\": {\"foo\": \"bar\"} }"

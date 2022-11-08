@@ -1,2 +1,4 @@
 # MacOS related files
 .DS_Store
+
+misc/test-service/node_modules

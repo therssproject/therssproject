@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+GITROOT=$(git rev-parse --show-toplevel)
+
+cd "$GITROOT/misc"
+
+defvalue='https://api.therssproject.com'
+base_url=${RSS_BASE_URL:-$defvalue}
+
+curl "$base_url/v1/endpoints" \
+  -X POST \
+  -H "Authorization: $(cat ./key.txt)" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Yet another endpoint",
+    "url": "https://google.com/webhooks/rss"
+  }'
