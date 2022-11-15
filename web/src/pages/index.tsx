@@ -26,6 +26,7 @@ import {Logo} from '@/components/Logo';
 import {Terminal} from '@/components/Terminal';
 
 import * as SNIPPETS from '@/content/snippets';
+import {Pricing} from '@/features/Pricing';
 import {SelectedAppAtom} from '@/models/application';
 import {useSession} from '@/models/user';
 
@@ -117,6 +118,7 @@ const HomePage: NextPageWithLayout = () => {
           <Hero />
           <Features />
           <UsefulResources />
+          <Pricing />
           <ByDevs />
         </main>
         <Footer />
