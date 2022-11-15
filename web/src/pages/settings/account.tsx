@@ -1,4 +1,4 @@
-import {BeakerIcon} from '@heroicons/react/outline';
+import {BeakerIcon} from '@heroicons/react/24/outline';
 
 import {Alert} from '@/components/Alert';
 import {Layout} from '@/components/layout/Layout';

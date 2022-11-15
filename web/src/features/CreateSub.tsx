@@ -1,5 +1,5 @@
 import {Listbox, Transition} from '@headlessui/react';
-import {CheckIcon, SelectorIcon} from '@heroicons/react/solid';
+import {CheckIcon, ChevronUpDownIcon} from '@heroicons/react/24/solid';
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
@@ -232,7 +232,7 @@ const Select = ({options, selected, onSelect}: SelectProps) => (
               </span>
             </span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-              <SelectorIcon
+              <ChevronUpDownIcon
                 className="h-5 w-5 text-gray-400"
                 aria-hidden="true"
               />

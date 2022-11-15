@@ -1,4 +1,4 @@
-import {XIcon} from '@heroicons/react/solid';
+import {XMarkIcon} from '@heroicons/react/24/solid';
 import {ReactNode} from 'react';
 import {match} from 'ts-pattern';
 
@@ -47,7 +47,7 @@ export const Alert = ({
           className="absolute top-3 right-3"
           onClick={onDismiss}
         >
-          <XIcon className={clsxm('h-5 w-5', text)} />
+          <XMarkIcon className={clsxm('h-5 w-5', text)} />
         </button>
       ) : null}
     </article>

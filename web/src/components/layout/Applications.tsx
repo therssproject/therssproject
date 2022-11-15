@@ -1,5 +1,5 @@
-import {MenuIcon} from '@heroicons/react/outline';
-import {HomeIcon} from '@heroicons/react/solid';
+import {Bars3Icon} from '@heroicons/react/24/outline';
+import {HomeIcon} from '@heroicons/react/24/solid';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -144,7 +144,7 @@ export const Applications = ({title, children, seo}: Props) => {
                 onClick={() => setSidebarOpen(true)}
               >
                 <span className="sr-only">Open sidebar</span>
-                <MenuIcon className="h-6 w-6" aria-hidden="true" />
+                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               </button>
 
               <div className="mx-2 w-40">
@@ -188,20 +188,21 @@ const getPages = (app: Application, current: Route): Breadcrumb[] =>
       ],
       AppSubs: () => [{name: 'Subscriptions', href: Route.appSubs(app.id)}],
       AppLogs: () => [{name: 'Logs', href: Route.appLogs(app.id)}],
-      AppSettingsGeneral: () => [
-        {name: 'Settings', href: Route.appSettingsGeneral(app.id)},
-      ],
       AppSettingsKeys: () => [
-        {name: 'Settings', href: Route.appSettingsGeneral(app.id)},
+        {name: 'Settings', href: Route.appSettingsKeys(app.id)},
         {name: 'Keys', href: Route.appSettingsKeys(app.id)},
       ],
       AppSettingsMembers: () => [
-        {name: 'Settings', href: Route.appSettingsGeneral(app.id)},
+        {name: 'Settings', href: Route.appSettingsKeys(app.id)},
         {name: 'Members', href: Route.appSettingsMembers(app.id)},
       ],
       AppSettingsBilling: () => [
-        {name: 'Settings', href: Route.appSettingsGeneral(app.id)},
+        {name: 'Settings', href: Route.appSettingsKeys(app.id)},
         {name: 'Billing', href: Route.appSettingsBilling(app.id)},
+      ],
+      AppSettingsAdvanced: () => [
+        {name: 'Settings', href: Route.appSettingsKeys(app.id)},
+        {name: 'Advanced', href: Route.appSettingsAdvanced(app.id)},
       ],
 
       // Reset ...
@@ -217,7 +218,7 @@ const getPages = (app: Application, current: Route): Breadcrumb[] =>
       ResetPasswordRequest: () => [],
       SettingsAccount: () => [],
     }),
-    A.cons<Breadcrumb>({name: app.name, href: Route.appDashboard(app.id)}),
+    A.prepend<Breadcrumb>({name: app.name, href: Route.appDashboard(app.id)}),
   );
 
 const Breadcrumbs = () => {

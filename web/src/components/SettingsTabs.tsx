@@ -1,9 +1,9 @@
 import {
-  CashIcon,
-  CogIcon,
+  CurrencyDollarIcon,
+  ExclamationCircleIcon,
   KeyIcon,
   UserGroupIcon,
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -19,12 +19,6 @@ import {UnstyledLink} from '@/components/links/UnstyledLink';
 
 const getTabs = (app: string) => [
   {
-    name: 'General',
-    Icon: CogIcon,
-    href: Route.appSettingsGeneral(app),
-    disabled: false,
-  },
-  {
     name: 'Keys',
     Icon: KeyIcon,
     href: Route.appSettingsKeys(app),
@@ -38,9 +32,15 @@ const getTabs = (app: string) => [
   },
   {
     name: 'Billing',
-    Icon: CashIcon,
+    Icon: CurrencyDollarIcon,
     href: Route.appSettingsBilling(app),
     disabled: true,
+  },
+  {
+    name: 'Advanced',
+    Icon: ExclamationCircleIcon,
+    href: Route.appSettingsAdvanced(app),
+    disabled: false,
   },
 ];
 

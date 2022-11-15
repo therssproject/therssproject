@@ -1,6 +1,13 @@
-import {LinkIcon, TrashIcon} from '@heroicons/react/outline';
-import {ClipboardCheckIcon, ClipboardIcon} from '@heroicons/react/outline';
-import {CalendarIcon, CheckIcon, PencilAltIcon} from '@heroicons/react/solid';
+import {LinkIcon, TrashIcon} from '@heroicons/react/24/outline';
+import {
+  ClipboardDocumentCheckIcon,
+  ClipboardIcon,
+} from '@heroicons/react/24/outline';
+import {
+  CalendarIcon,
+  CheckIcon,
+  PencilSquareIcon,
+} from '@heroicons/react/24/solid';
 import * as date from 'date-fns';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
@@ -70,7 +77,7 @@ export const EndpointItem = ({endpoint, onDelete, onEdit}: Props) => {
             <p className="text-md">{endpoint.id}</p>
             {clipboard.id.didCopy ? (
               <div className="flex items-center text-sm">
-                <ClipboardCheckIcon
+                <ClipboardDocumentCheckIcon
                   className="mr-1 h-6 w-6 flex-shrink-0 text-gray-400"
                   aria-hidden="true"
                 />
@@ -126,7 +133,7 @@ export const EndpointItem = ({endpoint, onDelete, onEdit}: Props) => {
               </IconButton>
 
               <IconButton onClick={() => onEdit(endpoint)}>
-                <PencilAltIcon className="h-6 w-6" />
+                <PencilSquareIcon className="h-6 w-6" />
               </IconButton>
             </div>
           </div>

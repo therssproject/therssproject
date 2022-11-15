@@ -1,14 +1,14 @@
 import {Popover, Transition} from '@headlessui/react';
 import {
-  CloudUploadIcon,
-  CodeIcon,
-  MenuIcon,
+  Bars3Icon,
+  CloudArrowUpIcon,
+  CodeBracketIcon,
+  QueueListIcon,
   RssIcon,
-  ViewListIcon,
-  XIcon,
-} from '@heroicons/react/outline';
-import {LightningBoltIcon} from '@heroicons/react/solid';
-import {ChevronRightIcon} from '@heroicons/react/solid';
+} from '@heroicons/react/24/outline';
+import {BoltIcon} from '@heroicons/react/24/solid';
+import {XMarkIcon} from '@heroicons/react/24/solid';
+import {ChevronRightIcon} from '@heroicons/react/24/solid';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import {Fragment, useState} from 'react';
@@ -145,7 +145,7 @@ const Navigation = () => {
               <div className="-mr-2 flex items-center md:hidden">
                 <Popover.Button className="focus-ring-inset inline-flex items-center justify-center rounded-md bg-gray-900 p-2 text-gray-400 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-white">
                   <span className="sr-only">Open main menu</span>
-                  <MenuIcon className="h-6 w-6" aria-hidden="true" />
+                  <Bars3Icon className="h-6 w-6" aria-hidden="true" />
                 </Popover.Button>
               </div>
             </div>
@@ -244,7 +244,7 @@ const Navigation = () => {
               <div className="-mr-2">
                 <Popover.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-600">
                   <span className="sr-only">Close menu</span>
-                  <XIcon className="h-6 w-6" aria-hidden="true" />
+                  <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                 </Popover.Button>
               </div>
             </div>
@@ -445,7 +445,7 @@ const _Embed = () => (
 
 export const ByDevs = () => (
   <section className="relative bg-gray-900">
-    <div className="relative h-56 bg-indigo-600 sm:h-72 md:absolute md:left-0 md:h-full md:w-1/2">
+    <div className="relative h-56 bg-teal-600 sm:h-72 md:absolute md:left-0 md:h-full md:w-1/2">
       <img
         className="h-full w-full object-cover"
         src="/images/developers.jpg"
@@ -497,28 +497,28 @@ const features = [
     soon: false,
     description:
       'Get webhook events almost in real time from your feed subscriptions. Premium subscribers receive even faster updates.',
-    icon: LightningBoltIcon,
+    icon: BoltIcon,
   },
   {
     name: 'Tracking Webhook Events',
     soon: false,
     description:
       'We keep track of the webhook events sent to your endpoints. You access them at any time from the UI.',
-    icon: ViewListIcon,
+    icon: QueueListIcon,
   },
   {
     name: 'Dashboard & API',
     soon: false,
     description:
       'Register endpoints, subscribe to and parse feeds using our API or the dashboard, whichever is more convenient for you.',
-    icon: CloudUploadIcon,
+    icon: CloudArrowUpIcon,
   },
   {
     name: 'Transformers',
     soon: true,
     description:
       'Transform the webhook event body to match the payload expected by your endpoint.',
-    icon: CodeIcon,
+    icon: CodeBracketIcon,
   },
 ];
 

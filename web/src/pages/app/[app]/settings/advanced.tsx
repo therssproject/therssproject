@@ -32,7 +32,7 @@ type Confirm = {tag: 'closed'} | {tag: 'open'; confirmation: string};
 const closed: Confirm = {tag: 'closed'};
 const open: Confirm = {tag: 'open', confirmation: ''};
 
-const AppSettingsGeneral: NextPageWithLayout = () => {
+const AppSettingsAdvanced: NextPageWithLayout = () => {
   const {refetchAppData} = useRefetchAppData();
   const [currentApp, _setCurrentApp] = useAtom(SelectedAppAtom);
 
@@ -136,13 +136,13 @@ const AppSettingsGeneral: NextPageWithLayout = () => {
   );
 };
 
-AppSettingsGeneral.getLayout = (page) => (
+AppSettingsAdvanced.getLayout = (page) => (
   <Layout variant="applications" title="Settings" seo={{}}>
     {page}
   </Layout>
 );
 
-export default AppSettingsGeneral;
+export default AppSettingsAdvanced;
 
 type ConfirmModalProps = {
   app: Application;

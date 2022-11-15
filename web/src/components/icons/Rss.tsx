@@ -1,4 +1,4 @@
-import {RssIcon} from '@heroicons/react/outline';
+import {RssIcon} from '@heroicons/react/24/outline';
 import {FC} from 'react';
 
 import {clsxm} from '@/lib/clsxm';
