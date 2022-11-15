@@ -28,7 +28,7 @@ type AppSubs = {tag: 'AppSubs'; app: string};
 type AppLogs = {tag: 'AppLogs'; app: string};
 type AppSettingsKeys = {tag: 'AppSettingsKeys'; app: string};
 type AppSettingsMembers = {tag: 'AppSettingsMembers'; app: string};
-type AppSettingsGeneral = {tag: 'AppSettingsGeneral'; app: string};
+type AppSettingsAdvanced = {tag: 'AppSettingsAdvanced'; app: string};
 type AppSettingsBilling = {tag: 'AppSettingsBilling'; app: string};
 type NotFound = {tag: 'NotFound'};
 
@@ -48,7 +48,7 @@ export type Route =
   | AppLogs
   | AppSettingsKeys
   | AppSettingsMembers
-  | AppSettingsGeneral
+  | AppSettingsAdvanced
   | AppSettingsBilling
   | NotFound;
 
@@ -71,7 +71,7 @@ export const match =
     AppLogs: (r: AppLogs) => R;
     AppSettingsKeys: (r: AppSettingsKeys) => R;
     AppSettingsMembers: (r: AppSettingsMembers) => R;
-    AppSettingsGeneral: (r: AppSettingsGeneral) => R;
+    AppSettingsAdvanced: (r: AppSettingsAdvanced) => R;
     AppSettingsBilling: (r: AppSettingsBilling) => R;
     NotFound: (r: NotFound) => R;
   }) =>
@@ -107,8 +107,8 @@ export const match =
         return matcher.AppSettingsKeys(route);
       case 'AppSettingsMembers':
         return matcher.AppSettingsMembers(route);
-      case 'AppSettingsGeneral':
-        return matcher.AppSettingsGeneral(route);
+      case 'AppSettingsAdvanced':
+        return matcher.AppSettingsAdvanced(route);
       case 'AppSettingsBilling':
         return matcher.AppSettingsBilling(route);
       case 'NotFound':
@@ -159,8 +159,8 @@ const appSettingsMembers = (app: string): Route => ({
   tag: 'AppSettingsMembers',
   app,
 });
-const appSettingsGeneral = (app: string): Route => ({
-  tag: 'AppSettingsGeneral',
+const appSettingsAdvanced = (app: string): Route => ({
+  tag: 'AppSettingsAdvanced',
   app,
 });
 const appSettingsBilling = (app: string): Route => ({
@@ -185,7 +185,7 @@ export const Route = {
   appLogs,
   appSettingsKeys,
   appSettingsMembers,
-  appSettingsGeneral,
+  appSettingsAdvanced,
   appSettingsBilling,
   notFound,
 };
@@ -264,10 +264,10 @@ const appSettingsMembersMatch = Routing.lit('app')
   .then(Routing.lit('members'))
 
   .then(Routing.end);
-const appSettingsGeneralMatch = Routing.lit('app')
+const appSettingsAdvancedMatch = Routing.lit('app')
   .then(Routing.str('app'))
   .then(Routing.lit('settings'))
-  .then(Routing.lit('general'))
+  .then(Routing.lit('advanced'))
 
   .then(Routing.end);
 const appSettingsBillingMatch = Routing.lit('app')
@@ -294,7 +294,7 @@ export const Match = {
   appLogs: appLogsMatch,
   appSettingsKeys: appSettingsKeysMatch,
   appSettingsMembers: appSettingsMembersMatch,
-  appSettingsGeneral: appSettingsGeneralMatch,
+  appSettingsAdvanced: appSettingsAdvancedMatch,
   appSettingsBilling: appSettingsBillingMatch,
   notFound: notFoundMatch,
 };
@@ -332,8 +332,8 @@ const router = Routing.zero<Route>()
     ),
   )
   .alt(
-    Match.appSettingsGeneral.parser.map(({app}) =>
-      Route.appSettingsGeneral(app),
+    Match.appSettingsAdvanced.parser.map(({app}) =>
+      Route.appSettingsAdvanced(app),
     ),
   )
   .alt(
@@ -382,8 +382,8 @@ export const format = (route: Route): string =>
         Routing.format(Match.appSettingsKeys.formatter, {app}),
       AppSettingsMembers: ({app}) =>
         Routing.format(Match.appSettingsMembers.formatter, {app}),
-      AppSettingsGeneral: ({app}) =>
-        Routing.format(Match.appSettingsGeneral.formatter, {app}),
+      AppSettingsAdvanced: ({app}) =>
+        Routing.format(Match.appSettingsAdvanced.formatter, {app}),
       AppSettingsBilling: ({app}) =>
         Routing.format(Match.appSettingsBilling.formatter, {app}),
       NotFound: () => Routing.format(Match.notFound.formatter, {}),

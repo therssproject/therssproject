@@ -1,9 +1,9 @@
 import {
   CheckIcon,
-  ClipboardCheckIcon,
+  ClipboardDocumentCheckIcon,
   ClipboardIcon,
   KeyIcon,
-} from '@heroicons/react/outline';
+} from '@heroicons/react/24/outline';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {pipe} from 'fp-ts/function';
 import * as TE from 'fp-ts/TaskEither';
@@ -135,7 +135,7 @@ export const Generate = ({open, app, onClose}: Props) => {
                         track.copyId('key');
                       },
                       component: clipboard.didCopy
-                        ? ClipboardCheckIcon
+                        ? ClipboardDocumentCheckIcon
                         : ClipboardIcon,
                     },
                   }}

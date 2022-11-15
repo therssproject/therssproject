@@ -2,9 +2,10 @@ import addDays from 'date-fns/addDays';
 import * as A from 'fp-ts/Array';
 import * as Eq from 'fp-ts/Eq';
 import {pipe} from 'fp-ts/function';
-import {fold} from 'fp-ts/Monoid';
+import {concatAll} from 'fp-ts/Monoid';
 import {Eq as eqNumber} from 'fp-ts/number';
 import * as O from 'fp-ts/Option';
+import * as Semi from 'fp-ts/Semigroup';
 import {Eq as eqString} from 'fp-ts/string';
 import * as TE from 'fp-ts/TaskEither';
 import {useStableEffect} from 'fp-ts-react-stable-hooks';
@@ -75,10 +76,10 @@ export const useAppIdFromPath = () =>
       useRouteOfType('AppLogs'),
       useRouteOfType('AppSettingsKeys'),
       useRouteOfType('AppSettingsMembers'),
-      useRouteOfType('AppSettingsGeneral'),
+      useRouteOfType('AppSettingsAdvanced'),
       useRouteOfType('AppSettingsBilling'),
     ],
-    fold(O.getFirstMonoid()),
+    concatAll(O.getMonoid(Semi.first())),
     O.map(({app}) => app),
   );
 

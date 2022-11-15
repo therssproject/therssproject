@@ -1,15 +1,15 @@
 import {Dialog, Transition} from '@headlessui/react';
 import {
-  ChatIcon,
+  ArrowLeftOnRectangleIcon,
+  ChatBubbleLeftEllipsisIcon,
   CogIcon,
   DocumentTextIcon,
   LinkIcon,
-  LogoutIcon,
+  QueueListIcon,
   RssIcon,
-  ViewGridIcon,
-  ViewListIcon,
-  XIcon,
-} from '@heroicons/react/outline';
+  Squares2X2Icon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 import {ComponentType, FC, Fragment} from 'react';
 
 import * as track from '@/lib/analytics/track';
@@ -38,7 +38,7 @@ type NavLink = {
 const navigation = (app: string): NavLink[] => [
   {
     name: 'Dashboard',
-    icon: ViewGridIcon,
+    icon: Squares2X2Icon,
     href: Route.appDashboard(app),
     group: [],
   },
@@ -54,16 +54,16 @@ const navigation = (app: string): NavLink[] => [
     href: Route.appSubs(app),
     group: [],
   },
-  {name: 'Logs', icon: ViewListIcon, href: Route.appLogs(app), group: []},
+  {name: 'Logs', icon: QueueListIcon, href: Route.appLogs(app), group: []},
   {
     name: 'Settings',
     icon: CogIcon,
-    href: Route.appSettingsGeneral(app),
+    href: Route.appSettingsKeys(app),
     group: [
-      'AppSettingsGeneral',
       'AppSettingsKeys',
       'AppSettingsMembers',
       'AppSettingsBilling',
+      'AppSettingsAdvanced',
     ],
   },
 ];
@@ -92,7 +92,7 @@ const secondaryNavigation = (
   {
     type: 'action',
     name: 'Chat with us',
-    icon: ChatIcon,
+    icon: ChatBubbleLeftEllipsisIcon,
     action: () => {
       crisp.setEmail(email);
       crisp.openChat();
@@ -101,7 +101,7 @@ const secondaryNavigation = (
   {
     type: 'action',
     name: 'Sign out',
-    icon: LogoutIcon,
+    icon: ArrowLeftOnRectangleIcon,
     action: onLogout,
   },
 ];
@@ -173,7 +173,10 @@ export const Sidebar: FC<Props> = ({
                     onClick={onClose}
                   >
                     <span className="sr-only">Close sidebar</span>
-                    <XIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                    <XMarkIcon
+                      className="h-6 w-6 text-white"
+                      aria-hidden="true"
+                    />
                   </button>
                 </div>
               </Transition.Child>

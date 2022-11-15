@@ -1,4 +1,4 @@
-import {ClipboardIcon, TerminalIcon} from '@heroicons/react/outline';
+import {ClipboardIcon, CommandLineIcon} from '@heroicons/react/24/outline';
 import {useMemo} from 'react';
 
 import * as track from '@/lib/analytics/track';
@@ -38,7 +38,7 @@ export const Terminal = ({id, snippet, from}: Props) => {
       <div className="w-full rounded-t-lg bg-gray-300 py-2">
         <div className="relative flex justify-between px-4 py-0.5 text-sm text-gray-900">
           <div>
-            <TerminalIcon className="mr-2 inline-flex h-4 w-4 self-center" />{' '}
+            <CommandLineIcon className="mr-2 inline-flex h-4 w-4 self-center" />{' '}
             Terminal
           </div>
           <div>

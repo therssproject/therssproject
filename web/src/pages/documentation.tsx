@@ -1,4 +1,4 @@
-import {BeakerIcon} from '@heroicons/react/outline';
+import {BeakerIcon} from '@heroicons/react/24/outline';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 

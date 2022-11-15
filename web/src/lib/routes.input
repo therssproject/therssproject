@@ -19,10 +19,10 @@
 /app/[app]/subscriptions AppSubs
 /app/[app]/logs          AppLogs
 
-/app/[app]/settings/keys     AppSettingsKeys
-/app/[app]/settings/members  AppSettingsMembers
-/app/[app]/settings/general  AppSettingsGeneral
-/app/[app]/settings/billing  AppSettingsBilling
+/app/[app]/settings/keys      AppSettingsKeys
+/app/[app]/settings/members   AppSettingsMembers
+/app/[app]/settings/advanced  AppSettingsAdvanced
+/app/[app]/settings/billing   AppSettingsBilling
 
 # Fallback
 

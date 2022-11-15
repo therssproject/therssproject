@@ -1,4 +1,4 @@
-import {ViewListIcon} from '@heroicons/react/outline';
+import {QueueListIcon} from '@heroicons/react/24/outline';
 import {sequenceT} from 'fp-ts/Apply';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
@@ -69,7 +69,7 @@ const AppLogs: NextPageWithLayout = () => {
 const EmptyState = ({app}: {app: string}) => (
   <div className="mt-16">
     <div className="text-center">
-      <ViewListIcon className="mx-auto h-12 w-12 text-gray-400" />
+      <QueueListIcon className="mx-auto h-12 w-12 text-gray-400" />
       <h3 className="mt-2 text-sm font-medium text-gray-900">
         No webhook events sent yet
       </h3>

@@ -1,4 +1,4 @@
-import {EyeIcon, EyeOffIcon} from '@heroicons/react/solid';
+import {EyeIcon, EyeSlashIcon} from '@heroicons/react/24/solid';
 import {forwardRef, useState} from 'react';
 
 import {Props, TextField} from './TextField';
@@ -9,7 +9,7 @@ export const PasswordField = forwardRef<HTMLInputElement, Props>(
 
     const iconAfter = {
       onClick: () => setShow((v) => !v),
-      component: show ? EyeOffIcon : EyeIcon,
+      component: show ? EyeSlashIcon : EyeIcon,
     };
 
     return (

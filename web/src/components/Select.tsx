@@ -1,5 +1,5 @@
 import {Listbox} from '@headlessui/react';
-import {CheckIcon, SelectorIcon} from '@heroicons/react/solid';
+import {CheckIcon, ChevronUpDownIcon} from '@heroicons/react/24/solid';
 import ColorHash from 'color-hash';
 
 import {clsxm} from '@/lib/clsxm';
@@ -64,7 +64,10 @@ export const Select = <O extends Option>({
             <span>{selectedO?.label}</span>
           </div>
 
-          <SelectorIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+          <ChevronUpDownIcon
+            className="h-5 w-5 text-gray-400"
+            aria-hidden="true"
+          />
         </Listbox.Button>
 
         {options.length > 0 && (

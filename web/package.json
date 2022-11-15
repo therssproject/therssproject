@@ -28,7 +28,7 @@
   "dependencies": {
     "@analytics/mixpanel": "^0.4.0",
     "@headlessui/react": "^1.6.5",
-    "@heroicons/react": "^1.0.6",
+    "@heroicons/react": "^2.0.13",
     "@hookform/resolvers": "^2.8.8",
     "analytics": "^0.8.1",
     "clsx": "^1.1.1",

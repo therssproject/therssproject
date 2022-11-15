@@ -1,4 +1,4 @@
-import {MenuIcon} from '@heroicons/react/outline';
+import {Bars3Icon} from '@heroicons/react/24/outline';
 import * as A from 'fp-ts/Array';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -133,7 +133,7 @@ export const Dashboard = ({title, children, seo, goToAppOnLoad}: Props) => {
                 onClick={() => setSidebarOpen(true)}
               >
                 <span className="sr-only">Open sidebar</span>
-                <MenuIcon className="h-6 w-6" aria-hidden="true" />
+                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               </button>
 
               <div className="mx-2 w-40">

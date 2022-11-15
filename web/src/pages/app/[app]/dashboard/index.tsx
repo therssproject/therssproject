@@ -1,4 +1,4 @@
-import {ArrowSmDownIcon, ArrowSmUpIcon} from '@heroicons/react/solid';
+import {ArrowDownIcon, ArrowUpIcon} from '@heroicons/react/24/solid';
 import {pipe} from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 
@@ -123,12 +123,12 @@ const TopCardsStats = () => {
                         )}
                       >
                         {item.changeType === 'increase' ? (
-                          <ArrowSmUpIcon
+                          <ArrowDownIcon
                             className="-ml-1 mr-0.5 h-5 w-5 flex-shrink-0 self-center text-green-500"
                             aria-hidden="true"
                           />
                         ) : (
-                          <ArrowSmDownIcon
+                          <ArrowUpIcon
                             className="-ml-1 mr-0.5 h-5 w-5 flex-shrink-0 self-center text-red-500"
                             aria-hidden="true"
                           />
