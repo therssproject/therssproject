@@ -4,6 +4,10 @@ export const freeTrial = (email: string) => {
   analytics.event('start_free_trial', {email: email ? email : null});
 };
 
+export const toBilling = (plan: string) => {
+  analytics.event('start_billing', {plan});
+};
+
 export const landingRegister = () => {
   analytics.event('landing_page_register');
 };
