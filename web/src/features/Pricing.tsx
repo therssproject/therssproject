@@ -1,12 +1,10 @@
 import {CheckIcon} from '@heroicons/react/24/outline';
 
-import {UnstyledButton} from '@/components/buttons/UnstyledButton';
-import {UnstyledLink} from '@/components/links/UnstyledLink';
-
-import {clsxm} from '@/lib/clsxm';
-import {noOp} from '@/lib/effect';
-import {Route} from '@/lib/routes';
 import * as track from '@/lib/analytics/track';
+import {clsxm} from '@/lib/clsxm';
+import {Route} from '@/lib/routes';
+
+import {UnstyledLink} from '@/components/links/UnstyledLink';
 import {useToast} from '@/components/Toast';
 
 const pricing = {
