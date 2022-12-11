@@ -17,10 +17,12 @@ const pricing = {
       frequency: '/month',
       description: 'The essentials to provide your best work for clients.',
       features: [
-        '5 products',
-        'Up to 1,000 subscribers',
-        'Basic analytics',
-        '48-hour support response time',
+        '1 application',
+        '1 endpoint per application',
+        '50 feed subscriptions per application',
+        'Up 5.000 monthly events',
+        '7 days logs retention',
+        '72-hour support response time',
       ],
       cta: 'Monthly billing',
       mostPopular: false,
@@ -31,11 +33,12 @@ const pricing = {
       frequency: '/month',
       description: 'A plan that scales with your rapidly growing business.',
       features: [
-        '25 products',
-        'Up to 10,000 subscribers',
-        'Advanced analytics',
+        '3 applications',
+        '2 endpoints per application',
+        '100 feed subscriptions per application',
+        'Up to 15.000 monthly events',
+        '14 days logs retention',
         '24-hour support response time',
-        'Marketing automations',
       ],
       cta: 'Monthly billing',
       mostPopular: true,
@@ -46,12 +49,12 @@ const pricing = {
       frequency: '/month',
       description: 'Dedicated support and infrastructure for your company.',
       features: [
-        'Unlimited products',
-        'Unlimited subscribers',
-        'Advanced analytics',
-        '1-hour, dedicated support response time',
-        'Marketing automations',
-        'Custom integrations',
+        'Unlimited applications',
+        'Unlimited endpoints',
+        'Unlimited subscriptions',
+        'Unlimited events',
+        '30 days logs retention',
+        '8-hour, dedicated support response time',
       ],
       cta: 'Monthly billing',
       mostPopular: false,
@@ -67,9 +70,9 @@ export const Pricing = () => {
       <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl sm:leading-none lg:text-6xl">
         Pricing plans for teams of all sizes
       </h2>
-      <p className="mt-6 max-w-2xl text-xl text-gray-500">
-        Choose an affordable plan that's packed with the best features for
-        engaging your audience, creating customer loyalty, and driving sales.
+      <p className="mt-6 max-w-3xl text-xl text-gray-500">
+        Choose from our range of pricing options to find the right fit for your
+        projects.
       </p>
 
       {/* Tiers */}
